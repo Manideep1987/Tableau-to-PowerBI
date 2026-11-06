@@ -18,7 +18,7 @@
 * **HR_Analytics.twbx:** 27 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
 * **Invoice_Health.twb:** 42 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
 * **Defect injection:** 11/11 injected conversion defects were detected by the validator.
-* **Verdict:** every number in the three sample reports matches Tableau, except for one documented Power BI limitation (a parameter-driven calculated column, reported as WARN).
+* **Verdict:** every number in the four sample reports matches Tableau. The exception is one documented Power BI limitation (a parameter-driven calculated column, reported as WARN). Gates 1-2 pass on all samples. Gates 3-5 wait on human checks (click paths, live identity tests, business sign-off), which this campaign records as PENDING instead of simulating.
 
 ## 2. Scope and approach
 

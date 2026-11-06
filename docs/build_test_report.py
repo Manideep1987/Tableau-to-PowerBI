@@ -471,8 +471,7 @@ def write_markdown(pyres, ui, samples, muts, cases):
         s = samples[n]["rep"].summary
         L.append(f"* **{n}:** {s['PASS']} PASS · {s['WARN']} WARN · {s['FAIL']} FAIL · {s['ERROR']} ERROR · {s['SKIP']} SKIP. Overall **{s['overall']}**.")
     L.append(f"* **Defect injection:** {sum(m['detected'] for m in muts)}/{len(muts)} injected conversion defects were detected by the validator.")
-    L.append("* **Verdict:** every number in the three sample reports matches Tableau, except for one documented Power BI limitation "
-             "(a parameter-driven calculated column, reported as WARN).")
+    L.append('* **Verdict:** every number in the four sample reports matches Tableau. The exception is one documented Power BI limitation (a parameter-driven calculated column, reported as WARN). Gates 1-2 pass on all samples. Gates 3-5 wait on human checks (click paths, live identity tests, business sign-off), which this campaign records as PENDING instead of simulating.')
     L.append("\n## 2. Scope and approach\n")
     L.append("**In scope:** metadata extraction, conversion of data sources, custom SQL, joins, relationships, calculations, "
              "LODs, table calculations, groups, bins, sets, parameters, filters, worksheets and dashboards. Also in scope: "
