@@ -1,0 +1,201 @@
+customer_id,customer_name,segment,region,state
+C0001,Jordan Lopez 1,Consumer,East,Massachusetts
+C0002,Taylor Kim 2,Consumer,West,Washington
+C0003,Morgan Lee 3,Home Office,East,New York
+C0004,Casey Clark 4,Consumer,South,Florida
+C0005,Riley Brown 5,Consumer,East,Pennsylvania
+C0006,Jamie Patel 6,Home Office,East,Pennsylvania
+C0007,Avery Young 7,Consumer,South,Tennessee
+C0008,Quinn Nguyen 8,Consumer,Central,Illinois
+C0009,Drew Garcia 9,Corporate,South,Virginia
+C0010,Sam Smith 10,Consumer,West,Oregon
+C0011,Robin Lopez 11,Consumer,East,New Jersey
+C0012,Kai Kim 12,Corporate,East,Massachusetts
+C0013,Rowan Lee 13,Consumer,Central,Minnesota
+C0014,Emery Clark 14,Corporate,East,New York
+C0015,Sky Brown 15,Home Office,Central,Michigan
+C0016,Reese Patel 16,Home Office,West,California
+C0017,Parker Young 17,Home Office,East,Pennsylvania
+C0018,Hayden Nguyen 18,Consumer,Central,Illinois
+C0019,Blake Garcia 19,Corporate,East,Massachusetts
+C0020,Alex Smith 20,Home Office,South,Virginia
+C0021,Jordan Lopez 21,Corporate,West,Oregon
+C0022,Taylor Kim 22,Home Office,West,Oregon
+C0023,Morgan Lee 23,Home Office,East,Pennsylvania
+C0024,Casey Clark 24,Consumer,West,Arizona
+C0025,Riley Brown 25,Corporate,South,Georgia
+C0026,Jamie Patel 26,Consumer,Central,Illinois
+C0027,Avery Young 27,Corporate,East,New Jersey
+C0028,Quinn Nguyen 28,Consumer,Central,Illinois
+C0029,Drew Garcia 29,Consumer,Central,Minnesota
+C0030,Sam Smith 30,Home Office,South,Tennessee
+C0031,Robin Lopez 31,Corporate,West,Washington
+C0032,Kai Kim 32,Home Office,West,Oregon
+C0033,Rowan Lee 33,Home Office,South,Tennessee
+C0034,Emery Clark 34,Consumer,Central,Illinois
+C0035,Sky Brown 35,Consumer,South,Florida
+C0036,Reese Patel 36,Consumer,East,Pennsylvania
+C0037,Parker Young 37,Home Office,South,Florida
+C0038,Hayden Nguyen 38,Corporate,South,Tennessee
+C0039,Blake Garcia 39,Home Office,Central,Texas
+C0040,Alex Smith 40,Home Office,East,Massachusetts
+C0041,Jordan Lopez 41,Consumer,Central,Michigan
+C0042,Taylor Kim 42,Consumer,South,Tennessee
+C0043,Morgan Lee 43,Home Office,East,Massachusetts
+C0044,Casey Clark 44,Home Office,West,California
+C0045,Riley Brown 45,Home Office,Central,Illinois
+C0046,Jamie Patel 46,Corporate,West,Washington
+C0047,Avery Young 47,Home Office,East,Massachusetts
+C0048,Quinn Nguyen 48,Consumer,South,Florida
+C0049,Drew Garcia 49,Corporate,Central,Illinois
+C0050,Sam Smith 50,Consumer,East,New York
+C0051,Robin Lopez 51,Home Office,East,New Jersey
+C0052,Kai Kim 52,Home Office,East,Pennsylvania
+C0053,Rowan Lee 53,Home Office,West,Arizona
+C0054,Emery Clark 54,Corporate,West,Arizona
+C0055,Sky Brown 55,Home Office,West,Washington
+C0056,Reese Patel 56,Corporate,Central,Michigan
+C0057,Parker Young 57,Home Office,South,Tennessee
+C0058,Hayden Nguyen 58,Consumer,East,Pennsylvania
+C0059,Blake Garcia 59,Corporate,East,New York
+C0060,Alex Smith 60,Home Office,West,Washington
+C0061,Jordan Lopez 61,Consumer,East,New York
+C0062,Taylor Kim 62,Consumer,West,California
+C0063,Morgan Lee 63,Consumer,Central,Illinois
+C0064,Casey Clark 64,Home Office,Central,Minnesota
+C0065,Riley Brown 65,Home Office,West,Washington
+C0066,Jamie Patel 66,Consumer,South,Tennessee
+C0067,Avery Young 67,Consumer,South,Florida
+C0068,Quinn Nguyen 68,Home Office,East,New Jersey
+C0069,Drew Garcia 69,Corporate,Central,Minnesota
+C0070,Sam Smith 70,Home Office,South,Florida
+C0071,Robin Lopez 71,Consumer,East,New Jersey
+C0072,Kai Kim 72,Consumer,Central,Illinois
+C0073,Rowan Lee 73,Consumer,West,Arizona
+C0074,Emery Clark 74,Corporate,West,Washington
+C0075,Sky Brown 75,Corporate,Central,Illinois
+C0076,Reese Patel 76,Corporate,East,New York
+C0077,Parker Young 77,Home Office,East,New York
+C0078,Hayden Nguyen 78,Consumer,East,Pennsylvania
+C0079,Blake Garcia 79,Corporate,South,Tennessee
+C0080,Alex Smith 80,Corporate,West,California
+C0081,Jordan Lopez 81,Corporate,West,California
+C0082,Taylor Kim 82,Corporate,South,Tennessee
+C0083,Morgan Lee 83,Corporate,Central,Minnesota
+C0084,Casey Clark 84,Consumer,West,Oregon
+C0085,Riley Brown 85,Consumer,West,California
+C0086,Jamie Patel 86,Consumer,Central,Texas
+C0087,Avery Young 87,Home Office,South,Georgia
+C0088,Quinn Nguyen 88,Home Office,East,New York
+C0089,Drew Garcia 89,Consumer,West,California
+C0090,Sam Smith 90,Corporate,West,California
+C0091,Robin Lopez 91,Home Office,West,California
+C0092,Kai Kim 92,Corporate,East,Massachusetts
+C0093,Rowan Lee 93,Consumer,Central,Michigan
+C0094,Emery Clark 94,Corporate,West,Arizona
+C0095,Sky Brown 95,Home Office,West,Oregon
+C0096,Reese Patel 96,Corporate,South,Florida
+C0097,Parker Young 97,Corporate,East,New York
+C0098,Hayden Nguyen 98,Home Office,East,Pennsylvania
+C0099,Blake Garcia 99,Consumer,Central,Michigan
+C0100,Alex Smith 100,Consumer,East,Massachusetts
+C0101,Jordan Lopez 101,Consumer,Central,Minnesota
+C0102,Taylor Kim 102,Home Office,Central,Texas
+C0103,Morgan Lee 103,Home Office,Central,Texas
+C0104,Casey Clark 104,Corporate,West,California
+C0105,Riley Brown 105,Home Office,East,Pennsylvania
+C0106,Jamie Patel 106,Corporate,Central,Illinois
+C0107,Avery Young 107,Consumer,Central,Michigan
+C0108,Quinn Nguyen 108,Corporate,South,Florida
+C0109,Drew Garcia 109,Home Office,East,New Jersey
+C0110,Sam Smith 110,Consumer,Central,Texas
+C0111,Robin Lopez 111,Consumer,Central,Michigan
+C0112,Kai Kim 112,Home Office,West,Arizona
+C0113,Rowan Lee 113,Home Office,South,Florida
+C0114,Emery Clark 114,Consumer,East,Pennsylvania
+C0115,Sky Brown 115,Corporate,East,Pennsylvania
+C0116,Reese Patel 116,Consumer,South,Florida
+C0117,Parker Young 117,Corporate,Central,Texas
+C0118,Hayden Nguyen 118,Consumer,Central,Illinois
+C0119,Blake Garcia 119,Corporate,East,New Jersey
+C0120,Alex Smith 120,Consumer,West,Washington
+C0121,Jordan Lopez 121,Corporate,West,California
+C0122,Taylor Kim 122,Home Office,West,Oregon
+C0123,Morgan Lee 123,Home Office,South,Georgia
+C0124,Casey Clark 124,Consumer,Central,Texas
+C0125,Riley Brown 125,Consumer,South,Tennessee
+C0126,Jamie Patel 126,Consumer,West,Arizona
+C0127,Avery Young 127,Corporate,Central,Illinois
+C0128,Quinn Nguyen 128,Consumer,West,Washington
+C0129,Drew Garcia 129,Corporate,South,Virginia
+C0130,Sam Smith 130,Corporate,East,Massachusetts
+C0131,Robin Lopez 131,Home Office,South,Virginia
+C0132,Kai Kim 132,Consumer,East,Massachusetts
+C0133,Rowan Lee 133,Home Office,West,Oregon
+C0134,Emery Clark 134,Consumer,East,New Jersey
+C0135,Sky Brown 135,Home Office,Central,Michigan
+C0136,Reese Patel 136,Home Office,South,Florida
+C0137,Parker Young 137,Home Office,South,Georgia
+C0138,Hayden Nguyen 138,Consumer,Central,Minnesota
+C0139,Blake Garcia 139,Home Office,East,Pennsylvania
+C0140,Alex Smith 140,Corporate,Central,Texas
+C0141,Jordan Lopez 141,Home Office,Central,Michigan
+C0142,Taylor Kim 142,Home Office,East,Massachusetts
+C0143,Morgan Lee 143,Home Office,Central,Minnesota
+C0144,Casey Clark 144,Corporate,Central,Michigan
+C0145,Riley Brown 145,Consumer,West,Arizona
+C0146,Jamie Patel 146,Home Office,South,Georgia
+C0147,Avery Young 147,Corporate,Central,Texas
+C0148,Quinn Nguyen 148,Corporate,Central,Illinois
+C0149,Drew Garcia 149,Home Office,South,Virginia
+C0150,Sam Smith 150,Corporate,South,Tennessee
+C0151,Robin Lopez 151,Home Office,West,Arizona
+C0152,Kai Kim 152,Home Office,West,California
+C0153,Rowan Lee 153,Home Office,Central,Michigan
+C0154,Emery Clark 154,Consumer,East,Massachusetts
+C0155,Sky Brown 155,Consumer,West,Washington
+C0156,Reese Patel 156,Consumer,East,Pennsylvania
+C0157,Parker Young 157,Home Office,South,Florida
+C0158,Hayden Nguyen 158,Corporate,South,Georgia
+C0159,Blake Garcia 159,Corporate,South,Tennessee
+C0160,Alex Smith 160,Consumer,West,California
+C0161,Jordan Lopez 161,Corporate,East,Pennsylvania
+C0162,Taylor Kim 162,Home Office,West,Arizona
+C0163,Morgan Lee 163,Home Office,East,Pennsylvania
+C0164,Casey Clark 164,Corporate,East,Pennsylvania
+C0165,Riley Brown 165,Home Office,South,Virginia
+C0166,Jamie Patel 166,Home Office,South,Tennessee
+C0167,Avery Young 167,Consumer,South,Tennessee
+C0168,Quinn Nguyen 168,Corporate,South,Georgia
+C0169,Drew Garcia 169,Home Office,Central,Minnesota
+C0170,Sam Smith 170,Corporate,West,Arizona
+C0171,Robin Lopez 171,Home Office,East,Massachusetts
+C0172,Kai Kim 172,Corporate,West,Oregon
+C0173,Rowan Lee 173,Home Office,Central,Texas
+C0174,Emery Clark 174,Consumer,West,Washington
+C0175,Sky Brown 175,Home Office,South,Georgia
+C0176,Reese Patel 176,Consumer,West,Arizona
+C0177,Parker Young 177,Corporate,South,Tennessee
+C0178,Hayden Nguyen 178,Consumer,South,Georgia
+C0179,Blake Garcia 179,Corporate,South,Florida
+C0180,Alex Smith 180,Corporate,South,Florida
+C0181,Jordan Lopez 181,Corporate,Central,Minnesota
+C0182,Taylor Kim 182,Home Office,South,Georgia
+C0183,Morgan Lee 183,Consumer,South,Virginia
+C0184,Casey Clark 184,Corporate,South,Florida
+C0185,Riley Brown 185,Corporate,South,Tennessee
+C0186,Jamie Patel 186,Corporate,West,Washington
+C0187,Avery Young 187,Corporate,East,New York
+C0188,Quinn Nguyen 188,Home Office,East,New Jersey
+C0189,Drew Garcia 189,Corporate,West,Washington
+C0190,Sam Smith 190,Corporate,East,New Jersey
+C0191,Robin Lopez 191,Consumer,Central,Minnesota
+C0192,Kai Kim 192,Corporate,Central,Minnesota
+C0193,Rowan Lee 193,Corporate,Central,Michigan
+C0194,Emery Clark 194,Corporate,East,New York
+C0195,Sky Brown 195,Corporate,East,Pennsylvania
+C0196,Reese Patel 196,Home Office,East,New York
+C0197,Parker Young 197,Consumer,East,Pennsylvania
+C0198,Hayden Nguyen 198,Home Office,East,Pennsylvania
+C0199,Blake Garcia 199,Consumer,West,Arizona
+C0200,Alex Smith 200,Home Office,East,Pennsylvania

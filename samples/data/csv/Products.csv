@@ -1,0 +1,61 @@
+product_id,product_name,category,sub_category,unit_price
+P0001,Chairs Model 1,Furniture,Chairs,222.67
+P0002,Chairs Model 2,Furniture,Chairs,155.02
+P0003,Chairs Model 3,Furniture,Chairs,191.52
+P0004,Chairs Model 4,Furniture,Chairs,268.31
+P0005,Chairs Model 5,Furniture,Chairs,384.25
+P0006,Tables Model 1,Furniture,Tables,304.75
+P0007,Tables Model 2,Furniture,Tables,324.0
+P0008,Tables Model 3,Furniture,Tables,125.06
+P0009,Tables Model 4,Furniture,Tables,172.78
+P0010,Tables Model 5,Furniture,Tables,259.49
+P0011,Bookcases Model 1,Furniture,Bookcases,372.96
+P0012,Bookcases Model 2,Furniture,Bookcases,258.56
+P0013,Bookcases Model 3,Furniture,Bookcases,366.2
+P0014,Bookcases Model 4,Furniture,Bookcases,193.6
+P0015,Bookcases Model 5,Furniture,Bookcases,377.04
+P0016,Furnishings Model 1,Furniture,Furnishings,136.26
+P0017,Furnishings Model 2,Furniture,Furnishings,263.84
+P0018,Furnishings Model 3,Furniture,Furnishings,341.11
+P0019,Furnishings Model 4,Furniture,Furnishings,150.68
+P0020,Furnishings Model 5,Furniture,Furnishings,297.89
+P0021,Binders Model 1,Office Supplies,Binders,23.57
+P0022,Binders Model 2,Office Supplies,Binders,40.79
+P0023,Binders Model 3,Office Supplies,Binders,46.25
+P0024,Binders Model 4,Office Supplies,Binders,45.83
+P0025,Binders Model 5,Office Supplies,Binders,35.47
+P0026,Paper Model 1,Office Supplies,Paper,11.85
+P0027,Paper Model 2,Office Supplies,Paper,33.97
+P0028,Paper Model 3,Office Supplies,Paper,39.77
+P0029,Paper Model 4,Office Supplies,Paper,13.1
+P0030,Paper Model 5,Office Supplies,Paper,39.14
+P0031,Storage Model 1,Office Supplies,Storage,10.57
+P0032,Storage Model 2,Office Supplies,Storage,28.9
+P0033,Storage Model 3,Office Supplies,Storage,32.06
+P0034,Storage Model 4,Office Supplies,Storage,29.51
+P0035,Storage Model 5,Office Supplies,Storage,26.3
+P0036,Art Model 1,Office Supplies,Art,50.12
+P0037,Art Model 2,Office Supplies,Art,30.69
+P0038,Art Model 3,Office Supplies,Art,16.88
+P0039,Art Model 4,Office Supplies,Art,17.93
+P0040,Art Model 5,Office Supplies,Art,33.48
+P0041,Phones Model 1,Technology,Phones,502.66
+P0042,Phones Model 2,Technology,Phones,482.77
+P0043,Phones Model 3,Technology,Phones,657.7
+P0044,Phones Model 4,Technology,Phones,574.19
+P0045,Phones Model 5,Technology,Phones,395.77
+P0046,Machines Model 1,Technology,Machines,603.62
+P0047,Machines Model 2,Technology,Machines,469.27
+P0048,Machines Model 3,Technology,Machines,313.65
+P0049,Machines Model 4,Technology,Machines,269.41
+P0050,Machines Model 5,Technology,Machines,666.34
+P0051,Accessories Model 1,Technology,Accessories,288.66
+P0052,Accessories Model 2,Technology,Accessories,387.66
+P0053,Accessories Model 3,Technology,Accessories,560.27
+P0054,Accessories Model 4,Technology,Accessories,456.23
+P0055,Accessories Model 5,Technology,Accessories,512.88
+P0056,Copiers Model 1,Technology,Copiers,321.76
+P0057,Copiers Model 2,Technology,Copiers,412.72
+P0058,Copiers Model 3,Technology,Copiers,315.21
+P0059,Copiers Model 4,Technology,Copiers,408.83
+P0060,Copiers Model 5,Technology,Copiers,332.38
