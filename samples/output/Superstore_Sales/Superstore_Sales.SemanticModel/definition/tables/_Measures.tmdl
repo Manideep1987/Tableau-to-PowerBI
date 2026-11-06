@@ -1,0 +1,150 @@
+table _Measures
+	lineageTag: 9bfbdb50-7172-5e8c-8bec-b172ab38b40e
+
+	measure 'Profit Ratio' = DIVIDE(SUM('Orders'[Profit]), SUM('Orders'[Sales]))
+		formatString: 0.0%
+		displayFolder: KPIs
+		lineageTag: 3a1f48fa-a18e-589c-a957-523b33065e04
+
+		annotation TableauSource = Calculation_0001
+
+	measure 'Sales vs Target' = (SUM('Orders'[Sales]) - [Sales Target Value])
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 9cbfc792-4c7e-5050-813e-2f971cb03b55
+
+		annotation TableauSource = Calculation_0007
+
+	measure 'Running Sales' = CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start])))
+		lineageTag: 8c751315-7a09-5de4-a477-65e0816f18cd
+
+		annotation TableauSource = Calculation_0008
+
+	measure 'Sales Rank' = RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)
+		lineageTag: d91ecd71-6184-5058-a3ea-abf32aaa4dde
+
+		annotation TableauSource = Calculation_0009
+
+	measure 'Order Count' = DISTINCTCOUNTNOBLANK('Orders'[Order ID])
+		displayFolder: KPIs
+		lineageTag: e965311c-7070-56b8-8500-a70a7dfcbe58
+
+		annotation TableauSource = Calculation_0010
+
+	measure 'Avg Sales per Customer' = DIVIDE(SUM('Orders'[Sales]), CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders'))
+		lineageTag: b6583b98-e766-51a8-b8ef-f9330176a62a
+
+		annotation TableauSource = Calculation_0011
+
+	measure 'Selected Metric' = SWITCH([Metric Selector Value], "Sales", SUM('Orders'[Sales]), "Profit", SUM('Orders'[Profit]), SUM('Orders'[Quantity]))
+		lineageTag: a2b0694f-e704-56b6-8f2d-cd79ced658be
+
+		annotation TableauSource = Calculation_0012
+
+	measure 'Avg Customer Sales (INCLUDE)' = SUMX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))
+		lineageTag: c195aed8-17a6-507a-80be-63110ec55b09
+
+		annotation TableauSource = Calculation_0017
+
+	measure 'Share of Region' = DIVIDE(SUM('Orders'[Sales]), SUM('Orders'[Region Sales]))
+		formatString: 0%
+		lineageTag: a326e9a6-78ff-5d85-81e2-b77e1d80dd3e
+
+		annotation TableauSource = Calculation_0018
+
+	measure 'Percent of Total Sales' = DIVIDE(SUM('Orders'[Sales]), CALCULATE(SUM('Orders'[Sales]), ALLSELECTED('Products'[Sub-Category])))
+		formatString: 0%
+		lineageTag: d7181a3b-d6bf-5de5-9faf-ba0647782640
+
+		annotation TableauSource = Calculation_0020
+
+	measure 'Profit per Unit' = DIVIDE(COALESCE(SUM('Orders'[Profit]), 0), SUM('Orders'[Quantity]))
+		lineageTag: d33266d0-63fe-5e08-949e-db7538b9dd0f
+
+		annotation TableauSource = Calculation_0022
+
+	/// Tableau SUM([Sales])
+	measure 'Sum of Sales' = SUM('Orders'[Sales])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		displayFolder: Base measures
+		lineageTag: 1a8a845c-cf52-54a3-b338-952638a5d31f
+
+		annotation TableauSource = sum:Sales
+
+	/// Tableau SUM([Profit])
+	measure 'Sum of Profit' = SUM('Orders'[Profit])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		displayFolder: Base measures
+		lineageTag: cc0bb8e6-f724-5b28-9252-60dd4b0808c3
+
+		annotation TableauSource = sum:Profit
+
+	/// Tableau COUNTD([Customer Name])
+	measure 'Distinct Count of Customer Name' = CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders')
+		displayFolder: Base measures
+		lineageTag: 8af7d2b0-7786-5158-a64c-6fe19aa5aca5
+
+		annotation TableauSource = ctd:Customer Name
+
+	/// Tableau AVG([Calculation_0005])
+	measure 'Average of Customer Lifetime Sales' = AVERAGE('Orders'[Customer Lifetime Sales])
+		displayFolder: Base measures
+		lineageTag: 598e2890-d840-5a0f-ad12-49c9b807b9b7
+
+		annotation TableauSource = avg:Calculation_0005
+
+	/// Tableau AVG([Calculation_0017])
+	measure 'Average of Avg Customer Sales (INCLUDE)' = AVERAGEX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))
+		displayFolder: Base measures
+		lineageTag: f49fe700-5c00-53d0-9804-d235e975e652
+
+		annotation TableauSource = avg:Calculation_0017
+
+	/// Tableau SUM([Calculation_0013])
+	measure 'Sum of Net Sales' = SUM('Orders'[Net Sales])
+		displayFolder: Base measures
+		lineageTag: 29d32364-efe8-5aaf-bf1b-f329457ed329
+
+		annotation TableauSource = sum:Calculation_0013
+
+	/// Tableau AVG([Discount])
+	measure 'Average of Discount' = AVERAGE('Orders'[Discount])
+		formatString: 0%
+		displayFolder: Base measures
+		lineageTag: 1e0bfbb4-bbfe-5fbc-84e0-ef3962ba431a
+
+		annotation TableauSource = avg:Discount
+
+	/// Tableau AVG([Calculation_0004])
+	measure 'Average of Days to Ship' = AVERAGE('Orders'[Days to Ship])
+		displayFolder: Base measures
+		lineageTag: 49b39432-3228-5df2-ae1f-f1136db40c6d
+
+		annotation TableauSource = avg:Calculation_0004
+
+	/// Tableau SUM([Calculation_0006])
+	measure 'Sum of Region Sales' = SUM('Orders'[Region Sales])
+		displayFolder: Base measures
+		lineageTag: eec353f6-2bc9-5e78-9117-43d80628fc58
+
+		annotation TableauSource = sum:Calculation_0006
+
+	/// Tableau COUNT([Order ID])
+	measure 'Count of Order ID' = COUNTA('Orders'[Order ID])
+		displayFolder: Base measures
+		lineageTag: ff83ab89-5798-5faf-8534-e66b9cc4c062
+
+		annotation TableauSource = cnt:Order ID
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: 0890885f-0d9a-5b56-b8ee-8a56902aff82
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Measures
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Measures", BLANK())
+
+	annotation PBI_ResultType = Table

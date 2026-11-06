@@ -1,0 +1,25 @@
+table 'Top N Customers'
+	lineageTag: 27ddc70b-65ba-5a2b-a155-8d1e3f4175af
+
+	/// Selected value of Tableau parameter 'Top N Customers'
+	measure 'Top N Customers Value' = SELECTEDVALUE('Top N Customers'[Top N Customers], 10)
+		lineageTag: 2b763f9d-dae9-57ef-ae5c-5ae0a2a72a05
+
+		annotation TableauSource = Parameter 2
+
+	column 'Top N Customers'
+		dataType: int64
+		lineageTag: 62f8ce81-0d81-56c7-bfc1-acaaa1ccd4a6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Top N Customers]
+
+		annotation TableauSource = [Parameters].[Parameter 2]
+
+	partition 'Top N Customers' = calculated
+		mode: import
+		source = SELECTCOLUMNS({5, 10, 15, 20}, "Top N Customers", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

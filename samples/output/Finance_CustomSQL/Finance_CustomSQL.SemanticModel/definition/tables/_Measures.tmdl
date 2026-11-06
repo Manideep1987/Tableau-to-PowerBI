@@ -1,0 +1,81 @@
+table _Measures
+	lineageTag: d6d6da31-217e-5f5c-abe2-9825ca217ba8
+
+	measure 'Target Attainment' = DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))
+		formatString: 0.0%
+		lineageTag: 6b8d5a72-8d6b-51ed-8ef5-d2d262467e16
+
+		annotation TableauSource = Calculation_F01
+
+	measure 'Projected Sales' = (SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))
+		lineageTag: 80a322a4-0599-5ea9-a95a-0fb3dc6827f8
+
+		annotation TableauSource = Calculation_F02
+
+	measure 'Margin %' = IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))
+		formatString: 0%
+		lineageTag: 6d273836-ada1-5a02-a287-a964c212b54f
+
+		annotation TableauSource = Calculation_F03
+
+	measure 'Sales YoY Prior' = CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))
+		lineageTag: 369827f9-4457-5306-abdb-07f85e6befcb
+
+		annotation TableauSource = Calculation_F05
+
+	measure 'Loss Orders' = SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))
+		lineageTag: da528fce-5b07-58fe-a6eb-40c6d01f5e1f
+
+		annotation TableauSource = Calculation_F07
+
+	measure 'Avg Monthly Sales' = AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))
+		lineageTag: 2f16e6b7-3525-5c10-b2d9-3a02779f39a7
+
+		annotation TableauSource = Calculation_F09
+
+	measure 'Max Order Value' = MAX('Finance Orders'[sales])
+		lineageTag: c72226c7-a26b-5df8-b5f7-ee35f249411a
+
+		annotation TableauSource = Calculation_F10
+
+	/// Tableau SUM([sales])
+	measure 'Sum of sales' = SUM('Finance Orders'[sales])
+		displayFolder: Base measures
+		lineageTag: 845f8a37-967e-5ce0-8475-516572df5535
+
+		annotation TableauSource = sum:sales
+
+	/// Tableau SUM([sales_target])
+	measure 'Sum of sales_target' = SUM('Finance Orders'[sales_target])
+		displayFolder: Base measures
+		lineageTag: d981295a-0445-58c7-ad5e-e2f54646e85a
+
+		annotation TableauSource = sum:sales_target
+
+	/// Tableau COUNT([order_id])
+	measure 'Count of order_id' = COUNTA('Finance Orders'[order_id])
+		displayFolder: Base measures
+		lineageTag: 151d5270-acda-540e-844a-16d6a2939141
+
+		annotation TableauSource = cnt:order_id
+
+	/// Tableau SUM([profit])
+	measure 'Sum of profit' = SUM('Finance Orders'[profit])
+		displayFolder: Base measures
+		lineageTag: 495c1f69-bb0c-51a8-872b-aa1e93f2d410
+
+		annotation TableauSource = sum:profit
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: e045d61b-d872-55b9-9d7f-9429633b4b91
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Measures
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Measures", BLANK())
+
+	annotation PBI_ResultType = Table

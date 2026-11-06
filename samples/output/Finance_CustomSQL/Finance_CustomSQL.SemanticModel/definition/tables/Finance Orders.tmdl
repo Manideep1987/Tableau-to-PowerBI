@@ -1,0 +1,123 @@
+table 'Finance Orders'
+	lineageTag: 999d0a13-4a29-52f2-bc45-db11693c7b64
+
+	column order_id
+		dataType: string
+		lineageTag: 9596a97d-6246-5622-8c7b-3a88ddb9a2cb
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation TableauSource = order_id
+
+	column order_date
+		dataType: dateTime
+		lineageTag: 4415314a-08c2-5fe8-b010-0fcecadad626
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation TableauSource = order_date
+
+	column sales
+		dataType: double
+		lineageTag: 4d7aea32-c596-5691-90ed-85236a667e0d
+		summarizeBy: sum
+		sourceColumn: sales
+
+		annotation TableauSource = sales
+
+	column profit
+		dataType: double
+		lineageTag: 75c4f021-ff42-5118-8d7d-3e8823a278a6
+		summarizeBy: sum
+		sourceColumn: profit
+
+		annotation TableauSource = profit
+
+	column quantity
+		dataType: int64
+		lineageTag: a566c83e-56df-5b46-baa5-129bad06176b
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation TableauSource = quantity
+
+	column region
+		dataType: string
+		lineageTag: 9e02eb54-b283-5f2e-b421-a70832d3f796
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation TableauSource = region
+
+	column segment
+		dataType: string
+		lineageTag: a9088097-6bc1-5cee-a46b-854bb045fbf9
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation TableauSource = segment
+
+	column 'region (Targets)'
+		dataType: string
+		lineageTag: 82ca6466-3351-561e-84d0-5ac01afb45cd
+		summarizeBy: none
+		sourceColumn: region (Targets)
+
+		annotation TableauSource = region (Targets)
+
+	column sales_target
+		dataType: double
+		lineageTag: ba6bab72-1a23-530f-90d0-712cea7296fa
+		summarizeBy: sum
+		sourceColumn: sales_target
+
+		annotation TableauSource = sales_target
+
+	column 'Fiscal Year' = IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))
+		dataType: int64
+		lineageTag: b63db93e-6b12-592b-86cc-2a53b592fae9
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_F04
+
+	column 'Order Size' = SWITCH('Finance Orders'[quantity], 1, "Single", 2, "Pair", "Bulk")
+		dataType: string
+		lineageTag: 8bf68105-02cc-55c0-86a0-119e9a192b58
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_F06
+
+	column 'Region Code' = UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)
+		dataType: string
+		lineageTag: 1cc6bb44-15c9-5b66-a092-375aa34de7c6
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_F08
+
+	partition 'Finance Orders' = m
+		mode: import
+		source =
+				let
+				    T0 = let
+				        Source = PostgreSQL.Database(#"Finance Orders Server", #"Finance Orders Database"),
+				        Data = Value.NativeQuery(Source, "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment
+				    FROM Orders o
+				    INNER JOIN Customers c ON c.customer_id = o.customer_id
+				    WHERE o.quantity >= " & Text.From(#"Min Quantity"), null, [EnableFolding = true]),
+				        Selected = Table.SelectColumns(Data, {"order_id", "order_date", "sales", "profit", "quantity", "region", "segment"}, MissingField.UseNull),
+				        Typed = Table.TransformColumnTypes(Selected, {{"order_id", type text}, {"order_date", type date}, {"sales", type number}, {"profit", type number}, {"quantity", Int64.Type}, {"region", type text}, {"segment", type text}})
+				    in
+				        Typed,
+				    T1 = let
+				        Source = PostgreSQL.Database(#"Finance Orders Server", #"Finance Orders Database"),
+				        Data = Source{[Schema = "public", Item = "Targets"]}[Data],
+				        Selected = Table.SelectColumns(Data, {"region", "sales_target"}, MissingField.UseNull),
+				        Renamed = Table.RenameColumns(Selected, {{"region", "region (Targets)"}}),
+				        Typed = Table.TransformColumnTypes(Renamed, {{"region (Targets)", type text}, {"sales_target", type number}})
+				    in
+				        Typed,
+				    J0 = Table.Join(T0, {"region"}, T1, {"region (Targets)"}, JoinKind.Inner)
+				in
+				    J0
+
+	annotation PBI_ResultType = Table

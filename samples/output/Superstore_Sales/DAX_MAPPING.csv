@@ -1,0 +1,64 @@
+Data source,Tableau field,Tableau formula,Kind,Power BI table,Power BI object,DAX,Status,Notes
+Parameters,Sales Target,250000.0,parameter,Sales Target,Sales Target Value,"Sales Target = SELECTCOLUMNS(GENERATESERIES(50000, 500000, 50000), ""Sales Target"", [Value])
+
+[Sales Target Value] = SELECTEDVALUE('Sales Target'[Sales Target], 250000)",Converted,What-if (range) parameter -> disconnected table + slicer + value measure
+Parameters,Top N Customers,10,parameter,Top N Customers,Top N Customers Value,"Top N Customers = SELECTCOLUMNS({5, 10, 15, 20}, ""Top N Customers"", [Value])
+
+[Top N Customers Value] = SELECTEDVALUE('Top N Customers'[Top N Customers], 10)",Converted,List parameter -> disconnected table + slicer + value measure
+Parameters,Discount Threshold,0.2,parameter,Discount Threshold,Discount Threshold Value,"Discount Threshold = SELECTCOLUMNS(GENERATESERIES(0, 0.5, 0.05), ""Discount Threshold"", [Value])
+
+[Discount Threshold Value] = SELECTEDVALUE('Discount Threshold'[Discount Threshold], 0.2)",Converted,What-if (range) parameter -> disconnected table + slicer + value measure
+Parameters,Metric Selector,"""Sales""",parameter,Metric Selector,Metric Selector Value,"Metric Selector = SELECTCOLUMNS({""Sales"", ""Profit"", ""Quantity""}, ""Metric Selector"", [Value])
+
+[Metric Selector Value] = SELECTEDVALUE('Metric Selector'[Metric Selector], ""Sales"")",Converted,List parameter -> disconnected table + slicer + value measure
+Superstore,TMN([Order Date]),"DATETRUNC('month', [Order Date])",date-part,Orders,Order Date Month Start,"DATE(YEAR('Orders'[Order Date]), MONTH('Orders'[Order Date]), 1)",Converted,
+Superstore,YR([Order Date]),"DATEPART('year', [Order Date])",date-part,Orders,Order Date Year,YEAR('Orders'[Order Date]),Converted,
+Superstore,TQR([Order Date]),"DATETRUNC('quarter', [Order Date])",date-part,Orders,Order Date Quarter Start,"DATE(YEAR('Orders'[Order Date]), (QUARTER('Orders'[Order Date]) - 1) * 3 + 1, 1)",Converted,
+Superstore,Profit Ratio,SUM([Profit]) / SUM([Sales]),measure,_Measures,Profit Ratio,"DIVIDE(SUM('Orders'[Profit]), SUM('Orders'[Sales]))",Converted,
+Superstore,Profit Status,IF [Profit] > 0 THEN 'Profitable' ELSEIF [Profit] = 0 THEN 'Break-even' ELSE 'Loss' END,column,Orders,Profit Status,"SWITCH(TRUE(),
+        ('Orders'[Profit] > 0), ""Profitable"",
+        ('Orders'[Profit] = 0), ""Break-even"",
+        ""Loss""
+    )",Converted,
+Superstore,Discount Band,"IIF(ZN([Discount]) >= [Parameters].[Parameter 3], 'High Discount', 'Standard')",column,Orders,Discount Band,"IF((COALESCE('Orders'[Discount], 0) >= [Discount Threshold Value]), ""High Discount"", ""Standard"")",Converted with notes,Calculated column uses parameter 'Discount Threshold': it is evaluated at refresh with the default value. Use a measure for interactive behaviour.
+Superstore,Days to Ship,"DATEDIFF('day', [Order Date], [Ship Date])",column,Orders,Days to Ship,"DATEDIFF('Orders'[Order Date], 'Orders'[Ship Date], DAY)",Converted,
+Superstore,Customer Lifetime Sales,{FIXED [Customer Name] : SUM([Sales])},column,Orders,Customer Lifetime Sales,"(VAR __lod1 = RELATED('Customers'[Customer Name]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Customer Name] = __lod1))",Converted,
+Superstore,Region Sales,{ FIXED [Region] : SUM([Sales]) },column,Orders,Region Sales,"(VAR __lod1 = RELATED('Customers'[Region]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Region] = __lod1))",Converted,
+Superstore,Sales vs Target,SUM([Sales]) - [Parameters].[Parameter 1],measure,_Measures,Sales vs Target,(SUM('Orders'[Sales]) - [Sales Target Value]),Converted,
+Superstore,Running Sales,RUNNING_SUM(SUM([Sales])),measure,_Measures,Running Sales,"CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start])))",Converted,
+Superstore,Sales Rank,RANK(SUM([Sales])),measure,_Measures,Sales Rank,"RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)",Converted,
+Superstore,Order Count,COUNTD([Order ID]),measure,_Measures,Order Count,DISTINCTCOUNTNOBLANK('Orders'[Order ID]),Converted,
+Superstore,Avg Sales per Customer,SUM([Sales]) / COUNTD([Customer Name]),measure,_Measures,Avg Sales per Customer,"DIVIDE(SUM('Orders'[Sales]), CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders'))",Converted with notes,Aggregation over 'Customers' is filtered through 'Orders' so that filters on other dimensions apply (Tableau relationship semantics).
+Superstore,Selected Metric,CASE [Parameters].[Parameter 4] WHEN 'Sales' THEN SUM([Sales]) WHEN 'Profit' THEN SUM([Profit]) ELSE SUM([Quantity]) END,measure,_Measures,Selected Metric,"SWITCH([Metric Selector Value], ""Sales"", SUM('Orders'[Sales]), ""Profit"", SUM('Orders'[Profit]), SUM('Orders'[Quantity]))",Converted,
+Superstore,Net Sales,[Sales] * (1 - [Discount]),column,Orders,Net Sales,"('Orders'[Sales] * IF(ISBLANK('Orders'[Discount]), BLANK(), (1 - 'Orders'[Discount])))",Converted,
+Superstore,Customer Tier,IF [Customer Lifetime Sales] >= 25000 THEN 'Platinum' ELSEIF [Customer Lifetime Sales] >= 12000 THEN 'Gold' ELSE 'Silver' END,column,Orders,Customer Tier,"SWITCH(TRUE(),
+        ('Orders'[Customer Lifetime Sales] >= 25000), ""Platinum"",
+        ('Orders'[Customer Lifetime Sales] >= 12000), ""Gold"",
+        ""Silver""
+    )",Converted,
+Superstore,Order Month Name,"DATENAME('month', [Order Date])",column,Orders,Order Month Name,"FORMAT('Orders'[Order Date], ""MMMM"")",Converted with notes,DATENAME() output depends on the model culture (FORMAT locale).
+Superstore,Product Code,"UPPER(LEFT([Sub-Category], 3)) + '-' + RIGHT([Product ID], 4)",column,Orders,Product Code,"UPPER(LEFT(RELATED('Products'[Sub-Category]), 3)) & ""-"" & RIGHT('Orders'[Product ID], 4)",Converted,
+Superstore,Avg Customer Sales (INCLUDE),{INCLUDE [Customer Name] : SUM([Sales])},measure,_Measures,Avg Customer Sales (INCLUDE),"SUMX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))",Converted,
+Superstore,Share of Region,SUM([Sales]) / SUM([Region Sales]),measure,_Measures,Share of Region,"DIVIDE(SUM('Orders'[Sales]), SUM('Orders'[Region Sales]))",Converted,
+Superstore,Large Order,[Quantity] >= 7 AND [Sales] > 500,column,Orders,Large Order,(('Orders'[Quantity] >= 7) && ('Orders'[Sales] > 500)),Converted,
+Superstore,Percent of Total Sales,SUM([Sales]) / TOTAL(SUM([Sales])),measure,_Measures,Percent of Total Sales,"DIVIDE(SUM('Orders'[Sales]), CALCULATE(SUM('Orders'[Sales]), ALLSELECTED('Products'[Sub-Category])))",Converted with notes,TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures.
+Superstore,Ship Quarter Start,"DATETRUNC('quarter', [Ship Date])",column,Orders,Ship Quarter Start,"DATE(YEAR('Orders'[Ship Date]), (QUARTER('Orders'[Ship Date]) - 1) * 3 + 1, 1)",Converted,
+Superstore,Profit per Unit,ZN(SUM([Profit])) / SUM([Quantity]),measure,_Measures,Profit per Unit,"DIVIDE(COALESCE(SUM('Orders'[Profit]), 0), SUM('Orders'[Quantity]))",Converted,
+Superstore,Region Group,"GROUP Coastal = ['East', 'West']; Inland = ['Central', 'South']",group,Customers,Region Group,"SWITCH(TRUE(),
+        'Customers'[Region] IN {""East"", ""West""}, ""Coastal"",
+        'Customers'[Region] IN {""Central"", ""South""}, ""Inland"",
+        'Customers'[Region]
+    )",Converted,
+Superstore,Sales (bin),[Sales],bin,Orders,Sales (bin),"IF(ISBLANK('Orders'[Sales]), BLANK(), FLOOR('Orders'[Sales], 500))",Converted,
+Superstore,Key States,"SET [State] IN ['California', 'New York', 'Texas']",set,Customers,Key States,"'Customers'[State] IN {""California"", ""New York"", ""Texas""}",Converted,
+Superstore,Top 20 Customers,SET top 20 [Customer Name] by SUM([Sales]),set,Customers,Top 20 Customers,"RANKX(ALL('Customers'), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP) <= 20",Converted with notes,Top-N set evaluated at refresh (static); ranks rows of 'Customers' (one row per [Customer Name] assumed).
+Superstore,Sum of Sales,SUM([Sales]),base-measure,_Measures,Sum of Sales,SUM('Orders'[Sales]),Converted,
+Superstore,Sum of Profit,SUM([Profit]),base-measure,_Measures,Sum of Profit,SUM('Orders'[Profit]),Converted,
+Superstore,Distinct Count of Customer Name,COUNTD([Customer Name]),base-measure,_Measures,Distinct Count of Customer Name,"CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders')",Converted with notes,Aggregation over 'Customers' is filtered through 'Orders' so that filters on other dimensions apply (Tableau relationship semantics).
+Superstore,Average of Customer Lifetime Sales,AVG([Calculation_0005]),base-measure,_Measures,Average of Customer Lifetime Sales,AVERAGE('Orders'[Customer Lifetime Sales]),Converted,
+Superstore,Average of Avg Customer Sales (INCLUDE),AVG({INCLUDE [Customer Name] : SUM([Sales])}),base-measure,_Measures,Average of Avg Customer Sales (INCLUDE),"AVERAGEX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))",Converted,
+Superstore,Sum of Net Sales,SUM([Calculation_0013]),base-measure,_Measures,Sum of Net Sales,SUM('Orders'[Net Sales]),Converted,
+Superstore,Average of Discount,AVG([Discount]),base-measure,_Measures,Average of Discount,AVERAGE('Orders'[Discount]),Converted,
+Superstore,Average of Days to Ship,AVG([Calculation_0004]),base-measure,_Measures,Average of Days to Ship,AVERAGE('Orders'[Days to Ship]),Converted,
+Superstore,Sum of Region Sales,SUM([Calculation_0006]),base-measure,_Measures,Sum of Region Sales,SUM('Orders'[Region Sales]),Converted,
+Superstore,Count of Order ID,COUNT([Order ID]),base-measure,_Measures,Count of Order ID,COUNTA('Orders'[Order ID]),Converted,

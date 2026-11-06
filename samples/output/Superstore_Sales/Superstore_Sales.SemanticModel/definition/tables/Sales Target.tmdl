@@ -1,0 +1,25 @@
+table 'Sales Target'
+	lineageTag: 08b7a685-dec9-5440-96c3-f4dbb271ec35
+
+	/// Selected value of Tableau parameter 'Sales Target'
+	measure 'Sales Target Value' = SELECTEDVALUE('Sales Target'[Sales Target], 250000)
+		lineageTag: dbcec5be-e44a-5ec6-9a9b-a45e04d29466
+
+		annotation TableauSource = Parameter 1
+
+	column 'Sales Target'
+		dataType: double
+		lineageTag: 92a2fd6f-e2ad-54d3-a29b-c97c576f8e6b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Sales Target]
+
+		annotation TableauSource = [Parameters].[Parameter 1]
+
+	partition 'Sales Target' = calculated
+		mode: import
+		source = SELECTCOLUMNS(GENERATESERIES(50000, 500000, 50000), "Sales Target", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

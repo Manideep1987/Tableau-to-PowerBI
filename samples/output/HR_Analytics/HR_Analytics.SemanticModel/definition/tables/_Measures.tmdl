@@ -1,0 +1,70 @@
+table _Measures
+	lineageTag: fafa426b-9ec1-56b7-9bab-47740bb6e5c5
+
+	measure Headcount = DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])
+		lineageTag: f33cb2a4-c1fd-5c7e-a452-dc5ce0b906b8
+
+		annotation TableauSource = Calculation_H01
+
+	measure 'Attrition Rate' = DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))
+		formatString: 0%
+		lineageTag: 0e59cbcf-b846-5cae-95c0-e21bb103b8f5
+
+		annotation TableauSource = Calculation_H03
+
+	measure 'Salary vs Dept' = (AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))
+		lineageTag: b51d6ef1-00b8-5c10-932f-e8c7277dc0e3
+
+		annotation TableauSource = Calculation_H07
+
+	measure 'Median Salary' = MEDIAN('employees.csv'[Salary])
+		lineageTag: bc1fe5eb-f9ba-57c1-8a61-46145723b34a
+
+		annotation TableauSource = Calculation_H10
+
+	measure 'Hires Running Total' = CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))
+		lineageTag: 101069a2-51a3-5ab8-a2f5-0d4b7f407011
+
+		annotation TableauSource = Calculation_H11
+
+	/// Tableau AVG([Calculation_H04])
+	measure 'Average of Tenure Years' = AVERAGE('employees.csv'[Tenure Years])
+		displayFolder: Base measures
+		lineageTag: c00805ec-00ee-5074-a3bf-23219b2271ee
+
+		annotation TableauSource = avg:Calculation_H04
+
+	/// Tableau AVG([Salary])
+	measure 'Average of Salary' = AVERAGE('employees.csv'[Salary])
+		displayFolder: Base measures
+		lineageTag: c029efa9-7970-5ea1-a082-d6ce041fb6be
+
+		annotation TableauSource = avg:Salary
+
+	/// Tableau AVG([Performance Score])
+	measure 'Average of Performance Score' = AVERAGE('employees.csv'[Performance Score])
+		displayFolder: Base measures
+		lineageTag: a96480b7-cc0e-5ddb-ba3b-17c3a71c314c
+
+		annotation TableauSource = avg:Performance Score
+
+	/// Tableau COUNT([Employee ID])
+	measure 'Count of Employee ID' = COUNTA('employees.csv'[Employee ID])
+		displayFolder: Base measures
+		lineageTag: 5eda4d46-2a7b-562e-8d5e-1b04a93ab2d7
+
+		annotation TableauSource = cnt:Employee ID
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: 45b13ed7-4a49-579a-a606-a03f60699508
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Measures
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Measures", BLANK())
+
+	annotation PBI_ResultType = Table

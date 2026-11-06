@@ -1,0 +1,25 @@
+table 'Discount Threshold'
+	lineageTag: 65afcd22-901e-5b2f-b761-40ab9a7ae89f
+
+	/// Selected value of Tableau parameter 'Discount Threshold'
+	measure 'Discount Threshold Value' = SELECTEDVALUE('Discount Threshold'[Discount Threshold], 0.2)
+		lineageTag: b6c622c3-55b4-51d6-801e-520c5ea7d233
+
+		annotation TableauSource = Parameter 3
+
+	column 'Discount Threshold'
+		dataType: double
+		lineageTag: d77af015-4a69-50da-8e77-2dad9808eb6a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Discount Threshold]
+
+		annotation TableauSource = [Parameters].[Parameter 3]
+
+	partition 'Discount Threshold' = calculated
+		mode: import
+		source = SELECTCOLUMNS(GENERATESERIES(0, 0.5, 0.05), "Discount Threshold", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

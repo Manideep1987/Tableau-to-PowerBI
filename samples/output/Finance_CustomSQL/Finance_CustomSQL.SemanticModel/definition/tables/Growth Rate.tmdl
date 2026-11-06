@@ -1,0 +1,25 @@
+table 'Growth Rate'
+	lineageTag: e2af377d-8ea0-5018-8bc8-14beacae4822
+
+	/// Selected value of Tableau parameter 'Growth Rate'
+	measure 'Growth Rate Value' = SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)
+		lineageTag: 7322c008-0c9d-5000-9ebb-1c46c55746bd
+
+		annotation TableauSource = Growth Rate
+
+	column 'Growth Rate'
+		dataType: double
+		lineageTag: ae56980c-930e-5d06-b7c3-d411d6b614de
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Growth Rate]
+
+		annotation TableauSource = [Parameters].[Growth Rate]
+
+	partition 'Growth Rate' = calculated
+		mode: import
+		source = SELECTCOLUMNS({0.08}, "Growth Rate", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

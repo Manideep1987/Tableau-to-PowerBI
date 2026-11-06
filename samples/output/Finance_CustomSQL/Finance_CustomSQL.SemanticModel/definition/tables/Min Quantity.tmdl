@@ -1,0 +1,25 @@
+table 'Min Quantity'
+	lineageTag: 657747f6-9ccf-5550-a464-f6cae540aefa
+
+	/// Selected value of Tableau parameter 'Min Quantity'
+	measure 'Min Quantity Value' = SELECTEDVALUE('Min Quantity'[Min Quantity], 2)
+		lineageTag: cf2195f1-edbc-51b5-ad79-077463dc1bd7
+
+		annotation TableauSource = Min Quantity
+
+	column 'Min Quantity'
+		dataType: int64
+		lineageTag: 90d1ac86-c5f3-502e-b0d3-edfc422ebe7d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Min Quantity]
+
+		annotation TableauSource = [Parameters].[Min Quantity]
+
+	partition 'Min Quantity' = calculated
+		mode: import
+		source = SELECTCOLUMNS(GENERATESERIES(1, 9, 1), "Min Quantity", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

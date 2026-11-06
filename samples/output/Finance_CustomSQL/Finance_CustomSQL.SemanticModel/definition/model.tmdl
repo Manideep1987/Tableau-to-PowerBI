@@ -1,0 +1,19 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["Finance Orders"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation ConvertedFrom = Tableau workbook Finance_CustomSQL
+
+ref table _Measures
+ref table 'Finance Orders'
+ref table 'Min Quantity'
+ref table 'Growth Rate'
+ref table Date

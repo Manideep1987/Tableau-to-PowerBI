@@ -1,0 +1,1405 @@
+{
+  "workbook": {
+    "name": "HR_Analytics",
+    "version": "18.1",
+    "build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [
+      "Data/hr/employees.csv"
+    ]
+  },
+  "stats": {
+    "datasources": 1,
+    "tables": 1,
+    "columns": 10,
+    "relationships": 1,
+    "calculations": 11,
+    "parameters": 0,
+    "worksheets": 5,
+    "dashboards": 1,
+    "filters": 2,
+    "measures": 9,
+    "calc_columns": 6,
+    "pages": 2,
+    "visuals": 6,
+    "converted": 11,
+    "converted_with_notes": 0,
+    "manual": 0
+  },
+  "datasources": [
+    {
+      "name": "federated.hr01csvsource",
+      "caption": "Employees",
+      "model_style": "single",
+      "is_extract": false,
+      "connections": [
+        {
+          "name": "textscan.0hr",
+          "class": "textscan",
+          "server": "",
+          "database": null,
+          "schema": null,
+          "file": "Data/hr/employees.csv"
+        }
+      ],
+      "tables": [
+        {
+          "name": "employees.csv",
+          "type": "table",
+          "table": "[employees#csv]",
+          "sql": null
+        }
+      ],
+      "relationships": [],
+      "columns": [
+        {
+          "name": "Employee ID",
+          "table": "employees.csv",
+          "remote": "employee_id",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Employee Name",
+          "table": "employees.csv",
+          "remote": "employee_name",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Department",
+          "table": "employees.csv",
+          "remote": "department",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Job Level",
+          "table": "employees.csv",
+          "remote": "job_level",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Gender",
+          "table": "employees.csv",
+          "remote": "gender",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Location",
+          "table": "employees.csv",
+          "remote": "location",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Hire Date",
+          "table": "employees.csv",
+          "remote": "hire_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Termination Date",
+          "table": "employees.csv",
+          "remote": "termination_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": true,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Salary",
+          "table": "employees.csv",
+          "remote": "salary",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Performance Score",
+          "table": "employees.csv",
+          "remote": "performance_score",
+          "datatype": "integer",
+          "role": "measure",
+          "nullable": true,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        }
+      ],
+      "hierarchies": []
+    }
+  ],
+  "model": {
+    "tables": [
+      {
+        "name": "_Measures",
+        "kind": "measures",
+        "m": null,
+        "dax_source": "ROW(\"Measures\", BLANK())",
+        "columns": [
+          {
+            "name": "Measures",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [
+          {
+            "name": "Headcount",
+            "expression": "DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H01"
+          },
+          {
+            "name": "Attrition Rate",
+            "expression": "DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))",
+            "format": "0%",
+            "folder": null,
+            "tableau": "Calculation_H03"
+          },
+          {
+            "name": "Salary vs Dept",
+            "expression": "(AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H07"
+          },
+          {
+            "name": "Median Salary",
+            "expression": "MEDIAN('employees.csv'[Salary])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H10"
+          },
+          {
+            "name": "Hires Running Total",
+            "expression": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H11"
+          },
+          {
+            "name": "Average of Tenure Years",
+            "expression": "AVERAGE('employees.csv'[Tenure Years])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Calculation_H04"
+          },
+          {
+            "name": "Average of Salary",
+            "expression": "AVERAGE('employees.csv'[Salary])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Salary"
+          },
+          {
+            "name": "Average of Performance Score",
+            "expression": "AVERAGE('employees.csv'[Performance Score])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Performance Score"
+          },
+          {
+            "name": "Count of Employee ID",
+            "expression": "COUNTA('employees.csv'[Employee ID])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "cnt:Employee ID"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "employees.csv",
+        "kind": "single",
+        "m": "let\n    Source = File.Contents(\"Data/hr/employees.csv\"),\n    Csv = Csv.Document(Source, [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),\n    Selected = Table.SelectColumns(Data, {\"employee_id\", \"employee_name\", \"department\", \"job_level\", \"gender\", \"location\", \"hire_date\", \"termination_date\", \"salary\", \"performance_score\"}, MissingField.UseNull),\n    Renamed = Table.RenameColumns(Selected, {{\"employee_id\", \"Employee ID\"}, {\"employee_name\", \"Employee Name\"}, {\"department\", \"Department\"}, {\"job_level\", \"Job Level\"}, {\"gender\", \"Gender\"}, {\"location\", \"Location\"}, {\"hire_date\", \"Hire Date\"}, {\"termination_date\", \"Termination Date\"}, {\"salary\", \"Salary\"}, {\"performance_score\", \"Performance Score\"}}),\n    Typed = Table.TransformColumnTypes(Renamed, {{\"Employee ID\", type text}, {\"Employee Name\", type text}, {\"Department\", type text}, {\"Job Level\", type text}, {\"Gender\", type text}, {\"Location\", type text}, {\"Hire Date\", type date}, {\"Termination Date\", type date}, {\"Salary\", type number}, {\"Performance Score\", Int64.Type}})\nin\n    Typed",
+        "dax_source": null,
+        "columns": [
+          {
+            "name": "Employee ID",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Employee ID"
+          },
+          {
+            "name": "Employee Name",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Employee Name"
+          },
+          {
+            "name": "Department",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Department"
+          },
+          {
+            "name": "Job Level",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Job Level"
+          },
+          {
+            "name": "Gender",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Gender"
+          },
+          {
+            "name": "Location",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Location"
+          },
+          {
+            "name": "Hire Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Hire Date"
+          },
+          {
+            "name": "Termination Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Termination Date"
+          },
+          {
+            "name": "Salary",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "Salary"
+          },
+          {
+            "name": "Performance Score",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "average",
+            "tableau": "Performance Score"
+          },
+          {
+            "name": "Is Active",
+            "datatype": "boolean",
+            "expression": "ISBLANK('employees.csv'[Termination Date])",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H02"
+          },
+          {
+            "name": "Tenure Years",
+            "datatype": "double",
+            "expression": "DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H04"
+          },
+          {
+            "name": "Tenure Band",
+            "datatype": "string",
+            "expression": "SWITCH(TRUE(),\n        ('employees.csv'[Tenure Years] < 2), \"0-2 yrs\",\n        ('employees.csv'[Tenure Years] < 5), \"2-5 yrs\",\n        \"5+ yrs\"\n    )",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H05"
+          },
+          {
+            "name": "Dept Avg Salary",
+            "datatype": "double",
+            "expression": "(VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H06"
+          },
+          {
+            "name": "High Performer",
+            "datatype": "boolean",
+            "expression": "IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H08"
+          },
+          {
+            "name": "Hire Year",
+            "datatype": "int64",
+            "expression": "YEAR('employees.csv'[Hire Date])",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H09"
+          }
+        ],
+        "measures": [],
+        "hierarchies": []
+      },
+      {
+        "name": "Date",
+        "kind": "date",
+        "m": null,
+        "dax_source": "ADDCOLUMNS(CALENDARAUTO(), \"Year\", YEAR([Date]), \"Quarter\", \"Q\" & QUARTER([Date]), \"Month Number\", MONTH([Date]), \"Month\", FORMAT([Date], \"MMM\"), \"Month Start\", DATE(YEAR([Date]), MONTH([Date]), 1))",
+        "columns": [
+          {
+            "name": "Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Year",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Quarter",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Number",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Start",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [],
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              "Year",
+              "Quarter",
+              "Month"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "from_table": "employees.csv",
+        "from_column": "Hire Date",
+        "to_table": "Date",
+        "to_column": "Date",
+        "cross_filter": "oneDirection",
+        "active": true,
+        "tableau_join": "relationship"
+      }
+    ],
+    "expressions": []
+  },
+  "calculations": [
+    {
+      "datasource": "Employees",
+      "tableau_name": "Headcount",
+      "tableau_formula": "COUNTD([Employee ID])",
+      "kind": "measure",
+      "pbi_object": "Headcount",
+      "pbi_table": "_Measures",
+      "dax": "DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DISTINCTCOUNTNOBLANK"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Is Active",
+      "tableau_formula": "ISNULL([Termination Date])",
+      "kind": "column",
+      "pbi_object": "Is Active",
+      "pbi_table": "employees.csv",
+      "dax": "ISBLANK('employees.csv'[Termination Date])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ISBLANK"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Attrition Rate",
+      "tableau_formula": "SUM(IF NOT ISNULL([Termination Date]) THEN 1 ELSE 0 END) / COUNTD([Employee ID])",
+      "kind": "measure",
+      "pbi_object": "Attrition Rate",
+      "pbi_table": "_Measures",
+      "dax": "DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DISTINCTCOUNTNOBLANK",
+        "DIVIDE",
+        "IF",
+        "ISBLANK",
+        "SUMX"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Tenure Years",
+      "tableau_formula": "DATEDIFF('day', [Hire Date], IFNULL([Termination Date], #2025-12-31#)) / 365.25",
+      "kind": "column",
+      "pbi_object": "Tenure Years",
+      "pbi_table": "employees.csv",
+      "dax": "DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COALESCE",
+        "DATEDIFF",
+        "DIVIDE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Tenure Band",
+      "tableau_formula": "IF [Tenure Years] < 2 THEN '0-2 yrs' ELSEIF [Tenure Years] < 5 THEN '2-5 yrs' ELSE '5+ yrs' END",
+      "kind": "column",
+      "pbi_object": "Tenure Band",
+      "pbi_table": "employees.csv",
+      "dax": "SWITCH(TRUE(),\n        ('employees.csv'[Tenure Years] < 2), \"0-2 yrs\",\n        ('employees.csv'[Tenure Years] < 5), \"2-5 yrs\",\n        \"5+ yrs\"\n    )",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SWITCH",
+        "TRUE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Dept Avg Salary",
+      "tableau_formula": "{FIXED [Department] : AVG([Salary])}",
+      "kind": "column",
+      "pbi_object": "Dept Avg Salary",
+      "pbi_table": "employees.csv",
+      "dax": "(VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE",
+        "CALCULATE",
+        "REMOVEFILTERS"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Salary vs Dept",
+      "tableau_formula": "AVG([Salary]) - AVG([Dept Avg Salary])",
+      "kind": "measure",
+      "pbi_object": "Salary vs Dept",
+      "pbi_table": "_Measures",
+      "dax": "(AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "High Performer",
+      "tableau_formula": "[Performance Score] >= 4",
+      "kind": "column",
+      "pbi_object": "High Performer",
+      "pbi_table": "employees.csv",
+      "dax": "IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ISBLANK"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Hire Year",
+      "tableau_formula": "YEAR([Hire Date])",
+      "kind": "column",
+      "pbi_object": "Hire Year",
+      "pbi_table": "employees.csv",
+      "dax": "YEAR('employees.csv'[Hire Date])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "YEAR"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Median Salary",
+      "tableau_formula": "MEDIAN([Salary])",
+      "kind": "measure",
+      "pbi_object": "Median Salary",
+      "pbi_table": "_Measures",
+      "dax": "MEDIAN('employees.csv'[Salary])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "MEDIAN"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Hires Running Total",
+      "tableau_formula": "RUNNING_SUM(COUNTD([Employee ID]))",
+      "kind": "measure",
+      "pbi_object": "Hires Running Total",
+      "pbi_table": "_Measures",
+      "dax": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "DISTINCTCOUNTNOBLANK",
+        "WINDOW"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Tenure Years",
+      "tableau_formula": "AVG([Calculation_H04])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Tenure Years",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Tenure Years])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Salary",
+      "tableau_formula": "AVG([Salary])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Salary",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Salary])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Performance Score",
+      "tableau_formula": "AVG([Performance Score])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Performance Score",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Performance Score])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ]
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Count of Employee ID",
+      "tableau_formula": "COUNT([Employee ID])",
+      "kind": "base-measure",
+      "pbi_object": "Count of Employee ID",
+      "pbi_table": "_Measures",
+      "dax": "COUNTA('employees.csv'[Employee ID])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COUNTA"
+      ]
+    }
+  ],
+  "parameters": [],
+  "worksheets": [
+    {
+      "name": "Headcount by Department",
+      "mark": "Text",
+      "rows": [
+        "none:Department:nk"
+      ],
+      "cols": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H03:qk",
+        "usr:Calculation_H10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "993eccefe61322c8013e",
+        "type": "tableEx",
+        "worksheet": "Headcount by Department",
+        "title": "Headcount by Department",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Department"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Attrition Rate"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Median Salary"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Tenure Distribution",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_H05:nk",
+        "none:Calculation_H02:nk"
+      ],
+      "cols": [
+        "usr:Calculation_H01:qk",
+        "avg:Calculation_H04:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "7c606b2fc616745bd46f",
+        "type": "tableEx",
+        "worksheet": "Tenure Distribution",
+        "title": "Tenure Distribution",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Tenure Band"
+            },
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Is Active"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Tenure Years"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Salary Benchmark",
+      "mark": "Text",
+      "rows": [
+        "none:Department:nk",
+        "none:Job Level:nk"
+      ],
+      "cols": [
+        "avg:Salary:qk",
+        "usr:Calculation_H07:qk",
+        "avg:Performance Score:qk"
+      ],
+      "encodings": {
+        "text": [
+          "avg:Salary:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Location:nk",
+          "members": [
+            "Austin",
+            "Seattle"
+          ],
+          "exclude": false,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "90d7b4bfdaa47df54104",
+        "type": "tableEx",
+        "worksheet": "Salary Benchmark",
+        "title": "Salary Benchmark",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Department"
+            },
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Job Level"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Salary"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Salary vs Dept"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Performance Score"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "employees.csv",
+            "column": "Location",
+            "measure": null,
+            "values": [
+              "Austin",
+              "Seattle"
+            ],
+            "exclude": false,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Hiring Trend",
+      "mark": "Line",
+      "rows": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H11:qk"
+      ],
+      "cols": [
+        "none:Calculation_H09:ok"
+      ],
+      "encodings": {},
+      "filters": [],
+      "visual": {
+        "name": "346a6db51077fff0d9bd",
+        "type": "lineChart",
+        "worksheet": "Hiring Trend",
+        "title": "Hiring Trend",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Hire Year"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Hires Running Total"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Performance Mix",
+      "mark": "Bar",
+      "rows": [
+        "none:Calculation_H08:nk"
+      ],
+      "cols": [
+        "cnt:Employee ID:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Department:nk",
+          "members": [
+            "HR"
+          ],
+          "exclude": true,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "c4c825aa5e4a743b5023",
+        "type": "clusteredBarChart",
+        "worksheet": "Performance Mix",
+        "title": "Performance Mix",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "High Performer"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Count of Employee ID"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "employees.csv",
+            "column": "Department",
+            "measure": null,
+            "values": [
+              "HR"
+            ],
+            "exclude": true,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "8722fc4a3338703e2d94",
+      "display_name": "HR Overview",
+      "width": 1280,
+      "height": 720,
+      "source": "dashboard",
+      "visuals": [
+        {
+          "name": "fb1f18c00578f2ed3f4b",
+          "type": "tableEx",
+          "worksheet": "Headcount by Department",
+          "title": "Headcount by Department",
+          "x": 0,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Attrition Rate"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Median Salary"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "6922df68889e29571681",
+          "type": "lineChart",
+          "worksheet": "Hiring Trend",
+          "title": "Hiring Trend",
+          "x": 640,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Hire Year"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Hires Running Total"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "448d2b0ba68cabc5aa2a",
+          "type": "tableEx",
+          "worksheet": "Salary Benchmark",
+          "title": "Salary Benchmark",
+          "x": 0,
+          "y": 360,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              },
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Job Level"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Salary"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Salary vs Dept"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Performance Score"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "employees.csv",
+              "column": "Location",
+              "measure": null,
+              "values": [
+                "Austin",
+                "Seattle"
+              ],
+              "exclude": false,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "062be3c5c81ed0ad9a08",
+          "type": "tableEx",
+          "worksheet": "Tenure Distribution",
+          "title": "Tenure Distribution",
+          "x": 640,
+          "y": 360,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Tenure Band"
+              },
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Is Active"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Tenure Years"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "9e48016c1de01f682b53",
+          "type": "slicer",
+          "worksheet": null,
+          "title": "Department",
+          "x": 1024,
+          "y": 0,
+          "w": 256,
+          "h": 72,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    },
+    {
+      "name": "6af85021afc5098d11ad",
+      "display_name": "Performance Mix",
+      "width": 1280,
+      "height": 720,
+      "source": "worksheet",
+      "visuals": [
+        {
+          "name": "c4c825aa5e4a743b5023",
+          "type": "clusteredBarChart",
+          "worksheet": "Performance Mix",
+          "title": "Performance Mix",
+          "x": 20,
+          "y": 20,
+          "w": 1240,
+          "h": 680,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "High Performer"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Count of Employee ID"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "employees.csv",
+              "column": "Department",
+              "measure": null,
+              "values": [
+                "HR"
+              ],
+              "exclude": true,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "HR Overview",
+      "width": 1200,
+      "height": 800,
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Headcount by Department",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Hiring Trend",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Salary Benchmark",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "Tenure Distribution",
+          "x": 50000.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "6",
+          "type": "filter",
+          "name": "Headcount by Department",
+          "x": 80000.0,
+          "y": 0.0,
+          "w": 20000.0,
+          "h": 10000.0,
+          "param": "[federated.hr01csvsource].[none:Department:nk]",
+          "text": null,
+          "mode": null
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "issues": [
+    {
+      "severity": "info",
+      "area": "Model",
+      "object": "Date",
+      "message": "Added a Date table (CALENDARAUTO) related to employees.csv[Hire Date] for time intelligence."
+    }
+  ],
+  "sql": []
+}

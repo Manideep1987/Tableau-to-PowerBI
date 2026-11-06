@@ -1,0 +1,4 @@
+relationship 0968571b-08b5-5934-b87f-a7608b58df2f
+	fromColumn: 'Finance Orders'.order_date
+	toColumn: Date.Date
+

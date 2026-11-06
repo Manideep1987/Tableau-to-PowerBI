@@ -1,0 +1,25 @@
+table 'Metric Selector'
+	lineageTag: 085f9a8b-70af-5475-b555-94ece9e3107a
+
+	/// Selected value of Tableau parameter 'Metric Selector'
+	measure 'Metric Selector Value' = SELECTEDVALUE('Metric Selector'[Metric Selector], "Sales")
+		lineageTag: afa521c0-025b-580f-a28d-98c29b68dd3f
+
+		annotation TableauSource = Parameter 4
+
+	column 'Metric Selector'
+		dataType: string
+		lineageTag: e37ae394-1ba6-5c4e-8c4b-e008829f3de1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Metric Selector]
+
+		annotation TableauSource = [Parameters].[Parameter 4]
+
+	partition 'Metric Selector' = calculated
+		mode: import
+		source = SELECTCOLUMNS({"Sales", "Profit", "Quantity"}, "Metric Selector", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

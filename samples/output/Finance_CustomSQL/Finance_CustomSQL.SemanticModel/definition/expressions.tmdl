@@ -1,0 +1,18 @@
+/// Converted from Tableau connection
+expression 'Finance Orders Server' = "pg-finance.corp.local" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 13a56f01-dd72-51e5-be6a-5de8f15156ad
+
+	annotation PBI_ResultType = Text
+
+/// Converted from Tableau connection
+expression 'Finance Orders Database' = "finance" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: adc1ec6a-f944-5891-9980-3a44bd6681cc
+
+	annotation PBI_ResultType = Text
+
+/// Power Query parameter from Tableau parameter used in custom SQL
+expression 'Min Quantity' = 2 meta [IsParameterQuery=true, Type="Number", IsParameterQueryRequired=true]
+	lineageTag: 0f08fa44-8f1a-52d4-aec3-f7feef7c626b
+
+	annotation PBI_ResultType = Number
+

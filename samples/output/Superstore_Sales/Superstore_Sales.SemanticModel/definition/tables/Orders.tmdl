@@ -1,0 +1,229 @@
+table Orders
+	lineageTag: 1e066418-b3ad-5ae2-9cc0-813076a00314
+
+	column 'Row ID'
+		dataType: int64
+		isHidden
+		lineageTag: 9fcd1136-d9ef-5db9-bac0-9bc457f3d9e8
+		summarizeBy: none
+		sourceColumn: Row ID
+
+		annotation TableauSource = Row ID
+
+	column 'Order ID'
+		dataType: string
+		lineageTag: 51a6afde-02f7-579f-b5b0-134c654d526a
+		summarizeBy: none
+		sourceColumn: Order ID
+
+		annotation TableauSource = Order ID
+
+	column 'Order Date'
+		dataType: dateTime
+		lineageTag: 90109cd9-29ae-5d87-9862-1a17054d702a
+		summarizeBy: none
+		sourceColumn: Order Date
+
+		annotation TableauSource = Order Date
+
+	column 'Ship Date'
+		dataType: dateTime
+		lineageTag: 9a6da933-973b-5d7b-97b2-ad0974eaf25e
+		summarizeBy: none
+		sourceColumn: Ship Date
+
+		annotation TableauSource = Ship Date
+
+	column 'Ship Mode'
+		dataType: string
+		lineageTag: a0cf6464-fe3b-5068-8390-9d1ed7f62836
+		summarizeBy: none
+		sourceColumn: Ship Mode
+
+		annotation TableauSource = Ship Mode
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: 386bccb8-4648-556a-a752-4042d18ec39f
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation TableauSource = Customer ID
+
+	column 'Product ID'
+		dataType: string
+		lineageTag: 2b280798-e33b-5645-9858-f08a9f883e3b
+		summarizeBy: none
+		sourceColumn: Product ID
+
+		annotation TableauSource = Product ID
+
+	column Sales
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		lineageTag: a073cee6-eb63-5212-bc9f-9e58647d8149
+		summarizeBy: sum
+		sourceColumn: Sales
+
+		annotation TableauSource = Sales
+
+	column Quantity
+		dataType: int64
+		lineageTag: 243d1997-e2f7-5df6-9d4c-102a832d9d83
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation TableauSource = Quantity
+
+	/// Discount rate applied to the order line
+	column Discount
+		dataType: double
+		formatString: 0%
+		lineageTag: 793741c2-dc5a-5c2f-b586-2a071a675eca
+		summarizeBy: average
+		sourceColumn: Discount
+
+		annotation TableauSource = Discount
+
+	column Profit
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		lineageTag: 46cc39fe-5ed0-5cd7-877c-49f27b8c3fa8
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation TableauSource = Profit
+
+	column 'Order Date Month Start' = DATE(YEAR('Orders'[Order Date]), MONTH('Orders'[Order Date]), 1)
+		dataType: dateTime
+		displayFolder: Date parts
+		lineageTag: 8b1dadb3-b025-5393-896b-5d0018d3b759
+		summarizeBy: none
+
+		annotation TableauSource = tmn:Order Date
+
+	column 'Order Date Year' = YEAR('Orders'[Order Date])
+		dataType: int64
+		displayFolder: Date parts
+		lineageTag: 750333f8-e6df-5b3a-8c5d-a4b87a1a643b
+		summarizeBy: none
+
+		annotation TableauSource = yr:Order Date
+
+	column 'Order Date Quarter Start' = DATE(YEAR('Orders'[Order Date]), (QUARTER('Orders'[Order Date]) - 1) * 3 + 1, 1)
+		dataType: dateTime
+		displayFolder: Date parts
+		lineageTag: 2b7a2a96-ec4a-5227-8aa6-122a5cbfa18d
+		summarizeBy: none
+
+		annotation TableauSource = tqr:Order Date
+
+	column 'Profit Status' = ```
+		SWITCH(TRUE(),
+		        ('Orders'[Profit] > 0), "Profitable",
+		        ('Orders'[Profit] = 0), "Break-even",
+		        "Loss"
+		    )
+		```
+		dataType: string
+		lineageTag: 78c6e5f3-5d48-5331-8732-4142b283c8bd
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0002
+
+	column 'Discount Band' = IF((COALESCE('Orders'[Discount], 0) >= [Discount Threshold Value]), "High Discount", "Standard")
+		dataType: string
+		lineageTag: 5608b059-2263-5fab-a80d-22c7172d7cf1
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0003
+
+	column 'Days to Ship' = DATEDIFF('Orders'[Order Date], 'Orders'[Ship Date], DAY)
+		dataType: int64
+		lineageTag: f5abe23a-12e0-5b66-9f92-daa063675cee
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0004
+
+	column 'Customer Lifetime Sales' = (VAR __lod1 = RELATED('Customers'[Customer Name]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Customer Name] = __lod1))
+		dataType: double
+		lineageTag: 1676f576-9fcf-5822-aa00-5efa309802e6
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0005
+
+	column 'Region Sales' = (VAR __lod1 = RELATED('Customers'[Region]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Region] = __lod1))
+		dataType: double
+		lineageTag: ed145026-3358-5c2c-94d7-2a3d8cb0f000
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0006
+
+	column 'Net Sales' = ('Orders'[Sales] * IF(ISBLANK('Orders'[Discount]), BLANK(), (1 - 'Orders'[Discount])))
+		dataType: double
+		lineageTag: b846d5d7-ad4f-574a-9b56-dfd9af17b069
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0013
+
+	column 'Customer Tier' = ```
+		SWITCH(TRUE(),
+		        ('Orders'[Customer Lifetime Sales] >= 25000), "Platinum",
+		        ('Orders'[Customer Lifetime Sales] >= 12000), "Gold",
+		        "Silver"
+		    )
+		```
+		dataType: string
+		lineageTag: 8b8f6622-f62a-517b-ae3a-485aeff180da
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0014
+
+	column 'Order Month Name' = FORMAT('Orders'[Order Date], "MMMM")
+		dataType: string
+		lineageTag: bf7b4929-7bf5-5df1-adc7-812e508c097a
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0015
+
+	column 'Product Code' = UPPER(LEFT(RELATED('Products'[Sub-Category]), 3)) & "-" & RIGHT('Orders'[Product ID], 4)
+		dataType: string
+		lineageTag: b54d7dc1-8832-5a8b-af37-04f6c6090bf9
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0016
+
+	column 'Large Order' = (('Orders'[Quantity] >= 7) && ('Orders'[Sales] > 500))
+		dataType: boolean
+		lineageTag: 46ad1590-ced0-5ff1-a299-106c3b2bc8c8
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0019
+
+	column 'Ship Quarter Start' = DATE(YEAR('Orders'[Ship Date]), (QUARTER('Orders'[Ship Date]) - 1) * 3 + 1, 1)
+		dataType: dateTime
+		lineageTag: 01a33d0a-967a-5f2d-b2cf-8c4b6ab09aa4
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_0021
+
+	column 'Sales (bin)' = IF(ISBLANK('Orders'[Sales]), BLANK(), FLOOR('Orders'[Sales], 500))
+		dataType: double
+		lineageTag: 90cdfc6d-5013-5e57-8a1b-ebad02f29411
+		summarizeBy: none
+
+		annotation TableauSource = Sales (bin)
+
+	partition Orders = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Superstore Server", #"Superstore Database"),
+				    Data = Source{[Schema = "dbo", Item = "Orders"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"row_id", "order_id", "order_date", "ship_date", "ship_mode", "customer_id", "product_id", "sales", "quantity", "discount", "profit"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"row_id", "Row ID"}, {"order_id", "Order ID"}, {"order_date", "Order Date"}, {"ship_date", "Ship Date"}, {"ship_mode", "Ship Mode"}, {"customer_id", "Customer ID"}, {"product_id", "Product ID"}, {"sales", "Sales"}, {"quantity", "Quantity"}, {"discount", "Discount"}, {"profit", "Profit"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Row ID", Int64.Type}, {"Order ID", type text}, {"Order Date", type date}, {"Ship Date", type date}, {"Ship Mode", type text}, {"Customer ID", type text}, {"Product ID", type text}, {"Sales", type number}, {"Quantity", Int64.Type}, {"Discount", type number}, {"Profit", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,145 @@
+table 'employees.csv'
+	lineageTag: 2a5a472a-cd10-5ff8-bf89-426f09f84908
+
+	column 'Employee ID'
+		dataType: string
+		lineageTag: 5b5c81a5-c4a9-5611-ad4f-b916927661fc
+		summarizeBy: none
+		sourceColumn: Employee ID
+
+		annotation TableauSource = Employee ID
+
+	column 'Employee Name'
+		dataType: string
+		lineageTag: 002c35e8-bf9e-5f4a-bf95-dacb6d63d496
+		summarizeBy: none
+		sourceColumn: Employee Name
+
+		annotation TableauSource = Employee Name
+
+	column Department
+		dataType: string
+		lineageTag: 9a826281-b936-52c4-8473-3b4058f754e2
+		summarizeBy: none
+		sourceColumn: Department
+
+		annotation TableauSource = Department
+
+	column 'Job Level'
+		dataType: string
+		lineageTag: 10a34676-61af-5bab-be00-789c8d52b3bb
+		summarizeBy: none
+		sourceColumn: Job Level
+
+		annotation TableauSource = Job Level
+
+	column Gender
+		dataType: string
+		lineageTag: 8c4b86a4-ba41-55d9-ada5-e55b16e93158
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation TableauSource = Gender
+
+	column Location
+		dataType: string
+		lineageTag: c1190a8d-8f8f-5457-8e89-467bf18da5c7
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation TableauSource = Location
+
+	column 'Hire Date'
+		dataType: dateTime
+		lineageTag: 31bd84d4-9585-5326-816d-d9cec3b2ad30
+		summarizeBy: none
+		sourceColumn: Hire Date
+
+		annotation TableauSource = Hire Date
+
+	column 'Termination Date'
+		dataType: dateTime
+		lineageTag: 720beef0-a523-56ba-bc5a-c2c00cb8b59d
+		summarizeBy: none
+		sourceColumn: Termination Date
+
+		annotation TableauSource = Termination Date
+
+	column Salary
+		dataType: double
+		lineageTag: 502350c5-555f-5178-bff5-eba4dcd735b2
+		summarizeBy: sum
+		sourceColumn: Salary
+
+		annotation TableauSource = Salary
+
+	column 'Performance Score'
+		dataType: int64
+		lineageTag: 6f742551-4379-55dc-abed-a1349aefed64
+		summarizeBy: average
+		sourceColumn: Performance Score
+
+		annotation TableauSource = Performance Score
+
+	column 'Is Active' = ISBLANK('employees.csv'[Termination Date])
+		dataType: boolean
+		lineageTag: 491f03c6-1aa6-5e38-ba4c-2e96bb3197e3
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H02
+
+	column 'Tenure Years' = DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)
+		dataType: double
+		lineageTag: e6e477e1-d296-5924-992f-868e98cc80aa
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H04
+
+	column 'Tenure Band' = ```
+		SWITCH(TRUE(),
+		        ('employees.csv'[Tenure Years] < 2), "0-2 yrs",
+		        ('employees.csv'[Tenure Years] < 5), "2-5 yrs",
+		        "5+ yrs"
+		    )
+		```
+		dataType: string
+		lineageTag: 0f7ee621-d94a-5fc2-b9b3-73faf79075da
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H05
+
+	column 'Dept Avg Salary' = (VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))
+		dataType: double
+		lineageTag: 27cd4bb9-6b3a-5481-bcf2-4b0795f349c7
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H06
+
+	column 'High Performer' = IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))
+		dataType: boolean
+		lineageTag: 3296f30e-f5dd-5860-bac4-8a1414a642c1
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H08
+
+	column 'Hire Year' = YEAR('employees.csv'[Hire Date])
+		dataType: int64
+		lineageTag: fda70f71-9659-59d8-b6b7-344b34ac2f0a
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_H09
+
+	partition 'employees.csv' = m
+		mode: import
+		source =
+				let
+				    Source = File.Contents("Data/hr/employees.csv"),
+				    Csv = Csv.Document(Source, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),
+				    Selected = Table.SelectColumns(Data, {"employee_id", "employee_name", "department", "job_level", "gender", "location", "hire_date", "termination_date", "salary", "performance_score"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"employee_id", "Employee ID"}, {"employee_name", "Employee Name"}, {"department", "Department"}, {"job_level", "Job Level"}, {"gender", "Gender"}, {"location", "Location"}, {"hire_date", "Hire Date"}, {"termination_date", "Termination Date"}, {"salary", "Salary"}, {"performance_score", "Performance Score"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Employee ID", type text}, {"Employee Name", type text}, {"Department", type text}, {"Job Level", type text}, {"Gender", type text}, {"Location", type text}, {"Hire Date", type date}, {"Termination Date", type date}, {"Salary", type number}, {"Performance Score", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

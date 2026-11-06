@@ -1,0 +1,1359 @@
+{
+  "workbook": {
+    "name": "Finance_CustomSQL",
+    "version": "18.1",
+    "build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": []
+  },
+  "stats": {
+    "datasources": 1,
+    "tables": 1,
+    "columns": 9,
+    "relationships": 1,
+    "calculations": 10,
+    "parameters": 2,
+    "worksheets": 4,
+    "dashboards": 1,
+    "filters": 1,
+    "measures": 13,
+    "calc_columns": 3,
+    "pages": 2,
+    "visuals": 4,
+    "converted": 12,
+    "converted_with_notes": 0,
+    "manual": 0
+  },
+  "datasources": [
+    {
+      "name": "federated.0fin7qz2x1lb9e0a8m3k",
+      "caption": "Finance Orders",
+      "model_style": "joins",
+      "is_extract": true,
+      "connections": [
+        {
+          "name": "postgres.1abc",
+          "class": "postgres",
+          "server": "pg-finance.corp.local",
+          "database": "finance",
+          "schema": null,
+          "file": null
+        }
+      ],
+      "tables": [
+        {
+          "name": "Custom SQL Query",
+          "type": "text",
+          "table": null,
+          "sql": "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= <Parameters.Min Quantity>"
+        },
+        {
+          "name": "Targets",
+          "type": "table",
+          "table": "[public].[Targets]",
+          "sql": null
+        }
+      ],
+      "relationships": [
+        {
+          "left_table": "Custom SQL Query",
+          "left_column": "region",
+          "right_table": "Targets",
+          "right_column": "region",
+          "join_type": "inner",
+          "cardinality": "many-to-one"
+        }
+      ],
+      "columns": [
+        {
+          "name": "order_id",
+          "table": "Custom SQL Query",
+          "remote": "order_id",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "order_date",
+          "table": "Custom SQL Query",
+          "remote": "order_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "sales",
+          "table": "Custom SQL Query",
+          "remote": "sales",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "profit",
+          "table": "Custom SQL Query",
+          "remote": "profit",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "quantity",
+          "table": "Custom SQL Query",
+          "remote": "quantity",
+          "datatype": "integer",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "region",
+          "table": "Custom SQL Query",
+          "remote": "region",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "segment",
+          "table": "Custom SQL Query",
+          "remote": "segment",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "region (Targets)",
+          "table": "Targets",
+          "remote": "region",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "sales_target",
+          "table": "Targets",
+          "remote": "sales_target",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        }
+      ],
+      "hierarchies": []
+    }
+  ],
+  "model": {
+    "tables": [
+      {
+        "name": "_Measures",
+        "kind": "measures",
+        "m": null,
+        "dax_source": "ROW(\"Measures\", BLANK())",
+        "columns": [
+          {
+            "name": "Measures",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [
+          {
+            "name": "Target Attainment",
+            "expression": "DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",
+            "format": "0.0%",
+            "folder": null,
+            "tableau": "Calculation_F01"
+          },
+          {
+            "name": "Projected Sales",
+            "expression": "(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F02"
+          },
+          {
+            "name": "Margin %",
+            "expression": "IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",
+            "format": "0%",
+            "folder": null,
+            "tableau": "Calculation_F03"
+          },
+          {
+            "name": "Sales YoY Prior",
+            "expression": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F05"
+          },
+          {
+            "name": "Loss Orders",
+            "expression": "SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F07"
+          },
+          {
+            "name": "Avg Monthly Sales",
+            "expression": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F09"
+          },
+          {
+            "name": "Max Order Value",
+            "expression": "MAX('Finance Orders'[sales])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F10"
+          },
+          {
+            "name": "Sum of sales",
+            "expression": "SUM('Finance Orders'[sales])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:sales"
+          },
+          {
+            "name": "Sum of sales_target",
+            "expression": "SUM('Finance Orders'[sales_target])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:sales_target"
+          },
+          {
+            "name": "Count of order_id",
+            "expression": "COUNTA('Finance Orders'[order_id])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "cnt:order_id"
+          },
+          {
+            "name": "Sum of profit",
+            "expression": "SUM('Finance Orders'[profit])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:profit"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Finance Orders",
+        "kind": "single",
+        "m": "let\n    T0 = let\n        Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n        Data = Value.NativeQuery(Source, \"SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\n    FROM Orders o\n    INNER JOIN Customers c ON c.customer_id = o.customer_id\n    WHERE o.quantity >= \" & Text.From(#\"Min Quantity\"), null, [EnableFolding = true]),\n        Selected = Table.SelectColumns(Data, {\"order_id\", \"order_date\", \"sales\", \"profit\", \"quantity\", \"region\", \"segment\"}, MissingField.UseNull),\n        Typed = Table.TransformColumnTypes(Selected, {{\"order_id\", type text}, {\"order_date\", type date}, {\"sales\", type number}, {\"profit\", type number}, {\"quantity\", Int64.Type}, {\"region\", type text}, {\"segment\", type text}})\n    in\n        Typed,\n    T1 = let\n        Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n        Data = Source{[Schema = \"public\", Item = \"Targets\"]}[Data],\n        Selected = Table.SelectColumns(Data, {\"region\", \"sales_target\"}, MissingField.UseNull),\n        Renamed = Table.RenameColumns(Selected, {{\"region\", \"region (Targets)\"}}),\n        Typed = Table.TransformColumnTypes(Renamed, {{\"region (Targets)\", type text}, {\"sales_target\", type number}})\n    in\n        Typed,\n    J0 = Table.Join(T0, {\"region\"}, T1, {\"region (Targets)\"}, JoinKind.Inner)\nin\n    J0",
+        "dax_source": null,
+        "columns": [
+          {
+            "name": "order_id",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "order_id"
+          },
+          {
+            "name": "order_date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "order_date"
+          },
+          {
+            "name": "sales",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "sales"
+          },
+          {
+            "name": "profit",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "profit"
+          },
+          {
+            "name": "quantity",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "quantity"
+          },
+          {
+            "name": "region",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "region"
+          },
+          {
+            "name": "segment",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "segment"
+          },
+          {
+            "name": "region (Targets)",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "region (Targets)"
+          },
+          {
+            "name": "sales_target",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "sales_target"
+          },
+          {
+            "name": "Fiscal Year",
+            "datatype": "int64",
+            "expression": "IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F04"
+          },
+          {
+            "name": "Order Size",
+            "datatype": "string",
+            "expression": "SWITCH('Finance Orders'[quantity], 1, \"Single\", 2, \"Pair\", \"Bulk\")",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F06"
+          },
+          {
+            "name": "Region Code",
+            "datatype": "string",
+            "expression": "UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F08"
+          }
+        ],
+        "measures": [],
+        "hierarchies": []
+      },
+      {
+        "name": "Min Quantity",
+        "kind": "parameter",
+        "m": null,
+        "dax_source": "SELECTCOLUMNS(GENERATESERIES(1, 9, 1), \"Min Quantity\", [Value])",
+        "columns": [
+          {
+            "name": "Min Quantity",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "[Parameters].[Min Quantity]"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Min Quantity Value",
+            "expression": "SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",
+            "format": null,
+            "folder": null,
+            "tableau": "Min Quantity"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Growth Rate",
+        "kind": "parameter",
+        "m": null,
+        "dax_source": "SELECTCOLUMNS({0.08}, \"Growth Rate\", [Value])",
+        "columns": [
+          {
+            "name": "Growth Rate",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "[Parameters].[Growth Rate]"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Growth Rate Value",
+            "expression": "SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",
+            "format": null,
+            "folder": null,
+            "tableau": "Growth Rate"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Date",
+        "kind": "date",
+        "m": null,
+        "dax_source": "ADDCOLUMNS(CALENDARAUTO(), \"Year\", YEAR([Date]), \"Quarter\", \"Q\" & QUARTER([Date]), \"Month Number\", MONTH([Date]), \"Month\", FORMAT([Date], \"MMM\"), \"Month Start\", DATE(YEAR([Date]), MONTH([Date]), 1))",
+        "columns": [
+          {
+            "name": "Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Year",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Quarter",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Number",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Start",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [],
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              "Year",
+              "Quarter",
+              "Month"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "from_table": "Finance Orders",
+        "from_column": "order_date",
+        "to_table": "Date",
+        "to_column": "Date",
+        "cross_filter": "oneDirection",
+        "active": true,
+        "tableau_join": "relationship"
+      }
+    ],
+    "expressions": [
+      {
+        "name": "Finance Orders Server",
+        "expression": "\"pg-finance.corp.local\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "Finance Orders Database",
+        "expression": "\"finance\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "Min Quantity",
+        "expression": "2 meta [IsParameterQuery=true, Type=\"Number\", IsParameterQueryRequired=true]"
+      }
+    ]
+  },
+  "calculations": [
+    {
+      "datasource": "Parameters",
+      "tableau_name": "Min Quantity",
+      "tableau_formula": "2",
+      "kind": "parameter",
+      "pbi_object": "Min Quantity Value",
+      "pbi_table": "Min Quantity",
+      "dax": "Min Quantity = SELECTCOLUMNS(GENERATESERIES(1, 9, 1), \"Min Quantity\", [Value])\n\n[Min Quantity Value] = SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",
+      "status": "Converted",
+      "warnings": [
+        "What-if (range) parameter -> disconnected table + slicer + value measure"
+      ],
+      "functions": []
+    },
+    {
+      "datasource": "Parameters",
+      "tableau_name": "Growth Rate",
+      "tableau_formula": "0.08",
+      "kind": "parameter",
+      "pbi_object": "Growth Rate Value",
+      "pbi_table": "Growth Rate",
+      "dax": "Growth Rate = SELECTCOLUMNS({0.08}, \"Growth Rate\", [Value])\n\n[Growth Rate Value] = SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",
+      "status": "Converted",
+      "warnings": [
+        "Any value parameter -> disconnected table + slicer + value measure"
+      ],
+      "functions": []
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Target Attainment",
+      "tableau_formula": "SUM([sales]) / SUM([sales_target])",
+      "kind": "measure",
+      "pbi_object": "Target Attainment",
+      "pbi_table": "_Measures",
+      "dax": "DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DIVIDE",
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Projected Sales",
+      "tableau_formula": "SUM([sales]) * (1 + [Parameters].[Growth Rate])",
+      "kind": "measure",
+      "pbi_object": "Projected Sales",
+      "pbi_table": "_Measures",
+      "dax": "(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Margin %",
+      "tableau_formula": "IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END",
+      "kind": "measure",
+      "pbi_object": "Margin %",
+      "pbi_table": "_Measures",
+      "dax": "IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DIVIDE",
+        "IF",
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Fiscal Year",
+      "tableau_formula": "IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END",
+      "kind": "column",
+      "pbi_object": "Fiscal Year",
+      "pbi_table": "Finance Orders",
+      "dax": "IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "IF",
+        "YEAR"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sales YoY Prior",
+      "tableau_formula": "LOOKUP(SUM([sales]), -1)",
+      "kind": "measure",
+      "pbi_object": "Sales YoY Prior",
+      "pbi_table": "_Measures",
+      "dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "OFFSET",
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Order Size",
+      "tableau_formula": "CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END",
+      "kind": "column",
+      "pbi_object": "Order Size",
+      "pbi_table": "Finance Orders",
+      "dax": "SWITCH('Finance Orders'[quantity], 1, \"Single\", 2, \"Pair\", \"Bulk\")",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SWITCH"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Loss Orders",
+      "tableau_formula": "SUM(IF [profit] < 0 THEN 1 ELSE 0 END)",
+      "kind": "measure",
+      "pbi_object": "Loss Orders",
+      "pbi_table": "_Measures",
+      "dax": "SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "IF",
+        "SUMX"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Region Code",
+      "tableau_formula": "UPPER(LEFT([region], 1)) + STR(LEN([region]))",
+      "kind": "column",
+      "pbi_object": "Region Code",
+      "pbi_table": "Finance Orders",
+      "dax": "UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "LEFT",
+        "LEN",
+        "UPPER"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Avg Monthly Sales",
+      "tableau_formula": "WINDOW_AVG(SUM([sales]))",
+      "kind": "measure",
+      "pbi_object": "Avg Monthly Sales",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "AVERAGEX",
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Max Order Value",
+      "tableau_formula": "MAX([sales])",
+      "kind": "measure",
+      "pbi_object": "Max Order Value",
+      "pbi_table": "_Measures",
+      "dax": "MAX('Finance Orders'[sales])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "MAX"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of sales",
+      "tableau_formula": "SUM([sales])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of sales",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[sales])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of sales_target",
+      "tableau_formula": "SUM([sales_target])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of sales_target",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[sales_target])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Count of order_id",
+      "tableau_formula": "COUNT([order_id])",
+      "kind": "base-measure",
+      "pbi_object": "Count of order_id",
+      "pbi_table": "_Measures",
+      "dax": "COUNTA('Finance Orders'[order_id])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COUNTA"
+      ]
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of profit",
+      "tableau_formula": "SUM([profit])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of profit",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[profit])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Min Quantity",
+      "internal": "Min Quantity",
+      "datatype": "integer",
+      "value": 2,
+      "domain": "range",
+      "min": 1,
+      "max": 9,
+      "step": 1,
+      "members": []
+    },
+    {
+      "name": "Growth Rate",
+      "internal": "Growth Rate",
+      "datatype": "real",
+      "value": 0.08,
+      "domain": "any",
+      "min": null,
+      "max": null,
+      "step": null,
+      "members": []
+    }
+  ],
+  "worksheets": [
+    {
+      "name": "Attainment by Region",
+      "mark": "Text",
+      "rows": [
+        "none:region:nk"
+      ],
+      "cols": [
+        "sum:sales:qk",
+        "sum:sales_target:qk",
+        "usr:Calculation_F01:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_F01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "c6ce3bf1cd804ec5f519",
+        "type": "tableEx",
+        "worksheet": "Attainment by Region",
+        "title": "Attainment by Region",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "region"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales_target"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Target Attainment"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Fiscal Year Sales",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_F04:ok"
+      ],
+      "cols": [
+        "sum:sales:qk",
+        "usr:Calculation_F02:qk",
+        "usr:Calculation_F05:qk",
+        "usr:Calculation_F09:qk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:sales:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "9f093f7ecb6eaeb2b51d",
+        "type": "tableEx",
+        "worksheet": "Fiscal Year Sales",
+        "title": "Fiscal Year Sales",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Fiscal Year"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Projected Sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sales YoY Prior"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Avg Monthly Sales"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Order Size Mix",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_F06:nk",
+        "none:segment:nk"
+      ],
+      "cols": [
+        "cnt:order_id:qk",
+        "usr:Calculation_F03:qk",
+        "usr:Calculation_F07:qk",
+        "usr:Calculation_F10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "cnt:order_id:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:segment:nk",
+          "members": [
+            "Consumer",
+            "Corporate"
+          ],
+          "exclude": false,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "36074430a1b33e1150d5",
+        "type": "tableEx",
+        "worksheet": "Order Size Mix",
+        "title": "Order Size Mix",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Order Size"
+            },
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "segment"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Count of order_id"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Margin %"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Loss Orders"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Max Order Value"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "Finance Orders",
+            "column": "segment",
+            "measure": null,
+            "values": [
+              "Consumer",
+              "Corporate"
+            ],
+            "exclude": false,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Region Codes",
+      "mark": "Bar",
+      "rows": [
+        "none:Calculation_F08:nk"
+      ],
+      "cols": [
+        "sum:profit:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "visual": {
+        "name": "1272438c2844356c76d8",
+        "type": "clusteredBarChart",
+        "worksheet": "Region Codes",
+        "title": "Region Codes",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Region Code"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of profit"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "f4f9b3de0948ddcd1a1e",
+      "display_name": "Finance Summary",
+      "width": 1280,
+      "height": 720,
+      "source": "dashboard",
+      "visuals": [
+        {
+          "name": "d86954da62ee2db3e281",
+          "type": "tableEx",
+          "worksheet": "Attainment by Region",
+          "title": "Attainment by Region",
+          "x": 0,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "region"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales_target"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Target Attainment"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "9d17858aecf6bdbbf8d9",
+          "type": "tableEx",
+          "worksheet": "Fiscal Year Sales",
+          "title": "Fiscal Year Sales",
+          "x": 640,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Fiscal Year"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Projected Sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sales YoY Prior"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Avg Monthly Sales"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "f8625342eae50cb7cc20",
+          "type": "tableEx",
+          "worksheet": "Order Size Mix",
+          "title": "Order Size Mix",
+          "x": 0,
+          "y": 360,
+          "w": 1280,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Order Size"
+              },
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "segment"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Count of order_id"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Margin %"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Loss Orders"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Max Order Value"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "Finance Orders",
+              "column": "segment",
+              "measure": null,
+              "values": [
+                "Consumer",
+                "Corporate"
+              ],
+              "exclude": false,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    },
+    {
+      "name": "299cef0282f50fcce463",
+      "display_name": "Region Codes",
+      "width": 1280,
+      "height": 720,
+      "source": "worksheet",
+      "visuals": [
+        {
+          "name": "1272438c2844356c76d8",
+          "type": "clusteredBarChart",
+          "worksheet": "Region Codes",
+          "title": "Region Codes",
+          "x": 20,
+          "y": 20,
+          "w": 1240,
+          "h": 680,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Region Code"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of profit"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "Finance Summary",
+      "width": 1280,
+      "height": 720,
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Attainment by Region",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Fiscal Year Sales",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Order Size Mix",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 100000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "issues": [
+    {
+      "severity": "info",
+      "area": "Power Query",
+      "object": "Finance Orders",
+      "message": "Custom SQL parameters converted to Power Query parameters: Min Quantity"
+    },
+    {
+      "severity": "info",
+      "area": "Power Query",
+      "object": "Finance Orders",
+      "message": "Custom SQL is sent as a native query (query folding enabled)."
+    },
+    {
+      "severity": "info",
+      "area": "Data source",
+      "object": "Finance Orders",
+      "message": "Physical join of 2 tables flattened into 'Finance Orders' with Table.Join to keep Tableau join semantics (row duplication included). Consider refactoring to a star schema."
+    },
+    {
+      "severity": "info",
+      "area": "Parameter",
+      "object": "Growth Rate",
+      "message": "Free-entry parameter converted to a single-value table; add values or use a field parameter."
+    },
+    {
+      "severity": "info",
+      "area": "Model",
+      "object": "Date",
+      "message": "Added a Date table (CALENDARAUTO) related to Finance Orders[order_date] for time intelligence."
+    }
+  ],
+  "sql": [
+    {
+      "table": "Finance Orders",
+      "datasource": "Finance Orders",
+      "sql": "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= <Parameters.Min Quantity>",
+      "m": "let\n    Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n    Data = Value.NativeQuery(Source, \"SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= \" & Text.From(#\"Min Quantity\"), null, [EnableFolding = true]),\n    Selected = Table.SelectColumns(Data, {\"order_id\", \"order_date\", \"sales\", \"profit\", \"quantity\", \"region\", \"segment\"}, MissingField.UseNull),\n    Typed = Table.TransformColumnTypes(Selected, {{\"order_id\", type text}, {\"order_date\", type date}, {\"sales\", type number}, {\"profit\", type number}, {\"quantity\", Int64.Type}, {\"region\", type text}, {\"segment\", type text}})\nin\n    Typed",
+      "findings": [
+        "Tableau parameters in SQL were converted to Power Query parameters (static at refresh)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+table Date
+	lineageTag: 0c0fa84f-7472-5419-b2ec-2c042858d1b8
+
+	column Date
+		dataType: dateTime
+		lineageTag: 76cf7bbd-7bf9-5493-b92c-89062cd9f0ed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+	column Year
+		dataType: int64
+		lineageTag: 9e546afd-c85a-5b6b-b20c-a2d894cbcdf4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+	column Quarter
+		dataType: string
+		lineageTag: bcc86f23-ddb0-5be3-983e-3c8cb9d956ac
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter]
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		lineageTag: 3db2aaa9-19bf-536d-b8bd-fbca0f8b8b71
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Number]
+
+	column Month
+		dataType: string
+		lineageTag: 84a5e4c5-2fb2-5293-a339-2f8fd16e3bb3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+
+	column 'Month Start'
+		dataType: dateTime
+		lineageTag: 16773c02-fd4f-5e58-a38e-a02bee2c5276
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Start]
+
+	hierarchy Calendar
+		lineageTag: b9683af8-7323-5db3-b757-a00889cb84d7
+
+		level Year
+			lineageTag: a84da7ec-1107-5f28-8080-1c02ddb089f0
+			column: Year
+
+		level Quarter
+			lineageTag: 6fe9504b-e879-5946-9031-829745b106b7
+			column: Quarter
+
+		level Month
+			lineageTag: ede49a90-ec9b-53a5-aace-e3833b0af2b3
+			column: Month
+
+	partition Date = calculated
+		mode: import
+		source = ADDCOLUMNS(CALENDARAUTO(), "Year", YEAR([Date]), "Quarter", "Q" & QUARTER([Date]), "Month Number", MONTH([Date]), "Month", FORMAT([Date], "MMM"), "Month Start", DATE(YEAR([Date]), MONTH([Date]), 1))
+
+	annotation PBI_ResultType = Table

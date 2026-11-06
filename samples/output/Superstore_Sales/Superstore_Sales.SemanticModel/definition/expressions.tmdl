@@ -1,0 +1,12 @@
+/// Converted from Tableau connection
+expression 'Superstore Server' = "sql-prod-01.corp.local" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ce707f76-2e60-5a23-82e8-126207bfce4d
+
+	annotation PBI_ResultType = Text
+
+/// Converted from Tableau connection
+expression 'Superstore Database' = "Superstore" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: c5d2a43e-6632-559d-8a8f-221e02158a1c
+
+	annotation PBI_ResultType = Text
+

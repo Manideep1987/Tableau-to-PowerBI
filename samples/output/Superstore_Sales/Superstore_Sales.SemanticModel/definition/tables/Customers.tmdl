@@ -1,0 +1,94 @@
+table Customers
+	lineageTag: 76da911e-7f60-5121-a715-327ccfbc1f9b
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: adc089c0-6101-5e92-b3c8-e821787d3d78
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation TableauSource = Customer ID (Customers)
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: e892f9b7-8cab-596e-8e77-ab5ba4badab1
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+		annotation TableauSource = Customer Name
+
+	column Segment
+		dataType: string
+		lineageTag: 10a55731-405d-5287-803b-e763e661ffcd
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation TableauSource = Segment
+
+	column Region
+		dataType: string
+		lineageTag: c600d827-4780-506d-b7d7-2e0a7e5a0e71
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation TableauSource = Region
+
+	column State
+		dataType: string
+		lineageTag: 85d3c746-5499-543f-8ad1-772757605c8f
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation TableauSource = State
+
+	column 'Region Group' = ```
+		SWITCH(TRUE(),
+		        'Customers'[Region] IN {"East", "West"}, "Coastal",
+		        'Customers'[Region] IN {"Central", "South"}, "Inland",
+		        'Customers'[Region]
+		    )
+		```
+		dataType: string
+		lineageTag: 639f4013-089b-558b-b141-cd68352d5daa
+		summarizeBy: none
+
+		annotation TableauSource = Region (group)
+
+	column 'Key States' = 'Customers'[State] IN {"California", "New York", "Texas"}
+		dataType: boolean
+		lineageTag: 4091d438-052a-5e74-9dfa-24d438eebcf6
+		summarizeBy: none
+
+		annotation TableauSource = Key States
+
+	column 'Top 20 Customers' = RANKX(ALL('Customers'), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP) <= 20
+		dataType: boolean
+		lineageTag: 9f2223be-86e8-5577-8583-f9ff125442b6
+		summarizeBy: none
+
+		annotation TableauSource = Top Customers
+
+	hierarchy Geography
+		lineageTag: 61cd0b43-0f7d-5479-8e2e-e59c7f2d4ffa
+
+		level Region
+			lineageTag: 1238c34d-ff6e-5206-bb38-d3aabf12670b
+			column: Region
+
+		level State
+			lineageTag: 3b26dc55-caf2-5982-b62b-de9631fa36ff
+			column: State
+
+	partition Customers = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Superstore Server", #"Superstore Database"),
+				    Data = Source{[Schema = "dbo", Item = "Customers"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"customer_id", "customer_name", "segment", "region", "state"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"customer_id", "Customer ID"}, {"customer_name", "Customer Name"}, {"segment", "Segment"}, {"region", "Region"}, {"state", "State"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Customer ID", type text}, {"Customer Name", type text}, {"Segment", type text}, {"Region", type text}, {"State", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

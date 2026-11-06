@@ -1,0 +1,71 @@
+table Products
+	lineageTag: 8d2ea543-9512-56d1-a65f-8bb1c4a62c39
+
+	column 'Product ID'
+		dataType: string
+		lineageTag: 16c8f2ab-918e-5609-81f1-69bdeb30a06b
+		summarizeBy: none
+		sourceColumn: Product ID
+
+		annotation TableauSource = Product ID (Products)
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: 4674013d-ced1-5f4b-a0cd-aea7b5704870
+		summarizeBy: none
+		sourceColumn: Product Name
+
+		annotation TableauSource = Product Name
+
+	column Category
+		dataType: string
+		lineageTag: 03fba206-06cb-522e-aede-3bd44eaa7d2d
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation TableauSource = Category
+
+	column 'Sub-Category'
+		dataType: string
+		lineageTag: 46a70af2-d3aa-5c31-9850-2a1a87a2ba12
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+		annotation TableauSource = Sub-Category
+
+	column 'Unit Price'
+		dataType: double
+		lineageTag: 5b06316a-8b06-5939-91a3-4bedc82dd280
+		summarizeBy: average
+		sourceColumn: Unit Price
+
+		annotation TableauSource = Unit Price
+
+	hierarchy 'Product Hierarchy'
+		lineageTag: 74e229e7-68b9-56b4-880f-45c38c74caa6
+
+		level Category
+			lineageTag: 25498287-109b-5037-934c-d1defee19c6f
+			column: Category
+
+		level 'Sub-Category'
+			lineageTag: 08249cfa-9eec-5bc8-ba92-07918a25041a
+			column: 'Sub-Category'
+
+		level 'Product Name'
+			lineageTag: ced1cfc2-5da6-5f93-8416-67350a1dabbd
+			column: 'Product Name'
+
+	partition Products = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Superstore Server", #"Superstore Database"),
+				    Data = Source{[Schema = "dbo", Item = "Products"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"product_id", "product_name", "category", "sub_category", "unit_price"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"product_id", "Product ID"}, {"product_name", "Product Name"}, {"category", "Category"}, {"sub_category", "Sub-Category"}, {"unit_price", "Unit Price"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Product ID", type text}, {"Product Name", type text}, {"Category", type text}, {"Sub-Category", type text}, {"Unit Price", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

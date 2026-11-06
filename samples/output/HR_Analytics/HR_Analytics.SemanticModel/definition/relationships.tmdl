@@ -1,0 +1,4 @@
+relationship 66deb3f4-0394-59f7-bc6f-28ef9e814f25
+	fromColumn: 'employees.csv'.'Hire Date'
+	toColumn: Date.Date
+
