@@ -21,6 +21,34 @@ from .model import (Action, Column, CalculatedField, Connection, Dashboard, Dash
                     Datasource, FieldRef, Filter, Hierarchy, LogicalTable, Parameter,
                     Relation, Relationship, Workbook, Worksheet)
 
+class UnsafeWorkbookError(ValueError):
+    """Raised for packages or XML that violate the safety limits."""
+
+
+LIMITS = {"max_input_bytes": 500 * 2**20, "max_uncompressed_bytes": 2 * 2**30, "max_members": 20000,
+          "max_ratio": 200}
+
+# Elements the reader understands (or knowingly ignores as presentation-only). Anything
+# else is preserved in ``Workbook.unknown_nodes`` with its XPath and flagged for review.
+KNOWN_TAGS = set("""workbook document-format-change-manifest preferences preference repository-location datasources
+datasource connection named-connections named-connection relation columns column clause expression metadata-records
+metadata-record remote-name remote-type local-name parent-name remote-alias ordinal local-type aggregation
+contains-null precision scale width collation attributes attribute padded-semantics cast-to-local-type approx-count
+family object-id calculation bin value group groupfilter drill-paths drill-path field folder folder-item aliases
+alias members member range desc extract object-graph objects object properties relationships relationship
+first-end-point second-end-point layout semantic-values semantic-value date-options column-instance table-calc order
+worksheets worksheet layout-options title table view datasource-dependencies filter slices sort computed-sort
+natural-sort manual-sort shelf-sort-v2 encodings color size text label lod tooltip shape path wedge-size panes pane
+mark rows cols dashboards dashboard zones zone actions action activation source command param refresh
+breakdown mark-sizing aggregation simple-id customization customizations connection-customization vendor driver
+style-rule format encoding style windows window cards card edge strip viewpoints viewpoint highlight thumbnails
+thumbnail formatted-text run zone-style devicelayouts devicelayout selection-collection tuple-selector
+tuple-reference field-reference map-options mapsources mapsource semantic-role-ref target-field show-full-range
+reference-line reference-band trend-line annotation annotations point-selector point-zone area legend
+min max _.fcp.ObjectModelEncapsulateLegacy.false...relation""".split())
+PRESENTATION = {"style", "formatted-text", "thumbnails", "windows", "preferences", "devicelayouts", "layout-options",
+                "zone-style", "document-format-change-manifest", "map-options", "mapsources", "annotations"}
+
 FIELD_REF_RE = re.compile(r"\[((?:[^\]]|\]\])+)\]\.\[((?:[^\]]|\]\])+)\]")
 
 
@@ -143,17 +171,67 @@ class TableauReader:
         self.data = data if data is not None else open(path, "rb").read()
         self.packaged: dict[str, bytes] = {}
 
+    def _path(self, el):
+        try:
+            return self.tree.getpath(el)
+        except Exception:
+            return None
+
+    def _inventory(self, root, wb: Workbook):
+        """Count known vs unknown elements; preserve unknown nodes (path + tag) for review."""
+        known = unknown = 0
+
+        def walk(el):
+            nonlocal known, unknown
+            tag = _local(el.tag)
+            if not tag:
+                return
+            if tag in PRESENTATION:
+                known += 1
+                return
+            if tag in KNOWN_TAGS:
+                known += 1
+                for c in el:
+                    walk(c)
+            else:
+                unknown += 1
+                wb.unknown_nodes.append({"path": self._path(el), "tag": tag,
+                                         "attributes": dict(list(el.attrib.items())[:6])})
+        walk(root)
+        wb.parse_stats = {"known_elements": known, "unknown_elements": unknown,
+                          "completeness": round(100.0 * known / max(known + unknown, 1), 2)}
+
     def _load_xml(self) -> bytes:
+        if len(self.data) > LIMITS["max_input_bytes"]:
+            raise UnsafeWorkbookError(f"Workbook is larger than {LIMITS['max_input_bytes'] // 2**20} MB")
         if self.filename.lower().endswith(".twbx") or self.data[:2] == b"PK":
-            with zipfile.ZipFile(io.BytesIO(self.data)) as z:
-                twb_name = None
-                for n in z.namelist():
-                    if n.lower().endswith(".twb") and "/" not in n.strip("/"):
-                        twb_name = n
-                for n in z.namelist():
-                    if n.lower().endswith(".twb") and twb_name is None:
-                        twb_name = n
-                    elif not n.endswith("/") and not n.lower().endswith(".twb"):
+            try:
+                z = zipfile.ZipFile(io.BytesIO(self.data))
+            except zipfile.BadZipFile as e:
+                raise ValueError(f"Not a valid .twbx package: {e}") from e
+            with z:
+                infos = z.infolist()
+                if len(infos) > LIMITS["max_members"]:
+                    raise UnsafeWorkbookError(f"Package has {len(infos)} files (limit {LIMITS['max_members']})")
+                total = 0
+                for info in infos:
+                    n = info.filename
+                    if n.startswith(("/", "\\")) or ".." in n.replace("\\", "/").split("/") or re.match(r"^[A-Za-z]:", n):
+                        raise UnsafeWorkbookError(f"Unsafe path in package (path traversal): {n!r}")
+                    if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                        raise UnsafeWorkbookError(f"Symbolic link in package: {n!r}")
+                    total += info.file_size
+                    if info.compress_size and info.file_size / max(info.compress_size, 1) > LIMITS["max_ratio"] \
+                            and info.file_size > 10 * 2**20:
+                        raise UnsafeWorkbookError(f"Suspicious compression ratio for {n!r} (zip bomb)")
+                if total > LIMITS["max_uncompressed_bytes"]:
+                    raise UnsafeWorkbookError(f"Package expands to {total // 2**20} MB "
+                                              f"(limit {LIMITS['max_uncompressed_bytes'] // 2**20} MB)")
+                names = z.namelist()
+                twb_name = next((n for n in names if n.lower().endswith(".twb") and "/" not in n.strip("/")), None) \
+                    or next((n for n in names if n.lower().endswith(".twb")), None)
+                for n in names:
+                    if n != twb_name and not n.endswith("/") and not n.lower().endswith(".twb"):
                         self.packaged[n] = z.read(n)
                 if not twb_name:
                     raise ValueError("No .twb file found inside the .twbx package")
@@ -162,12 +240,23 @@ class TableauReader:
 
     def read(self) -> Workbook:
         xml = self._load_xml()
-        parser = etree.XMLParser(recover=True, huge_tree=True, remove_comments=True)
+        if b"<!ENTITY" in xml[:20000]:
+            raise UnsafeWorkbookError("XML entity declarations are not allowed (XXE / entity expansion)")
+        # secure parser settings: no DTD, no entity resolution, no network, bounded tree
+        parser = etree.XMLParser(recover=True, huge_tree=False, remove_comments=True, resolve_entities=False,
+                                 no_network=True, load_dtd=False, dtd_validation=False)
         root = etree.fromstring(xml, parser)
+        if root is None:
+            raise ValueError("The workbook XML could not be parsed")
+        self.tree = root.getroottree()
         name = os.path.splitext(self.filename)[0]
         wb = Workbook(name=name, version=root.get("version"),
                       source_build=root.get("source-build"))
         wb.packaged_files = self.packaged
+        if len(parser.error_log):
+            wb.warnings.append(f"XML had {len(parser.error_log)} syntax problem(s); recovered: "
+                               f"{parser.error_log[0].message}")
+        self._inventory(root, wb)
 
         ds_root = _child(root, "datasources")
         if ds_root is not None:
@@ -193,6 +282,7 @@ class TableauReader:
         if act_root is not None:
             for a in _children(act_root, "action"):
                 wb.actions.append(self._read_action(a))
+        _analyse(wb)
         return wb
 
     # ------------------------------------------------------------ params --
@@ -206,7 +296,8 @@ class TableauReader:
                 parse_member(formula) if formula else None)
             p = Parameter(internal_name=internal, caption=col.get("caption") or internal,
                           datatype=dt, current_value=_coerce(value, dt),
-                          domain_type=col.get("param-domain-type", "any"), formula=formula)
+                          domain_type=col.get("param-domain-type", "any"), formula=formula,
+                          xml_path=self._path(col))
             rng = _child(col, "range")
             if rng is not None:
                 p.min = _coerce(parse_member(rng.get("min")), dt) if rng.get("min") else None
@@ -226,7 +317,8 @@ class TableauReader:
 
     # -------------------------------------------------------- datasource --
     def _read_datasource(self, ds_el, wb: Workbook) -> Datasource:
-        ds = Datasource(name=ds_el.get("name"), caption=ds_el.get("caption") or ds_el.get("name"))
+        ds = Datasource(name=ds_el.get("name"), caption=ds_el.get("caption") or ds_el.get("name"),
+                        xml_path=self._path(ds_el))
         conn_el = _child(ds_el, "connection")
         named = {}
         if conn_el is not None:
@@ -426,7 +518,8 @@ class TableauReader:
             cls = calc.get("class", "tableau")
             cf = CalculatedField(internal_name=name, caption=caption or name,
                                  formula=calc.get("formula") or "", hidden=col_el.get("hidden") == "true",
-                                 description=desc, default_format=col_el.get("default-format"), **common)
+                                 description=desc, default_format=col_el.get("default-format"),
+                                 xml_path=self._path(col_el), **common)
             if cls == "categorical-bin":
                 cf.kind = "group"
                 cf.extra["source"] = strip_brackets(calc.get("column"))
@@ -457,6 +550,7 @@ class TableauReader:
         col.description = desc
         col.default_format = col_el.get("default-format")
         col.semantic_role = col_el.get("semantic-role")
+        col.xml_path = self._path(col_el)
         if col_el.get("aggregation"):
             col.aggregation = col_el.get("aggregation")
 
@@ -465,7 +559,7 @@ class TableauReader:
         caption = grp.get("caption") or name
         gf = _child(grp, "groupfilter")
         cf = CalculatedField(internal_name=name, caption=caption, formula="", datatype="boolean",
-                             role="dimension", type="nominal", kind="set")
+                             role="dimension", type="nominal", kind="set", xml_path=self._path(grp))
         if gf is None:
             return
         func = gf.get("function")
@@ -497,7 +591,7 @@ class TableauReader:
 
     # --------------------------------------------------------- worksheet --
     def _read_worksheet(self, ws_el, wb: Workbook) -> Worksheet:
-        ws = Worksheet(name=ws_el.get("name"))
+        ws = Worksheet(name=ws_el.get("name"), xml_path=self._path(ws_el))
         table = _child(ws_el, "table")
         if table is None:
             return ws
@@ -562,7 +656,7 @@ class TableauReader:
         if ref is None:
             return None
         flt = Filter(kind=cls or "categorical", datasource=ref.datasource, field=ref,
-                     is_context=f.get("context") == "true")
+                     is_context=f.get("context") == "true", xml_path=self._path(f))
         if cls == "categorical":
             gf = _child(f, "groupfilter")
             if gf is not None:
@@ -611,7 +705,7 @@ class TableauReader:
 
     # --------------------------------------------------------- dashboard --
     def _read_dashboard(self, el) -> Dashboard:
-        db = Dashboard(name=el.get("name"))
+        db = Dashboard(name=el.get("name"), xml_path=self._path(el))
         size = _child(el, "size")
         if size is not None:
             db.width = int(size.get("maxwidth") or size.get("minwidth") or 1200)
@@ -653,7 +747,8 @@ class TableauReader:
         act = _child(a, "activation")
         out = Action(name=a.get("caption") or strip_brackets(a.get("name")), type=kind,
                      source_sheet=(src.get("worksheet") or src.get("dashboard")) if src is not None else None,
-                     activation=act.get("type", "on-select") if act is not None else "on-select")
+                     activation=act.get("type", "on-select") if act is not None else "on-select",
+                     xml_path=self._path(a))
         if cmd is not None:
             for p in _children(cmd, "param"):
                 if p.get("name") in ("target", "worksheet"):
@@ -666,6 +761,27 @@ class TableauReader:
 
 
 # ---------------------------------------------------------------- utils --
+SECURITY_FUNCS = re.compile(r"\b(USERNAME|FULLNAME|USERDOMAIN|ISMEMBEROF|ISUSERNAME|ISFULLNAME|USERATTRIBUTE)\s*\(", re.I)
+
+
+def _analyse(wb: Workbook):
+    """Workbook-level findings: data blends and user (row-level security) filters."""
+    for ws in wb.worksheets:
+        used = {r.datasource for r in ws.all_fields()} - {"Parameters"}
+        if len(used) > 1:
+            wb.warnings.append(f"Worksheet '{ws.name}' blends {len(used)} data sources; Power BI needs a single "
+                               f"model with relationships (blend converted per data source, review required).")
+    for ds in wb.datasources:
+        for cf in ds.calculations.values():
+            if cf.formula and SECURITY_FUNCS.search(cf.formula):
+                used_as_filter = any(f.field.field == cf.internal_name for f in ds.datasource_filters)
+                cf.extra["security"] = True
+                cf.extra["security_filter"] = used_as_filter
+                wb.security_findings.append({
+                    "datasource": ds.caption, "calculation": cf.caption, "formula": cf.formula,
+                    "applied_as": "data source filter" if used_as_filter else "calculation",
+                    "xml_path": cf.xml_path})
+
 def _text(el, name) -> Optional[str]:
     c = _child(el, name)
     if c is None:

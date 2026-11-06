@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "name": "7e3d67d989176a85faff",
+  "position": {
+    "x": 512.0,
+    "y": 187.2,
+    "z": 3000,
+    "width": 512.0,
+    "height": 266.4,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactInvoices"
+                    }
+                  },
+                  "Property": "Invoice Date Month Start"
+                }
+              },
+              "queryRef": "FactInvoices.Invoice Date Month Start",
+              "nativeQueryRef": "Invoice Date Month Start",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Invoice Amount"
+                }
+              },
+              "queryRef": "_Measures.Total Invoice Amount",
+              "nativeQueryRef": "Total Invoice Amount"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "On Time Paid Amount"
+                }
+              },
+              "queryRef": "_Measures.On Time Paid Amount",
+              "nativeQueryRef": "On Time Paid Amount"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Monthly Payment Trend'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

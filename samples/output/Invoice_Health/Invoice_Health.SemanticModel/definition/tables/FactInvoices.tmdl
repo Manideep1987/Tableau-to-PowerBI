@@ -1,0 +1,148 @@
+table FactInvoices
+	lineageTag: 4f6f4b1e-15dc-5f79-902f-3bd2e40a7805
+
+	column 'Invoice ID'
+		dataType: string
+		lineageTag: 73fac929-de32-5937-8e4f-cf77947a854b
+		summarizeBy: none
+		sourceColumn: Invoice ID
+
+		annotation TableauSource = Invoice ID
+
+	column 'Vendor Key'
+		dataType: string
+		lineageTag: a1b2d5aa-0199-53de-a317-9b6c5844285c
+		summarizeBy: none
+		sourceColumn: Vendor Key
+
+		annotation TableauSource = Vendor Key
+
+	column 'Employee Key'
+		dataType: string
+		lineageTag: 70aebd93-d88a-5b0f-a7c0-d53980cee785
+		summarizeBy: none
+		sourceColumn: Employee Key
+
+		annotation TableauSource = Employee Key
+
+	column 'Date Key'
+		dataType: int64
+		lineageTag: 6faa0e04-ce11-5aee-9f8d-fe9353826b88
+		summarizeBy: none
+		sourceColumn: Date Key
+
+		annotation TableauSource = Date Key
+
+	column 'Invoice Date'
+		dataType: dateTime
+		lineageTag: b9e6ce14-6403-5c3e-b360-3b6ca603e973
+		summarizeBy: none
+		sourceColumn: Invoice Date
+
+		annotation TableauSource = Invoice Date
+
+	column 'Due Date'
+		dataType: dateTime
+		lineageTag: 40efd545-3443-56d6-8cd8-ca054df8198e
+		summarizeBy: none
+		sourceColumn: Due Date
+
+		annotation TableauSource = Due Date
+
+	column 'Payment Date'
+		dataType: dateTime
+		lineageTag: f3c145a3-6605-5c38-ab76-b530ae770e25
+		summarizeBy: none
+		sourceColumn: Payment Date
+
+		annotation TableauSource = Payment Date
+
+	/// Invoice value in reporting currency
+	column 'Invoice Amount'
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		lineageTag: 30e32a68-c2e3-5915-8f72-3d59efd71043
+		summarizeBy: sum
+		sourceColumn: Invoice Amount
+
+		annotation TableauSource = Invoice Amount
+
+	column Status
+		dataType: string
+		lineageTag: dee177c6-61cf-5846-a81d-d5a9d673faa4
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation TableauSource = Status
+
+	column 'Paid Flag'
+		dataType: boolean
+		lineageTag: 25a8ccd3-11d6-59e5-8cef-e2aa6ff6ab57
+		summarizeBy: none
+		sourceColumn: Paid Flag
+
+		annotation TableauSource = Paid Flag
+
+	column 'Invoice Date Month Start' = DATE(YEAR('FactInvoices'[Invoice Date]), MONTH('FactInvoices'[Invoice Date]), 1)
+		dataType: dateTime
+		displayFolder: Date parts
+		lineageTag: c7140803-9517-5955-83a7-13354f7b7fd1
+		summarizeBy: none
+
+		annotation TableauSource = tmn:Invoice Date
+
+	column 'Days Late' = DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY)
+		dataType: int64
+		lineageTag: 895c3694-8f27-5c96-84ae-86d3699c5743
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_I05
+
+	column 'Payment Status' = ```
+		SWITCH(TRUE(),
+		        ISBLANK('FactInvoices'[Payment Date]), "Unpaid",
+		        IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])), "On time",
+		        "Late"
+		    )
+		```
+		dataType: string
+		lineageTag: c4c99e9b-9d78-5742-9d9b-a62a18548196
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_I06
+
+	column 'Aging Bucket' = ```
+		SWITCH(TRUE(),
+		        ISBLANK('FactInvoices'[Payment Date]), "Unpaid",
+		        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 0)), "Not late",
+		        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 15)), "1-15 days",
+		        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 30)), "16-30 days",
+		        "30+ days"
+		    )
+		```
+		dataType: string
+		lineageTag: 3400c581-59bd-58b3-b482-79b48228da97
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_I07
+
+	column 'Vendor Fixed Amount' = (VAR __lod1 = RELATED('DimVendor'[Vendor Name]) RETURN CALCULATE(SUM('FactInvoices'[Invoice Amount]), REMOVEFILTERS(), 'DimVendor'[Vendor Name] = __lod1))
+		dataType: double
+		lineageTag: f85f12e2-50a5-5e38-a4f3-72e8d123573b
+		summarizeBy: none
+
+		annotation TableauSource = Calculation_I08
+
+	partition FactInvoices = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Invoice Health Server", #"Invoice Health Database"),
+				    Data = Source{[Schema = "dbo", Item = "FactInvoices"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"invoice_id", "vendor_key", "employee_key", "date_key", "invoice_date", "due_date", "payment_date", "invoice_amount", "status", "paid_flag"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"invoice_id", "Invoice ID"}, {"vendor_key", "Vendor Key"}, {"employee_key", "Employee Key"}, {"date_key", "Date Key"}, {"invoice_date", "Invoice Date"}, {"due_date", "Due Date"}, {"payment_date", "Payment Date"}, {"invoice_amount", "Invoice Amount"}, {"status", "Status"}, {"paid_flag", "Paid Flag"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Invoice ID", type text}, {"Vendor Key", type text}, {"Employee Key", type text}, {"Date Key", Int64.Type}, {"Invoice Date", type date}, {"Due Date", type date}, {"Payment Date", type date}, {"Invoice Amount", type number}, {"Status", type text}, {"Paid Flag", type logical}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

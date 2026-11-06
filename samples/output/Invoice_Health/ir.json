@@ -1,0 +1,1712 @@
+{
+  "ir_version": "0.1.0",
+  "workbook": {
+    "id": "wb_invoice_health",
+    "name": "Invoice_Health",
+    "version": "18.1",
+    "source_build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [],
+    "parse_stats": {
+      "known_elements": 486,
+      "unknown_elements": 0,
+      "completeness": 100.0
+    }
+  },
+  "sources": [
+    {
+      "id": "src_invoice_health",
+      "name": "Invoice Health",
+      "kind": "sql",
+      "model_style": "relationships",
+      "xml_path": "/workbook/datasources/datasource[2]",
+      "connections": [
+        {
+          "class": "sqlserver",
+          "server": "findw-sql.contoso.local",
+          "database": "FinanceDW",
+          "schema": "dbo",
+          "file": null,
+          "supported": true
+        }
+      ],
+      "tables": [
+        {
+          "id": "tbl_factinvoices",
+          "name": "FactInvoices",
+          "type": "table",
+          "physical": "[dbo].[FactInvoices]",
+          "sql": null
+        },
+        {
+          "id": "tbl_dimvendor",
+          "name": "DimVendor",
+          "type": "table",
+          "physical": "[dbo].[DimVendor]",
+          "sql": null
+        },
+        {
+          "id": "tbl_dimemployeesecurity",
+          "name": "DimEmployeeSecurity",
+          "type": "table",
+          "physical": "[dbo].[DimEmployeeSecurity]",
+          "sql": null
+        },
+        {
+          "id": "tbl_dimdate",
+          "name": "DimDate",
+          "type": "table",
+          "physical": "[dbo].[DimDate]",
+          "sql": null
+        }
+      ],
+      "relationships": [
+        {
+          "left": "FactInvoices.Vendor Key",
+          "right": "DimVendor.Vendor Key (DimVendor)",
+          "type": "relationship"
+        },
+        {
+          "left": "FactInvoices.Employee Key",
+          "right": "DimEmployeeSecurity.Employee Key (DimEmployeeSecurity)",
+          "type": "relationship"
+        },
+        {
+          "left": "FactInvoices.Date Key",
+          "right": "DimDate.Date Key (DimDate)",
+          "type": "relationship"
+        }
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "id": "f_factinvoices_invoice_id",
+      "name": "Invoice ID",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "invoice_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_vendor_key",
+      "name": "Vendor Key",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "vendor_key",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_employee_key",
+      "name": "Employee Key",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "employee_key",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_date_key",
+      "name": "Date Key",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "date_key",
+      "type": "integer",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_invoice_date",
+      "name": "Invoice Date",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "invoice_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_due_date",
+      "name": "Due Date",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "due_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_payment_date",
+      "name": "Payment Date",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "payment_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": true,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_invoice_amount",
+      "name": "Invoice Amount",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "invoice_amount",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": "Invoice value in reporting currency",
+      "xml_path": "/workbook/datasources/datasource[2]/column[1]"
+    },
+    {
+      "id": "f_factinvoices_status",
+      "name": "Status",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "status",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_factinvoices_paid_flag",
+      "name": "Paid Flag",
+      "source_id": "src_invoice_health",
+      "table": "FactInvoices",
+      "remote_name": "paid_flag",
+      "type": "boolean",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimvendor_vendor_key_dimvendor",
+      "name": "Vendor Key (DimVendor)",
+      "source_id": "src_invoice_health",
+      "table": "DimVendor",
+      "remote_name": "vendor_key",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimvendor_vendor_name",
+      "name": "Vendor Name",
+      "source_id": "src_invoice_health",
+      "table": "DimVendor",
+      "remote_name": "vendor_name",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimvendor_vendor_category",
+      "name": "Vendor Category",
+      "source_id": "src_invoice_health",
+      "table": "DimVendor",
+      "remote_name": "category",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimvendor_region",
+      "name": "Region",
+      "source_id": "src_invoice_health",
+      "table": "DimVendor",
+      "remote_name": "region",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimemployeesecurity_employee_key_dimemployeesecurity",
+      "name": "Employee Key (DimEmployeeSecurity)",
+      "source_id": "src_invoice_health",
+      "table": "DimEmployeeSecurity",
+      "remote_name": "employee_key",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimemployeesecurity_employee_name",
+      "name": "Employee Name",
+      "source_id": "src_invoice_health",
+      "table": "DimEmployeeSecurity",
+      "remote_name": "employee_name",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimemployeesecurity_email_upn",
+      "name": "Email UPN",
+      "source_id": "src_invoice_health",
+      "table": "DimEmployeeSecurity",
+      "remote_name": "email_upn",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": true,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[2]"
+    },
+    {
+      "id": "f_dimemployeesecurity_manager_upn",
+      "name": "Manager UPN",
+      "source_id": "src_invoice_health",
+      "table": "DimEmployeeSecurity",
+      "remote_name": "manager_upn",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimemployeesecurity_role",
+      "name": "Role",
+      "source_id": "src_invoice_health",
+      "table": "DimEmployeeSecurity",
+      "remote_name": "role",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimdate_date_key_dimdate",
+      "name": "Date Key (DimDate)",
+      "source_id": "src_invoice_health",
+      "table": "DimDate",
+      "remote_name": "date_key",
+      "type": "integer",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimdate_calendar_date",
+      "name": "Calendar Date",
+      "source_id": "src_invoice_health",
+      "table": "DimDate",
+      "remote_name": "date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimdate_month",
+      "name": "Month",
+      "source_id": "src_invoice_health",
+      "table": "DimDate",
+      "remote_name": "month",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_dimdate_fiscal_period",
+      "name": "Fiscal Period",
+      "source_id": "src_invoice_health",
+      "table": "DimDate",
+      "remote_name": "fiscal_period",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    }
+  ],
+  "calculations": [
+    {
+      "id": "c_total_invoice_amount",
+      "name": "Total Invoice Amount",
+      "internal_name": "Calculation_I01",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "SUM([Invoice Amount])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "SUM",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Invoice Amount",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_invoice_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[3]",
+      "pbi_object": "Total Invoice Amount",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUM('FactInvoices'[Invoice Amount])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_on_time_paid_amount",
+      "name": "On Time Paid Amount",
+      "internal_name": "Calculation_I02",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "SUM(IF [Paid Flag] = TRUE AND [Payment Date] <= [Due Date] THEN [Invoice Amount] ELSE 0 END)",
+      "expression_ast": {
+        "node": "Func",
+        "name": "SUM",
+        "args": [
+          {
+            "node": "If",
+            "branches": [
+              [
+                {
+                  "node": "BinOp",
+                  "op": "AND",
+                  "left": {
+                    "node": "BinOp",
+                    "op": "=",
+                    "left": {
+                      "node": "Field",
+                      "name": "Paid Flag",
+                      "datasource": null
+                    },
+                    "right": {
+                      "node": "Bool",
+                      "value": true
+                    }
+                  },
+                  "right": {
+                    "node": "BinOp",
+                    "op": "<=",
+                    "left": {
+                      "node": "Field",
+                      "name": "Payment Date",
+                      "datasource": null
+                    },
+                    "right": {
+                      "node": "Field",
+                      "name": "Due Date",
+                      "datasource": null
+                    }
+                  }
+                },
+                {
+                  "node": "Field",
+                  "name": "Invoice Amount",
+                  "datasource": null
+                }
+              ]
+            ],
+            "else_": {
+              "node": "Num",
+              "value": 0
+            }
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_paid_flag",
+        "f_factinvoices_payment_date",
+        "f_factinvoices_due_date",
+        "f_factinvoices_invoice_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[4]",
+      "pbi_object": "On Time Paid Amount",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUMX('FactInvoices', IF((('FactInvoices'[Paid Flag] = TRUE()) && IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), 'FactInvoices'[Invoice Amount], 0))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_paid_amount",
+      "name": "Paid Amount",
+      "internal_name": "Calculation_I03",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "SUM(IF [Paid Flag] THEN [Invoice Amount] END)",
+      "expression_ast": {
+        "node": "Func",
+        "name": "SUM",
+        "args": [
+          {
+            "node": "If",
+            "branches": [
+              [
+                {
+                  "node": "Field",
+                  "name": "Paid Flag",
+                  "datasource": null
+                },
+                {
+                  "node": "Field",
+                  "name": "Invoice Amount",
+                  "datasource": null
+                }
+              ]
+            ],
+            "else_": null
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_paid_flag",
+        "f_factinvoices_invoice_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[5]",
+      "pbi_object": "Paid Amount",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUMX('FactInvoices', IF('FactInvoices'[Paid Flag], 'FactInvoices'[Invoice Amount]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_on_time",
+      "name": "On-time %",
+      "internal_name": "Calculation_I04",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "[On Time Paid Amount] / [Paid Amount]",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Field",
+          "name": "On Time Paid Amount",
+          "datasource": null
+        },
+        "right": {
+          "node": "Field",
+          "name": "Paid Amount",
+          "datasource": null
+        }
+      },
+      "deps": [
+        "c_on_time_paid_amount",
+        "c_paid_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[6]",
+      "pbi_object": "On-time %",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE([On Time Paid Amount], [Paid Amount])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_days_late",
+      "name": "Days Late",
+      "internal_name": "Calculation_I05",
+      "source_id": "src_invoice_health",
+      "category": "column",
+      "tableau": "DATEDIFF('day', [Due Date], [Payment Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "DATEDIFF",
+        "args": [
+          {
+            "node": "Str",
+            "value": "day"
+          },
+          {
+            "node": "Field",
+            "name": "Due Date",
+            "datasource": null
+          },
+          {
+            "node": "Field",
+            "name": "Payment Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_due_date",
+        "f_factinvoices_payment_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[7]",
+      "pbi_object": "Days Late",
+      "pbi_table": "FactInvoices",
+      "pbi_dax": "DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_payment_status",
+      "name": "Payment Status",
+      "internal_name": "Calculation_I06",
+      "source_id": "src_invoice_health",
+      "category": "column",
+      "tableau": "IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Payment Date] <= [Due Date] THEN 'On time' ELSE 'Late' END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "Func",
+              "name": "ISNULL",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Payment Date",
+                  "datasource": null
+                }
+              ]
+            },
+            {
+              "node": "Str",
+              "value": "Unpaid"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "<=",
+              "left": {
+                "node": "Field",
+                "name": "Payment Date",
+                "datasource": null
+              },
+              "right": {
+                "node": "Field",
+                "name": "Due Date",
+                "datasource": null
+              }
+            },
+            {
+              "node": "Str",
+              "value": "On time"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "Late"
+        }
+      },
+      "deps": [
+        "f_factinvoices_payment_date",
+        "f_factinvoices_due_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[8]",
+      "pbi_object": "Payment Status",
+      "pbi_table": "FactInvoices",
+      "pbi_dax": "SWITCH(TRUE(),\n        ISBLANK('FactInvoices'[Payment Date]), \"Unpaid\",\n        IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])), \"On time\",\n        \"Late\"\n    )",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_aging_bucket",
+      "name": "Aging Bucket",
+      "internal_name": "Calculation_I07",
+      "source_id": "src_invoice_health",
+      "category": "column",
+      "tableau": "IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Days Late] <= 0 THEN 'Not late' ELSEIF [Days Late] <= 15 THEN '1-15 days' ELSEIF [Days Late] <= 30 THEN '16-30 days' ELSE '30+ days' END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "Func",
+              "name": "ISNULL",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Payment Date",
+                  "datasource": null
+                }
+              ]
+            },
+            {
+              "node": "Str",
+              "value": "Unpaid"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "<=",
+              "left": {
+                "node": "Field",
+                "name": "Days Late",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 0
+              }
+            },
+            {
+              "node": "Str",
+              "value": "Not late"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "<=",
+              "left": {
+                "node": "Field",
+                "name": "Days Late",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 15
+              }
+            },
+            {
+              "node": "Str",
+              "value": "1-15 days"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "<=",
+              "left": {
+                "node": "Field",
+                "name": "Days Late",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 30
+              }
+            },
+            {
+              "node": "Str",
+              "value": "16-30 days"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "30+ days"
+        }
+      },
+      "deps": [
+        "f_factinvoices_payment_date",
+        "c_days_late"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[9]",
+      "pbi_object": "Aging Bucket",
+      "pbi_table": "FactInvoices",
+      "pbi_dax": "SWITCH(TRUE(),\n        ISBLANK('FactInvoices'[Payment Date]), \"Unpaid\",\n        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 0)), \"Not late\",\n        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 15)), \"1-15 days\",\n        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 30)), \"16-30 days\",\n        \"30+ days\"\n    )",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_vendor_fixed_amount",
+      "name": "Vendor Fixed Amount",
+      "internal_name": "Calculation_I08",
+      "source_id": "src_invoice_health",
+      "category": "lod",
+      "tableau": "{ FIXED [Vendor Name] : SUM([Invoice Amount]) }",
+      "expression_ast": {
+        "node": "LOD",
+        "kind": "FIXED",
+        "dims": [
+          {
+            "node": "Field",
+            "name": "Vendor Name",
+            "datasource": null
+          }
+        ],
+        "expr": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Invoice Amount",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_dimvendor_vendor_name",
+        "f_factinvoices_invoice_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[10]",
+      "pbi_object": "Vendor Fixed Amount",
+      "pbi_table": "FactInvoices",
+      "pbi_dax": "(VAR __lod1 = RELATED('DimVendor'[Vendor Name]) RETURN CALCULATE(SUM('FactInvoices'[Invoice Amount]), REMOVEFILTERS(), 'DimVendor'[Vendor Name] = __lod1))",
+      "strategy": "rule:fixed-lod-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_overdue_invoices",
+      "name": "Overdue Invoices",
+      "internal_name": "Calculation_I09",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "SUM(IF ISNULL([Payment Date]) AND [Due Date] < #2025-12-31# THEN 1 ELSE 0 END)",
+      "expression_ast": {
+        "node": "Func",
+        "name": "SUM",
+        "args": [
+          {
+            "node": "If",
+            "branches": [
+              [
+                {
+                  "node": "BinOp",
+                  "op": "AND",
+                  "left": {
+                    "node": "Func",
+                    "name": "ISNULL",
+                    "args": [
+                      {
+                        "node": "Field",
+                        "name": "Payment Date",
+                        "datasource": null
+                      }
+                    ]
+                  },
+                  "right": {
+                    "node": "BinOp",
+                    "op": "<",
+                    "left": {
+                      "node": "Field",
+                      "name": "Due Date",
+                      "datasource": null
+                    },
+                    "right": {
+                      "node": "DateLit",
+                      "value": "2025-12-31"
+                    }
+                  }
+                },
+                {
+                  "node": "Num",
+                  "value": 1
+                }
+              ]
+            ],
+            "else_": {
+              "node": "Num",
+              "value": 0
+            }
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_payment_date",
+        "f_factinvoices_due_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[11]",
+      "pbi_object": "Overdue Invoices",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUMX('FactInvoices', IF((ISBLANK('FactInvoices'[Payment Date]) && ('FactInvoices'[Due Date] < DATE(2025, 12, 31))), 1, 0))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_invoice_count",
+      "name": "Invoice Count",
+      "internal_name": "Calculation_I10",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "COUNTD([Invoice ID])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "COUNTD",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Invoice ID",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_invoice_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[12]",
+      "pbi_object": "Invoice Count",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DISTINCTCOUNTNOBLANK('FactInvoices'[Invoice ID])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_avg_days_to_pay",
+      "name": "Avg Days to Pay",
+      "internal_name": "Calculation_I11",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "AVG(DATEDIFF('day', [Invoice Date], [Payment Date]))",
+      "expression_ast": {
+        "node": "Func",
+        "name": "AVG",
+        "args": [
+          {
+            "node": "Func",
+            "name": "DATEDIFF",
+            "args": [
+              {
+                "node": "Str",
+                "value": "day"
+              },
+              {
+                "node": "Field",
+                "name": "Invoice Date",
+                "datasource": null
+              },
+              {
+                "node": "Field",
+                "name": "Payment Date",
+                "datasource": null
+              }
+            ]
+          }
+        ]
+      },
+      "deps": [
+        "f_factinvoices_invoice_date",
+        "f_factinvoices_payment_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[13]",
+      "pbi_object": "Avg Days to Pay",
+      "pbi_table": "_Measures",
+      "pbi_dax": "AVERAGEX('FactInvoices', DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_selected_metric_amount",
+      "name": "Selected Metric Amount",
+      "internal_name": "Calculation_I12",
+      "source_id": "src_invoice_health",
+      "category": "measure",
+      "tableau": "CASE [Parameters].[Status Selector] WHEN 'Late invoices' THEN SUM(IF [Payment Status] = 'Late' THEN [Invoice Amount] END) WHEN 'On time' THEN [On Time Paid Amount] ELSE SUM([Invoice Amount]) END",
+      "expression_ast": {
+        "node": "Case",
+        "subject": {
+          "node": "Field",
+          "name": "Status Selector",
+          "datasource": "Parameters"
+        },
+        "whens": [
+          [
+            {
+              "node": "Str",
+              "value": "Late invoices"
+            },
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "If",
+                  "branches": [
+                    [
+                      {
+                        "node": "BinOp",
+                        "op": "=",
+                        "left": {
+                          "node": "Field",
+                          "name": "Payment Status",
+                          "datasource": null
+                        },
+                        "right": {
+                          "node": "Str",
+                          "value": "Late"
+                        }
+                      },
+                      {
+                        "node": "Field",
+                        "name": "Invoice Amount",
+                        "datasource": null
+                      }
+                    ]
+                  ],
+                  "else_": null
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "node": "Str",
+              "value": "On time"
+            },
+            {
+              "node": "Field",
+              "name": "On Time Paid Amount",
+              "datasource": null
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Invoice Amount",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "p_status_selector",
+        "c_payment_status",
+        "f_factinvoices_invoice_amount",
+        "c_on_time_paid_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[14]",
+      "pbi_object": "Selected Metric Amount",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SWITCH([Status Selector Value], \"Late invoices\", SUMX('FactInvoices', IF(('FactInvoices'[Payment Status] = \"Late\"), 'FactInvoices'[Invoice Amount])), \"On time\", [On Time Paid Amount], SUM('FactInvoices'[Invoice Amount]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_manager_security",
+      "name": "Manager Security",
+      "internal_name": "Calculation_I13",
+      "source_id": "src_invoice_health",
+      "category": "security",
+      "tableau": "[Manager UPN] = USERNAME()",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "=",
+        "left": {
+          "node": "Field",
+          "name": "Manager UPN",
+          "datasource": null
+        },
+        "right": {
+          "node": "Func",
+          "name": "USERNAME",
+          "args": []
+        }
+      },
+      "deps": [
+        "f_dimemployeesecurity_manager_upn"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[15]",
+      "pbi_object": "Manager Security",
+      "pbi_table": "DimEmployeeSecurity",
+      "pbi_dax": "'DimEmployeeSecurity'[Manager UPN] = USERPRINCIPALNAME()",
+      "strategy": "rule:user-filter-to-rls-role",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "REVIEW",
+      "warnings": [
+        "Tableau USERNAME() data source filter -> Power BI RLS role (USERPRINCIPALNAME). Assign Entra users/groups to the role in the service and test with real identities."
+      ],
+      "overridden": false
+    },
+    {
+      "id": "c_vendor_share_of_region",
+      "name": "Vendor Share of Region",
+      "internal_name": "Calculation_I14",
+      "source_id": "src_invoice_health",
+      "category": "table_calc",
+      "tableau": "SUM([Invoice Amount]) / TOTAL(SUM([Invoice Amount]))",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Invoice Amount",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "TOTAL",
+          "args": [
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Invoice Amount",
+                  "datasource": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_factinvoices_invoice_amount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[16]",
+      "pbi_object": "Vendor Share of Region",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('FactInvoices'[Invoice Amount]), CALCULATE(SUM('FactInvoices'[Invoice Amount]), ALLSELECTED('DimVendor'[Vendor Name])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "medium",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures."
+      ],
+      "overridden": false
+    }
+  ],
+  "parameters": [
+    {
+      "id": "p_status_selector",
+      "name": "Status Selector",
+      "type": "string",
+      "current_value": "All",
+      "domain": "list",
+      "members": [
+        "All",
+        "Late invoices",
+        "On time"
+      ],
+      "min": null,
+      "max": null,
+      "step": null,
+      "xml_path": "/workbook/datasources/datasource[1]/column"
+    }
+  ],
+  "worksheets": [
+    {
+      "id": "ws_kpi_overview",
+      "name": "KPI Overview",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[1]",
+      "rows": [],
+      "columns": [],
+      "encodings": {
+        "text": [
+          "usr:Calculation_I01:qk",
+          "usr:Calculation_I04:qk",
+          "usr:Calculation_I09:qk",
+          "usr:Calculation_I10:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "multiRowCard"
+    },
+    {
+      "id": "ws_invoice_amount_by_vendor",
+      "name": "Invoice Amount by Vendor",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[2]",
+      "rows": [
+        "none:Vendor Name:nk"
+      ],
+      "columns": [
+        "usr:Calculation_I01:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "top",
+          "field": "none:Vendor Name:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[2]/table/view/filter"
+        }
+      ],
+      "target_visual": "clusteredBarChart"
+    },
+    {
+      "id": "ws_monthly_payment_trend",
+      "name": "Monthly Payment Trend",
+      "mark": "line",
+      "xml_path": "/workbook/worksheets/worksheet[3]",
+      "rows": [
+        "usr:Calculation_I01:qk",
+        "usr:Calculation_I02:qk"
+      ],
+      "columns": [
+        "tmn:Invoice Date:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "target_visual": "lineChart"
+    },
+    {
+      "id": "ws_aging_by_region",
+      "name": "Aging by Region",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[4]",
+      "rows": [
+        "none:Region:nk"
+      ],
+      "columns": [
+        "none:Calculation_I07:nk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:Invoice Amount:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "pivotTable"
+    },
+    {
+      "id": "ws_vendor_category_performance",
+      "name": "Vendor Category Performance",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[5]",
+      "rows": [
+        "none:Vendor Category:nk"
+      ],
+      "columns": [
+        "usr:Calculation_I01:qk",
+        "usr:Calculation_I04:qk",
+        "usr:Calculation_I11:qk",
+        "avg:Calculation_I05:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_I01:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_payment_status_mix",
+      "name": "Payment Status Mix",
+      "mark": "pie",
+      "xml_path": "/workbook/worksheets/worksheet[6]",
+      "rows": [],
+      "columns": [],
+      "encodings": {
+        "color": [
+          "none:Calculation_I06:nk"
+        ],
+        "size": [
+          "sum:Invoice Amount:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "pieChart"
+    },
+    {
+      "id": "ws_selected_status_by_region",
+      "name": "Selected Status by Region",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[7]",
+      "rows": [
+        "none:Region:nk"
+      ],
+      "columns": [
+        "usr:Calculation_I12:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "target_visual": "clusteredBarChart"
+    },
+    {
+      "id": "ws_vendor_concentration",
+      "name": "Vendor Concentration",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[8]",
+      "rows": [
+        "none:Region:nk",
+        "none:Vendor Name:nk"
+      ],
+      "columns": [
+        "max:Calculation_I08:qk",
+        "usr:Calculation_I14:qk"
+      ],
+      "encodings": {
+        "text": [
+          "max:Calculation_I08:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Vendor Category:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[8]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_fiscal_period_south",
+      "name": "Fiscal Period South",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[9]",
+      "rows": [
+        "none:Fiscal Period:nk"
+      ],
+      "columns": [
+        "usr:Calculation_I01:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_I01:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Region:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[9]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "db_invoice_payment_health",
+      "name": "Invoice Payment Health",
+      "width": 1400,
+      "height": 800,
+      "xml_path": "/workbook/dashboards/dashboard",
+      "zones": [
+        {
+          "id": "2",
+          "type": "text",
+          "name": null,
+          "x": 0.0,
+          "y": 0.0,
+          "w": 80000.0,
+          "h": 8000.0
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "KPI Overview",
+          "x": 0.0,
+          "y": 8000.0,
+          "w": 80000.0,
+          "h": 18000.0
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Invoice Amount by Vendor",
+          "x": 0.0,
+          "y": 26000.0,
+          "w": 40000.0,
+          "h": 37000.0
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "Monthly Payment Trend",
+          "x": 40000.0,
+          "y": 26000.0,
+          "w": 40000.0,
+          "h": 37000.0
+        },
+        {
+          "id": "6",
+          "type": "worksheet",
+          "name": "Aging by Region",
+          "x": 0.0,
+          "y": 63000.0,
+          "w": 40000.0,
+          "h": 37000.0
+        },
+        {
+          "id": "7",
+          "type": "worksheet",
+          "name": "Payment Status Mix",
+          "x": 40000.0,
+          "y": 63000.0,
+          "w": 40000.0,
+          "h": 37000.0
+        },
+        {
+          "id": "8",
+          "type": "filter",
+          "name": "Aging by Region",
+          "x": 80000.0,
+          "y": 0.0,
+          "w": 20000.0,
+          "h": 20000.0
+        },
+        {
+          "id": "9",
+          "type": "paramctrl",
+          "name": null,
+          "x": 80000.0,
+          "y": 20000.0,
+          "w": 20000.0,
+          "h": 20000.0
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "name": "Filter by Vendor",
+      "type": "filter",
+      "source": "Invoice Amount by Vendor",
+      "xml_path": "/workbook/actions/action"
+    }
+  ],
+  "security": {
+    "rules": [
+      {
+        "datasource": "Invoice Health",
+        "calculation": "Manager Security",
+        "formula": "[Manager UPN] = USERNAME()",
+        "applied_as": "data source filter",
+        "xml_path": "/workbook/datasources/datasource[2]/column[15]"
+      }
+    ],
+    "roles": [
+      {
+        "name": "Manager Security",
+        "table_permissions": {
+          "DimEmployeeSecurity": "'DimEmployeeSecurity'[Manager UPN] = USERPRINCIPALNAME()"
+        }
+      }
+    ],
+    "requires_identity_review": true
+  },
+  "unknown_nodes": [],
+  "warnings": [
+    "Row-level security role 'Manager Security' created on 'DimEmployeeSecurity'. Security parity is a hard gate: test with permitted and forbidden real users before go-live.",
+    "TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures."
+  ],
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: sqlserver",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Data source",
+      "item": "Relationships (logical layer)",
+      "count": 3,
+      "status": "supported",
+      "note": "star schema"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 4,
+      "status": "supported",
+      "note": "4 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 9,
+      "status": "review",
+      "note": "8 PASS / 1 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Parameters",
+      "count": 1,
+      "status": "supported",
+      "note": "1 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "User filters -> RLS roles",
+      "count": 1,
+      "status": "review",
+      "note": "0 PASS / 1 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "LOD expressions",
+      "count": 1,
+      "status": "review",
+      "note": "context must be proven by validation"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 1,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 2,
+      "status": "supported",
+      "note": "-> clusteredBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Line",
+      "count": 1,
+      "status": "supported",
+      "note": "-> lineChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Pie",
+      "count": 1,
+      "status": "supported",
+      "note": "-> pieChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 5,
+      "status": "supported",
+      "note": "-> multiRowCard, pivotTable, tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 2,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Filters",
+      "item": "top",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 1,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: paramctrl",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: text",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 5,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Actions",
+      "item": "filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Security",
+      "item": "User filters / USERNAME()",
+      "count": 1,
+      "status": "review",
+      "note": "RLS role + live identity test required"
+    }
+  ],
+  "validation": {
+    "summary": {
+      "PASS": 42,
+      "WARN": 0,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "PENDING": 3,
+      "N/A": 0,
+      "total": 45,
+      "pass_rate": 100.0,
+      "overall": "PASS"
+    },
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 10,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "PASS",
+        "automated_checks": 16,
+        "passed": 16,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "PENDING",
+        "automated_checks": 11,
+        "passed": 11,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 5,
+        "passed": 5,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Live identity test (real users, groups, SSO)"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ]
+  }
+}

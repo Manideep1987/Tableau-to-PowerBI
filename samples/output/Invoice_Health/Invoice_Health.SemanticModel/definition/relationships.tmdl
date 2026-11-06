@@ -1,0 +1,12 @@
+relationship 9af9dfe3-b5f2-5144-96df-2642d2526987
+	fromColumn: FactInvoices.'Vendor Key'
+	toColumn: DimVendor.'Vendor Key'
+
+relationship 3e9fb64a-a0a5-53c2-84bd-fedcd67fc0a5
+	fromColumn: FactInvoices.'Employee Key'
+	toColumn: DimEmployeeSecurity.'Employee Key'
+
+relationship ebcbd874-7fe1-5448-bf39-456af5dc2f93
+	fromColumn: FactInvoices.'Date Key'
+	toColumn: DimDate.'Date Key'
+

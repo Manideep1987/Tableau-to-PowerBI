@@ -1,0 +1,21 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["FactInvoices", "DimVendor", "DimEmployeeSecurity", "DimDate"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation ConvertedFrom = Tableau workbook Invoice_Health
+
+ref table _Measures
+ref table FactInvoices
+ref table DimVendor
+ref table DimEmployeeSecurity
+ref table DimDate
+ref table 'Status Selector'
+ref role 'Manager Security'

@@ -1,19 +1,21 @@
 {
   "workbook": "Finance_CustomSQL",
   "binding": "SQLite: superstore.db",
-  "started": "2026-11-06T16:56:03",
-  "duration_s": 0.48,
+  "started": "2026-11-06T17:26:55",
+  "duration_s": 0.5,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 17,
+    "PASS": 25,
     "WARN": 0,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 1,
-    "total": 18,
+    "PENDING": 3,
+    "N/A": 1,
+    "total": 30,
     "pass_rate": 100.0,
     "overall": "PASS"
   },
@@ -27,14 +29,16 @@
         "expected": 10,
         "actual": 10,
         "manual": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Parameters converted",
       "status": "PASS",
       "detail": "2/2 parameters -> parameter tables + value measures",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -43,7 +47,8 @@
       "detail": "4/4 worksheets have a visual",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -52,28 +57,32 @@
       "detail": "1/1 dashboards -> report pages",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Worksheet filters converted",
       "status": "PASS",
       "detail": "1/1 worksheet filters -> visual-level filters",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Columns mapped",
       "status": "PASS",
       "detail": "9/9 source columns in the semantic model",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Relationships converted",
       "status": "PASS",
       "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 1)",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -83,7 +92,8 @@
       "data": {
         "tableau": 2672,
         "powerbi": 2672
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -173,7 +183,8 @@
             "status": "PASS"
           }
         ]
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L3 Visual",
@@ -359,7 +370,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -581,7 +593,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -814,7 +827,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -928,17 +942,447 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L4 Scenario",
       "name": "Parameter 'Min Quantity' = 3",
       "status": "SKIP",
       "detail": "Parameter is used in custom SQL: Power BI applies it at refresh (Power Query parameter); re-run validation after changing it in both tools.",
-      "data": {}
+      "data": {},
+      "gate": 2
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "KPI register",
+      "name": "KPI scenario: All data",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "All data",
+            "metric": "SUM(sales)",
+            "measure": "Sum of sales",
+            "tableau": 3069043.03,
+            "powerbi": 3069043.03,
+            "delta": 0.0,
+            "tolerance": 3.0690430299999996,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "SUM(sales_target)",
+            "measure": "Sum of sales_target",
+            "tableau": 978800000.0,
+            "powerbi": 978800000.0,
+            "delta": 0.0,
+            "tolerance": 978.8,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Target Attainment",
+            "measure": "Target Attainment",
+            "tableau": 0.0031355159685328973,
+            "powerbi": 0.0031355159685328973,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Projected Sales",
+            "measure": "Projected Sales",
+            "tableau": 3314566.4724,
+            "powerbi": 3314566.4724,
+            "delta": 0.0,
+            "tolerance": 3.3145664723999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "CNT(order_id)",
+            "measure": "Count of order_id",
+            "tableau": 2672.0,
+            "powerbi": 2672.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Margin %",
+            "measure": "Margin %",
+            "tableau": 0.01136020565993824,
+            "powerbi": 0.01136020565993824,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: region = Central",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "region = Central",
+            "metric": "SUM(sales)",
+            "measure": "Sum of sales",
+            "tableau": 674661.42,
+            "powerbi": 674661.42,
+            "delta": 0.0,
+            "tolerance": 0.67466142,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = Central",
+            "metric": "SUM(sales_target)",
+            "measure": "Sum of sales_target",
+            "tableau": 232560000.0,
+            "powerbi": 232560000.0,
+            "delta": 0.0,
+            "tolerance": 232.56,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = Central",
+            "metric": "Target Attainment",
+            "measure": "Target Attainment",
+            "tableau": 0.0029010208978328175,
+            "powerbi": 0.0029010208978328175,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = Central",
+            "metric": "Projected Sales",
+            "measure": "Projected Sales",
+            "tableau": 728634.3336000001,
+            "powerbi": 728634.3336000001,
+            "delta": 0.0,
+            "tolerance": 0.7286343336000001,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = Central",
+            "metric": "CNT(order_id)",
+            "measure": "Count of order_id",
+            "tableau": 646.0,
+            "powerbi": 646.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = Central",
+            "metric": "Margin %",
+            "measure": "Margin %",
+            "tableau": 0.015953202126186495,
+            "powerbi": 0.015953202126186495,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: region = East",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "region = East",
+            "metric": "SUM(sales)",
+            "measure": "Sum of sales",
+            "tableau": 910389.88,
+            "powerbi": 910389.88,
+            "delta": 0.0,
+            "tolerance": 0.91038988,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = East",
+            "metric": "SUM(sales_target)",
+            "measure": "Sum of sales_target",
+            "tableau": 296780000.0,
+            "powerbi": 296780000.0,
+            "delta": 0.0,
+            "tolerance": 296.78,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = East",
+            "metric": "Target Attainment",
+            "measure": "Target Attainment",
+            "tableau": 0.003067558056472808,
+            "powerbi": 0.003067558056472808,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = East",
+            "metric": "Projected Sales",
+            "measure": "Projected Sales",
+            "tableau": 983221.0704000001,
+            "powerbi": 983221.0704000001,
+            "delta": 0.0,
+            "tolerance": 0.9832210704000001,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = East",
+            "metric": "CNT(order_id)",
+            "measure": "Count of order_id",
+            "tableau": 781.0,
+            "powerbi": 781.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region = East",
+            "metric": "Margin %",
+            "measure": "Margin %",
+            "tableau": 4.1696421317864184e-05,
+            "powerbi": 4.1696421317864184e-05,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: region (Targets) = Central",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "SUM(sales)",
+            "measure": "Sum of sales",
+            "tableau": 674661.42,
+            "powerbi": 674661.42,
+            "delta": 0.0,
+            "tolerance": 0.67466142,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "SUM(sales_target)",
+            "measure": "Sum of sales_target",
+            "tableau": 232560000.0,
+            "powerbi": 232560000.0,
+            "delta": 0.0,
+            "tolerance": 232.56,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "Target Attainment",
+            "measure": "Target Attainment",
+            "tableau": 0.0029010208978328175,
+            "powerbi": 0.0029010208978328175,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "Projected Sales",
+            "measure": "Projected Sales",
+            "tableau": 728634.3336000001,
+            "powerbi": 728634.3336000001,
+            "delta": 0.0,
+            "tolerance": 0.7286343336000001,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "CNT(order_id)",
+            "measure": "Count of order_id",
+            "tableau": 646.0,
+            "powerbi": 646.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = Central",
+            "metric": "Margin %",
+            "measure": "Margin %",
+            "tableau": 0.015953202126186495,
+            "powerbi": 0.015953202126186495,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: region (Targets) = East",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "SUM(sales)",
+            "measure": "Sum of sales",
+            "tableau": 910389.88,
+            "powerbi": 910389.88,
+            "delta": 0.0,
+            "tolerance": 0.91038988,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "SUM(sales_target)",
+            "measure": "Sum of sales_target",
+            "tableau": 296780000.0,
+            "powerbi": 296780000.0,
+            "delta": 0.0,
+            "tolerance": 296.78,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "Target Attainment",
+            "measure": "Target Attainment",
+            "tableau": 0.003067558056472808,
+            "powerbi": 0.003067558056472808,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "Projected Sales",
+            "measure": "Projected Sales",
+            "tableau": 983221.0704000001,
+            "powerbi": 983221.0704000001,
+            "delta": 0.0,
+            "tolerance": 0.9832210704000001,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "CNT(order_id)",
+            "measure": "Count of order_id",
+            "tableau": 781.0,
+            "powerbi": 781.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "region (Targets) = East",
+            "metric": "Margin %",
+            "measure": "Margin %",
+            "tableau": 4.1696421317864184e-05,
+            "powerbi": 4.1696421317864184e-05,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "Interactions",
+      "name": "Report field references (PBIR)",
+      "status": "PASS",
+      "detail": "18/18 visual and filter field references resolve to model objects",
+      "data": {
+        "missing": []
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Quick filters and parameter controls -> slicers",
+      "status": "PASS",
+      "detail": "0 slicers for 0 dashboard controls",
+      "data": {
+        "columns": [
+          {
+            "dashboard": "Finance Summary",
+            "quick_filters_and_parameter_controls": 0,
+            "slicers": 0,
+            "status": "PASS"
+          }
+        ]
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Filter propagation design",
+      "status": "PASS",
+      "detail": "All relationships many-to-one, single direction (no ambiguous paths)",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Click paths, slicer defaults, tooltips, drillthrough",
+      "status": "PENDING",
+      "detail": "Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
       "name": "'Attainment by Region' sliced by segment = Consumer",
       "status": "PASS",
       "detail": "tableEx | 4 vs 4 rows | 12/12 cells match",
@@ -1121,10 +1565,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Fiscal Year Sales' sliced by region = Central",
       "status": "PASS",
       "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
@@ -1343,10 +1788,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Order Size Mix' sliced by region = Central",
       "status": "PASS",
       "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
@@ -1576,10 +2022,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Region Codes' sliced by region = Central",
       "status": "PASS",
       "detail": "clusteredBarChart | 1 vs 1 rows | 1/1 cells match",
@@ -1645,8 +2092,487 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Security",
+      "name": "User filters / USERNAME()",
+      "status": "N/A",
+      "detail": "No Tableau user filters or user functions found in the workbook.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Security",
+      "name": "Confirm no row-level security requirement",
+      "status": "PENDING",
+      "detail": "Business owner confirms the published Tableau content had no server-side permissions or user filters that must be reproduced.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Business UAT",
+      "name": "Business owner sign-off",
+      "status": "PENDING",
+      "detail": "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.",
+      "data": {},
+      "gate": 5
     }
   ],
-  "engine_errors": []
+  "engine_errors": [],
+  "kpi_register": [
+    {
+      "scenario": "All data",
+      "metric": "SUM(sales)",
+      "measure": "Sum of sales",
+      "tableau": 3069043.03,
+      "powerbi": 3069043.03,
+      "delta": 0.0,
+      "tolerance": 3.0690430299999996,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "SUM(sales_target)",
+      "measure": "Sum of sales_target",
+      "tableau": 978800000.0,
+      "powerbi": 978800000.0,
+      "delta": 0.0,
+      "tolerance": 978.8,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Target Attainment",
+      "measure": "Target Attainment",
+      "tableau": 0.0031355159685328973,
+      "powerbi": 0.0031355159685328973,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Projected Sales",
+      "measure": "Projected Sales",
+      "tableau": 3314566.4724,
+      "powerbi": 3314566.4724,
+      "delta": 0.0,
+      "tolerance": 3.3145664723999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "CNT(order_id)",
+      "measure": "Count of order_id",
+      "tableau": 2672.0,
+      "powerbi": 2672.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Margin %",
+      "measure": "Margin %",
+      "tableau": 0.01136020565993824,
+      "powerbi": 0.01136020565993824,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "SUM(sales)",
+      "measure": "Sum of sales",
+      "tableau": 674661.42,
+      "powerbi": 674661.42,
+      "delta": 0.0,
+      "tolerance": 0.67466142,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "SUM(sales_target)",
+      "measure": "Sum of sales_target",
+      "tableau": 232560000.0,
+      "powerbi": 232560000.0,
+      "delta": 0.0,
+      "tolerance": 232.56,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "Target Attainment",
+      "measure": "Target Attainment",
+      "tableau": 0.0029010208978328175,
+      "powerbi": 0.0029010208978328175,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "Projected Sales",
+      "measure": "Projected Sales",
+      "tableau": 728634.3336000001,
+      "powerbi": 728634.3336000001,
+      "delta": 0.0,
+      "tolerance": 0.7286343336000001,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "CNT(order_id)",
+      "measure": "Count of order_id",
+      "tableau": 646.0,
+      "powerbi": 646.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = Central",
+      "metric": "Margin %",
+      "measure": "Margin %",
+      "tableau": 0.015953202126186495,
+      "powerbi": 0.015953202126186495,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "SUM(sales)",
+      "measure": "Sum of sales",
+      "tableau": 910389.88,
+      "powerbi": 910389.88,
+      "delta": 0.0,
+      "tolerance": 0.91038988,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "SUM(sales_target)",
+      "measure": "Sum of sales_target",
+      "tableau": 296780000.0,
+      "powerbi": 296780000.0,
+      "delta": 0.0,
+      "tolerance": 296.78,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "Target Attainment",
+      "measure": "Target Attainment",
+      "tableau": 0.003067558056472808,
+      "powerbi": 0.003067558056472808,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "Projected Sales",
+      "measure": "Projected Sales",
+      "tableau": 983221.0704000001,
+      "powerbi": 983221.0704000001,
+      "delta": 0.0,
+      "tolerance": 0.9832210704000001,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "CNT(order_id)",
+      "measure": "Count of order_id",
+      "tableau": 781.0,
+      "powerbi": 781.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region = East",
+      "metric": "Margin %",
+      "measure": "Margin %",
+      "tableau": 4.1696421317864184e-05,
+      "powerbi": 4.1696421317864184e-05,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "SUM(sales)",
+      "measure": "Sum of sales",
+      "tableau": 674661.42,
+      "powerbi": 674661.42,
+      "delta": 0.0,
+      "tolerance": 0.67466142,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "SUM(sales_target)",
+      "measure": "Sum of sales_target",
+      "tableau": 232560000.0,
+      "powerbi": 232560000.0,
+      "delta": 0.0,
+      "tolerance": 232.56,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "Target Attainment",
+      "measure": "Target Attainment",
+      "tableau": 0.0029010208978328175,
+      "powerbi": 0.0029010208978328175,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "Projected Sales",
+      "measure": "Projected Sales",
+      "tableau": 728634.3336000001,
+      "powerbi": 728634.3336000001,
+      "delta": 0.0,
+      "tolerance": 0.7286343336000001,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "CNT(order_id)",
+      "measure": "Count of order_id",
+      "tableau": 646.0,
+      "powerbi": 646.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = Central",
+      "metric": "Margin %",
+      "measure": "Margin %",
+      "tableau": 0.015953202126186495,
+      "powerbi": 0.015953202126186495,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "SUM(sales)",
+      "measure": "Sum of sales",
+      "tableau": 910389.88,
+      "powerbi": 910389.88,
+      "delta": 0.0,
+      "tolerance": 0.91038988,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "SUM(sales_target)",
+      "measure": "Sum of sales_target",
+      "tableau": 296780000.0,
+      "powerbi": 296780000.0,
+      "delta": 0.0,
+      "tolerance": 296.78,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "Target Attainment",
+      "measure": "Target Attainment",
+      "tableau": 0.003067558056472808,
+      "powerbi": 0.003067558056472808,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "Projected Sales",
+      "measure": "Projected Sales",
+      "tableau": 983221.0704000001,
+      "powerbi": 983221.0704000001,
+      "delta": 0.0,
+      "tolerance": 0.9832210704000001,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "CNT(order_id)",
+      "measure": "Count of order_id",
+      "tableau": 781.0,
+      "powerbi": 781.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "region (Targets) = East",
+      "metric": "Margin %",
+      "measure": "Margin %",
+      "tableau": 4.1696421317864184e-05,
+      "powerbi": 4.1696421317864184e-05,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    }
+  ],
+  "identity_matrix": [],
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Data contract",
+      "status": "PASS",
+      "automated_checks": 9,
+      "passed": 9,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 2,
+      "name": "Numeric / KPI parity",
+      "status": "PASS",
+      "automated_checks": 10,
+      "passed": 9,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 3,
+      "name": "Interactions",
+      "status": "PENDING",
+      "automated_checks": 7,
+      "passed": 7,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Click paths, slicer defaults, tooltips, drillthrough"
+      ]
+    },
+    {
+      "gate": 4,
+      "name": "Security (RLS)",
+      "status": "PENDING",
+      "automated_checks": 1,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Confirm no row-level security requirement"
+      ]
+    },
+    {
+      "gate": 5,
+      "name": "Business UAT",
+      "status": "PENDING",
+      "automated_checks": 0,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Business owner sign-off"
+      ]
+    }
+  ],
+  "readiness": {
+    "metrics": [
+      {
+        "metric": "Parse completeness",
+        "value": 100.0,
+        "detail": "206 known / 0 unknown XML elements (unknown preserved for review)"
+      },
+      {
+        "metric": "Calculation pass rate",
+        "value": 91.7,
+        "detail": "11 of 12 calculations numerically verified in a passing check (12 PASS, 0 REVIEW, 0 UNSUPPORTED by rule)"
+      },
+      {
+        "metric": "Visual openability",
+        "value": null,
+        "detail": "NOT RUN: requires Power BI Desktop on Windows. 4/4 worksheets map to native visuals."
+      },
+      {
+        "metric": "Numeric parity",
+        "value": 100.0,
+        "detail": "9 of 9 visual, scenario and KPI checks pass"
+      },
+      {
+        "metric": "Security acceptance",
+        "value": null,
+        "detail": "No row-level security in the workbook"
+      },
+      {
+        "metric": "Manual effort (estimate)",
+        "value": 0,
+        "unit": "minutes",
+        "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
+      }
+    ],
+    "index": 97.2,
+    "verified_objects": [
+      "Avg Monthly Sales",
+      "Count of order_id",
+      "Fiscal Year",
+      "Growth Rate",
+      "Growth Rate Value",
+      "Loss Orders",
+      "Margin %",
+      "Max Order Value",
+      "Order Size",
+      "Projected Sales",
+      "Region Code",
+      "Sales YoY Prior",
+      "Sum of profit",
+      "Sum of sales",
+      "Sum of sales_target",
+      "Target Attainment",
+      "order_date",
+      "order_id",
+      "profit",
+      "quantity",
+      "region",
+      "sales",
+      "sales_target",
+      "segment"
+    ]
+  },
+  "verdict": "Automated gates passed; human checks pending"
 }

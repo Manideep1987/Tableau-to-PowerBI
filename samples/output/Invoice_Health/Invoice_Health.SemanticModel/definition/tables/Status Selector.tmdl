@@ -1,0 +1,25 @@
+table 'Status Selector'
+	lineageTag: 9cb3a906-d09e-5265-8034-b5e64d6cdee4
+
+	/// Selected value of Tableau parameter 'Status Selector'
+	measure 'Status Selector Value' = SELECTEDVALUE('Status Selector'[Status Selector], "All")
+		lineageTag: abc3c078-d7d3-5cea-af35-2b334b031a48
+
+		annotation TableauSource = Status Selector
+
+	column 'Status Selector'
+		dataType: string
+		lineageTag: 847c5a40-8490-596e-86ba-2a62918966ca
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Status Selector]
+
+		annotation TableauSource = [Parameters].[Status Selector]
+
+	partition 'Status Selector' = calculated
+		mode: import
+		source = SELECTCOLUMNS({"All", "Late invoices", "On time"}, "Status Selector", [Value])
+
+	annotation PBI_ResultType = Table
+
+	annotation TableauParameter = true

@@ -1,0 +1,2385 @@
+{
+  "ir_version": "0.1.0",
+  "workbook": {
+    "id": "wb_superstore_sales",
+    "name": "Superstore_Sales",
+    "version": "18.1",
+    "source_build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [],
+    "parse_stats": {
+      "known_elements": 674,
+      "unknown_elements": 0,
+      "completeness": 100.0
+    }
+  },
+  "sources": [
+    {
+      "id": "src_superstore",
+      "name": "Superstore",
+      "kind": "sql",
+      "model_style": "relationships",
+      "xml_path": "/workbook/datasources/datasource[2]",
+      "connections": [
+        {
+          "class": "sqlserver",
+          "server": "sql-prod-01.corp.local",
+          "database": "Superstore",
+          "schema": "dbo",
+          "file": null,
+          "supported": true
+        }
+      ],
+      "tables": [
+        {
+          "id": "tbl_orders",
+          "name": "Orders",
+          "type": "table",
+          "physical": "[dbo].[Orders]",
+          "sql": null
+        },
+        {
+          "id": "tbl_customers",
+          "name": "Customers",
+          "type": "table",
+          "physical": "[dbo].[Customers]",
+          "sql": null
+        },
+        {
+          "id": "tbl_products",
+          "name": "Products",
+          "type": "table",
+          "physical": "[dbo].[Products]",
+          "sql": null
+        }
+      ],
+      "relationships": [
+        {
+          "left": "Orders.Customer ID",
+          "right": "Customers.Customer ID (Customers)",
+          "type": "relationship"
+        },
+        {
+          "left": "Orders.Product ID",
+          "right": "Products.Product ID (Products)",
+          "type": "relationship"
+        }
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "id": "f_orders_row_id",
+      "name": "Row ID",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "row_id",
+      "type": "integer",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": true,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[6]"
+    },
+    {
+      "id": "f_orders_order_id",
+      "name": "Order ID",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "order_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_order_date",
+      "name": "Order Date",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "order_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_ship_date",
+      "name": "Ship Date",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "ship_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_ship_mode",
+      "name": "Ship Mode",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "ship_mode",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_customer_id",
+      "name": "Customer ID",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "customer_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_product_id",
+      "name": "Product ID",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "product_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_sales",
+      "name": "Sales",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "sales",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[3]"
+    },
+    {
+      "id": "f_orders_quantity",
+      "name": "Quantity",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "quantity",
+      "type": "integer",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_orders_discount",
+      "name": "Discount",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "discount",
+      "type": "real",
+      "role": "measure",
+      "nullable": true,
+      "hidden": false,
+      "description": "Discount rate applied to the order line",
+      "xml_path": "/workbook/datasources/datasource[2]/column[5]"
+    },
+    {
+      "id": "f_orders_profit",
+      "name": "Profit",
+      "source_id": "src_superstore",
+      "table": "Orders",
+      "remote_name": "profit",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[4]"
+    },
+    {
+      "id": "f_customers_customer_id_customers",
+      "name": "Customer ID (Customers)",
+      "source_id": "src_superstore",
+      "table": "Customers",
+      "remote_name": "customer_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_customers_customer_name",
+      "name": "Customer Name",
+      "source_id": "src_superstore",
+      "table": "Customers",
+      "remote_name": "customer_name",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_customers_segment",
+      "name": "Segment",
+      "source_id": "src_superstore",
+      "table": "Customers",
+      "remote_name": "segment",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_customers_region",
+      "name": "Region",
+      "source_id": "src_superstore",
+      "table": "Customers",
+      "remote_name": "region",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[1]"
+    },
+    {
+      "id": "f_customers_state",
+      "name": "State",
+      "source_id": "src_superstore",
+      "table": "Customers",
+      "remote_name": "state",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": "/workbook/datasources/datasource[2]/column[2]"
+    },
+    {
+      "id": "f_products_product_id_products",
+      "name": "Product ID (Products)",
+      "source_id": "src_superstore",
+      "table": "Products",
+      "remote_name": "product_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_products_product_name",
+      "name": "Product Name",
+      "source_id": "src_superstore",
+      "table": "Products",
+      "remote_name": "product_name",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_products_category",
+      "name": "Category",
+      "source_id": "src_superstore",
+      "table": "Products",
+      "remote_name": "category",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_products_sub_category",
+      "name": "Sub-Category",
+      "source_id": "src_superstore",
+      "table": "Products",
+      "remote_name": "sub_category",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_products_unit_price",
+      "name": "Unit Price",
+      "source_id": "src_superstore",
+      "table": "Products",
+      "remote_name": "unit_price",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    }
+  ],
+  "calculations": [
+    {
+      "id": "c_profit_ratio",
+      "name": "Profit Ratio",
+      "internal_name": "Calculation_0001",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "SUM([Profit]) / SUM([Sales])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Profit",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_orders_profit",
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[7]",
+      "pbi_object": "Profit Ratio",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('Orders'[Profit]), SUM('Orders'[Sales]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_profit_status",
+      "name": "Profit Status",
+      "internal_name": "Calculation_0002",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "IF [Profit] > 0 THEN 'Profitable' ELSEIF [Profit] = 0 THEN 'Break-even' ELSE 'Loss' END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "BinOp",
+              "op": ">",
+              "left": {
+                "node": "Field",
+                "name": "Profit",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 0
+              }
+            },
+            {
+              "node": "Str",
+              "value": "Profitable"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "=",
+              "left": {
+                "node": "Field",
+                "name": "Profit",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 0
+              }
+            },
+            {
+              "node": "Str",
+              "value": "Break-even"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "Loss"
+        }
+      },
+      "deps": [
+        "f_orders_profit"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[8]",
+      "pbi_object": "Profit Status",
+      "pbi_table": "Orders",
+      "pbi_dax": "SWITCH(TRUE(),\n        ('Orders'[Profit] > 0), \"Profitable\",\n        ('Orders'[Profit] = 0), \"Break-even\",\n        \"Loss\"\n    )",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_discount_band",
+      "name": "Discount Band",
+      "internal_name": "Calculation_0003",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "IIF(ZN([Discount]) >= [Parameters].[Parameter 3], 'High Discount', 'Standard')",
+      "expression_ast": {
+        "node": "Func",
+        "name": "IIF",
+        "args": [
+          {
+            "node": "BinOp",
+            "op": ">=",
+            "left": {
+              "node": "Func",
+              "name": "ZN",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Discount",
+                  "datasource": null
+                }
+              ]
+            },
+            "right": {
+              "node": "Field",
+              "name": "Parameter 3",
+              "datasource": "Parameters"
+            }
+          },
+          {
+            "node": "Str",
+            "value": "High Discount"
+          },
+          {
+            "node": "Str",
+            "value": "Standard"
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_discount",
+        "p_discount_threshold"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[9]",
+      "pbi_object": "Discount Band",
+      "pbi_table": "Orders",
+      "pbi_dax": "IF((COALESCE('Orders'[Discount], 0) >= [Discount Threshold Value]), \"High Discount\", \"Standard\")",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "medium",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "Calculated column uses parameter 'Discount Threshold': it is evaluated at refresh with the default value. Use a measure for interactive behaviour."
+      ],
+      "overridden": false
+    },
+    {
+      "id": "c_days_to_ship",
+      "name": "Days to Ship",
+      "internal_name": "Calculation_0004",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "DATEDIFF('day', [Order Date], [Ship Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "DATEDIFF",
+        "args": [
+          {
+            "node": "Str",
+            "value": "day"
+          },
+          {
+            "node": "Field",
+            "name": "Order Date",
+            "datasource": null
+          },
+          {
+            "node": "Field",
+            "name": "Ship Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_order_date",
+        "f_orders_ship_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[10]",
+      "pbi_object": "Days to Ship",
+      "pbi_table": "Orders",
+      "pbi_dax": "DATEDIFF('Orders'[Order Date], 'Orders'[Ship Date], DAY)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_customer_lifetime_sales",
+      "name": "Customer Lifetime Sales",
+      "internal_name": "Calculation_0005",
+      "source_id": "src_superstore",
+      "category": "lod",
+      "tableau": "{FIXED [Customer Name] : SUM([Sales])}",
+      "expression_ast": {
+        "node": "LOD",
+        "kind": "FIXED",
+        "dims": [
+          {
+            "node": "Field",
+            "name": "Customer Name",
+            "datasource": null
+          }
+        ],
+        "expr": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_customers_customer_name",
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[11]",
+      "pbi_object": "Customer Lifetime Sales",
+      "pbi_table": "Orders",
+      "pbi_dax": "(VAR __lod1 = RELATED('Customers'[Customer Name]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Customer Name] = __lod1))",
+      "strategy": "rule:fixed-lod-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_region_sales",
+      "name": "Region Sales",
+      "internal_name": "Calculation_0006",
+      "source_id": "src_superstore",
+      "category": "lod",
+      "tableau": "{ FIXED [Region] : SUM([Sales]) }",
+      "expression_ast": {
+        "node": "LOD",
+        "kind": "FIXED",
+        "dims": [
+          {
+            "node": "Field",
+            "name": "Region",
+            "datasource": null
+          }
+        ],
+        "expr": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_customers_region",
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[12]",
+      "pbi_object": "Region Sales",
+      "pbi_table": "Orders",
+      "pbi_dax": "(VAR __lod1 = RELATED('Customers'[Region]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Region] = __lod1))",
+      "strategy": "rule:fixed-lod-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_sales_vs_target",
+      "name": "Sales vs Target",
+      "internal_name": "Calculation_0007",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "SUM([Sales]) - [Parameters].[Parameter 1]",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "-",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Field",
+          "name": "Parameter 1",
+          "datasource": "Parameters"
+        }
+      },
+      "deps": [
+        "f_orders_sales",
+        "p_sales_target"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[13]",
+      "pbi_object": "Sales vs Target",
+      "pbi_table": "_Measures",
+      "pbi_dax": "(SUM('Orders'[Sales]) - [Sales Target Value])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_running_sales",
+      "name": "Running Sales",
+      "internal_name": "Calculation_0008",
+      "source_id": "src_superstore",
+      "category": "table_calc",
+      "tableau": "RUNNING_SUM(SUM([Sales]))",
+      "expression_ast": {
+        "node": "Func",
+        "name": "RUNNING_SUM",
+        "args": [
+          {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "Sales",
+                "datasource": null
+              }
+            ]
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[14]",
+      "pbi_object": "Running Sales",
+      "pbi_table": "_Measures",
+      "pbi_dax": "CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_sales_rank",
+      "name": "Sales Rank",
+      "internal_name": "Calculation_0009",
+      "source_id": "src_superstore",
+      "category": "table_calc",
+      "tableau": "RANK(SUM([Sales]))",
+      "expression_ast": {
+        "node": "Func",
+        "name": "RANK",
+        "args": [
+          {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "Sales",
+                "datasource": null
+              }
+            ]
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[15]",
+      "pbi_object": "Sales Rank",
+      "pbi_table": "_Measures",
+      "pbi_dax": "RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_order_count",
+      "name": "Order Count",
+      "internal_name": "Calculation_0010",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "COUNTD([Order ID])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "COUNTD",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Order ID",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_order_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[16]",
+      "pbi_object": "Order Count",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DISTINCTCOUNTNOBLANK('Orders'[Order ID])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_avg_sales_per_customer",
+      "name": "Avg Sales per Customer",
+      "internal_name": "Calculation_0011",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "SUM([Sales]) / COUNTD([Customer Name])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "COUNTD",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Customer Name",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_orders_sales",
+        "f_customers_customer_name"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[17]",
+      "pbi_object": "Avg Sales per Customer",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('Orders'[Sales]), CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders'))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "Aggregation over 'Customers' is filtered through 'Orders' so that filters on other dimensions apply (Tableau relationship semantics)."
+      ],
+      "overridden": false
+    },
+    {
+      "id": "c_selected_metric",
+      "name": "Selected Metric",
+      "internal_name": "Calculation_0012",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "CASE [Parameters].[Parameter 4] WHEN 'Sales' THEN SUM([Sales]) WHEN 'Profit' THEN SUM([Profit]) ELSE SUM([Quantity]) END",
+      "expression_ast": {
+        "node": "Case",
+        "subject": {
+          "node": "Field",
+          "name": "Parameter 4",
+          "datasource": "Parameters"
+        },
+        "whens": [
+          [
+            {
+              "node": "Str",
+              "value": "Sales"
+            },
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Sales",
+                  "datasource": null
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "node": "Str",
+              "value": "Profit"
+            },
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Profit",
+                  "datasource": null
+                }
+              ]
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Quantity",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "p_metric_selector",
+        "f_orders_sales",
+        "f_orders_profit",
+        "f_orders_quantity"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[18]",
+      "pbi_object": "Selected Metric",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SWITCH([Metric Selector Value], \"Sales\", SUM('Orders'[Sales]), \"Profit\", SUM('Orders'[Profit]), SUM('Orders'[Quantity]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_net_sales",
+      "name": "Net Sales",
+      "internal_name": "Calculation_0013",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "[Sales] * (1 - [Discount])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "*",
+        "left": {
+          "node": "Field",
+          "name": "Sales",
+          "datasource": null
+        },
+        "right": {
+          "node": "BinOp",
+          "op": "-",
+          "left": {
+            "node": "Num",
+            "value": 1
+          },
+          "right": {
+            "node": "Field",
+            "name": "Discount",
+            "datasource": null
+          }
+        }
+      },
+      "deps": [
+        "f_orders_sales",
+        "f_orders_discount"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[19]",
+      "pbi_object": "Net Sales",
+      "pbi_table": "Orders",
+      "pbi_dax": "('Orders'[Sales] * IF(ISBLANK('Orders'[Discount]), BLANK(), (1 - 'Orders'[Discount])))",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_customer_tier",
+      "name": "Customer Tier",
+      "internal_name": "Calculation_0014",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "IF [Customer Lifetime Sales] >= 25000 THEN 'Platinum' ELSEIF [Customer Lifetime Sales] >= 12000 THEN 'Gold' ELSE 'Silver' END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "BinOp",
+              "op": ">=",
+              "left": {
+                "node": "Field",
+                "name": "Customer Lifetime Sales",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 25000
+              }
+            },
+            {
+              "node": "Str",
+              "value": "Platinum"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": ">=",
+              "left": {
+                "node": "Field",
+                "name": "Customer Lifetime Sales",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 12000
+              }
+            },
+            {
+              "node": "Str",
+              "value": "Gold"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "Silver"
+        }
+      },
+      "deps": [
+        "c_customer_lifetime_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[20]",
+      "pbi_object": "Customer Tier",
+      "pbi_table": "Orders",
+      "pbi_dax": "SWITCH(TRUE(),\n        ('Orders'[Customer Lifetime Sales] >= 25000), \"Platinum\",\n        ('Orders'[Customer Lifetime Sales] >= 12000), \"Gold\",\n        \"Silver\"\n    )",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_order_month_name",
+      "name": "Order Month Name",
+      "internal_name": "Calculation_0015",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "DATENAME('month', [Order Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "DATENAME",
+        "args": [
+          {
+            "node": "Str",
+            "value": "month"
+          },
+          {
+            "node": "Field",
+            "name": "Order Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_order_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[21]",
+      "pbi_object": "Order Month Name",
+      "pbi_table": "Orders",
+      "pbi_dax": "FORMAT('Orders'[Order Date], \"MMMM\")",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "medium",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "DATENAME() output depends on the model culture (FORMAT locale)."
+      ],
+      "overridden": false
+    },
+    {
+      "id": "c_product_code",
+      "name": "Product Code",
+      "internal_name": "Calculation_0016",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "UPPER(LEFT([Sub-Category], 3)) + '-' + RIGHT([Product ID], 4)",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "+",
+        "left": {
+          "node": "BinOp",
+          "op": "+",
+          "left": {
+            "node": "Func",
+            "name": "UPPER",
+            "args": [
+              {
+                "node": "Func",
+                "name": "LEFT",
+                "args": [
+                  {
+                    "node": "Field",
+                    "name": "Sub-Category",
+                    "datasource": null
+                  },
+                  {
+                    "node": "Num",
+                    "value": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "right": {
+            "node": "Str",
+            "value": "-"
+          }
+        },
+        "right": {
+          "node": "Func",
+          "name": "RIGHT",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Product ID",
+              "datasource": null
+            },
+            {
+              "node": "Num",
+              "value": 4
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_products_sub_category",
+        "f_orders_product_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[22]",
+      "pbi_object": "Product Code",
+      "pbi_table": "Orders",
+      "pbi_dax": "UPPER(LEFT(RELATED('Products'[Sub-Category]), 3)) & \"-\" & RIGHT('Orders'[Product ID], 4)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_avg_customer_sales_include",
+      "name": "Avg Customer Sales (INCLUDE)",
+      "internal_name": "Calculation_0017",
+      "source_id": "src_superstore",
+      "category": "lod",
+      "tableau": "{INCLUDE [Customer Name] : SUM([Sales])}",
+      "expression_ast": {
+        "node": "LOD",
+        "kind": "INCLUDE",
+        "dims": [
+          {
+            "node": "Field",
+            "name": "Customer Name",
+            "datasource": null
+          }
+        ],
+        "expr": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_customers_customer_name",
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[23]",
+      "pbi_object": "Avg Customer Sales (INCLUDE)",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUMX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))",
+      "strategy": "rule:include-exclude-lod-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_share_of_region",
+      "name": "Share of Region",
+      "internal_name": "Calculation_0018",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "SUM([Sales]) / SUM([Region Sales])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Region Sales",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_orders_sales",
+        "c_region_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[24]",
+      "pbi_object": "Share of Region",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('Orders'[Sales]), SUM('Orders'[Region Sales]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_large_order",
+      "name": "Large Order",
+      "internal_name": "Calculation_0019",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "[Quantity] >= 7 AND [Sales] > 500",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "AND",
+        "left": {
+          "node": "BinOp",
+          "op": ">=",
+          "left": {
+            "node": "Field",
+            "name": "Quantity",
+            "datasource": null
+          },
+          "right": {
+            "node": "Num",
+            "value": 7
+          }
+        },
+        "right": {
+          "node": "BinOp",
+          "op": ">",
+          "left": {
+            "node": "Field",
+            "name": "Sales",
+            "datasource": null
+          },
+          "right": {
+            "node": "Num",
+            "value": 500
+          }
+        }
+      },
+      "deps": [
+        "f_orders_quantity",
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[25]",
+      "pbi_object": "Large Order",
+      "pbi_table": "Orders",
+      "pbi_dax": "(('Orders'[Quantity] >= 7) && ('Orders'[Sales] > 500))",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_percent_of_total_sales",
+      "name": "Percent of Total Sales",
+      "internal_name": "Calculation_0020",
+      "source_id": "src_superstore",
+      "category": "table_calc",
+      "tableau": "SUM([Sales]) / TOTAL(SUM([Sales]))",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "TOTAL",
+          "args": [
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Sales",
+                  "datasource": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[26]",
+      "pbi_object": "Percent of Total Sales",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('Orders'[Sales]), CALCULATE(SUM('Orders'[Sales]), ALLSELECTED('Products'[Sub-Category])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "medium",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures."
+      ],
+      "overridden": false
+    },
+    {
+      "id": "c_ship_quarter_start",
+      "name": "Ship Quarter Start",
+      "internal_name": "Calculation_0021",
+      "source_id": "src_superstore",
+      "category": "column",
+      "tableau": "DATETRUNC('quarter', [Ship Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "DATETRUNC",
+        "args": [
+          {
+            "node": "Str",
+            "value": "quarter"
+          },
+          {
+            "node": "Field",
+            "name": "Ship Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_orders_ship_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[27]",
+      "pbi_object": "Ship Quarter Start",
+      "pbi_table": "Orders",
+      "pbi_dax": "DATE(YEAR('Orders'[Ship Date]), (QUARTER('Orders'[Ship Date]) - 1) * 3 + 1, 1)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_profit_per_unit",
+      "name": "Profit per Unit",
+      "internal_name": "Calculation_0022",
+      "source_id": "src_superstore",
+      "category": "measure",
+      "tableau": "ZN(SUM([Profit])) / SUM([Quantity])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "ZN",
+          "args": [
+            {
+              "node": "Func",
+              "name": "SUM",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Profit",
+                  "datasource": null
+                }
+              ]
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Quantity",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_orders_profit",
+        "f_orders_quantity"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[28]",
+      "pbi_object": "Profit per Unit",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(COALESCE(SUM('Orders'[Profit]), 0), SUM('Orders'[Quantity]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_region_group",
+      "name": "Region Group",
+      "internal_name": "Region (group)",
+      "source_id": "src_superstore",
+      "category": "group",
+      "tableau": "GROUP Coastal = ['East', 'West']; Inland = ['Central', 'South']",
+      "expression_ast": null,
+      "deps": [
+        "f_customers_region"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[29]",
+      "pbi_object": "Region Group",
+      "pbi_table": "Customers",
+      "pbi_dax": "SWITCH(TRUE(),\n        'Customers'[Region] IN {\"East\", \"West\"}, \"Coastal\",\n        'Customers'[Region] IN {\"Central\", \"South\"}, \"Inland\",\n        'Customers'[Region]\n    )",
+      "strategy": "rule:group-switch-in",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_sales_bin",
+      "name": "Sales (bin)",
+      "internal_name": "Sales (bin)",
+      "source_id": "src_superstore",
+      "category": "bin",
+      "tableau": "[Sales]",
+      "expression_ast": null,
+      "deps": [
+        "f_orders_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[30]",
+      "pbi_object": "Sales (bin)",
+      "pbi_table": "Orders",
+      "pbi_dax": "IF(ISBLANK('Orders'[Sales]), BLANK(), FLOOR('Orders'[Sales], 500))",
+      "strategy": "rule:bin-floor",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_key_states",
+      "name": "Key States",
+      "internal_name": "Key States",
+      "source_id": "src_superstore",
+      "category": "set",
+      "tableau": "SET [State] IN ['California', 'New York', 'Texas']",
+      "expression_ast": null,
+      "deps": [
+        "f_customers_state"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/group[1]",
+      "pbi_object": "Key States",
+      "pbi_table": "Customers",
+      "pbi_dax": "'Customers'[State] IN {\"California\", \"New York\", \"Texas\"}",
+      "strategy": "rule:set-membership",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_top_20_customers",
+      "name": "Top 20 Customers",
+      "internal_name": "Top Customers",
+      "source_id": "src_superstore",
+      "category": "set",
+      "tableau": "SET top 20 [Customer Name] by SUM([Sales])",
+      "expression_ast": null,
+      "deps": [
+        "f_customers_customer_name"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/group[2]",
+      "pbi_object": "Top 20 Customers",
+      "pbi_table": "Customers",
+      "pbi_dax": "RANKX(ALL('Customers'), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP) <= 20",
+      "strategy": "rule:set-membership",
+      "confidence": "medium",
+      "status": "Converted with notes",
+      "classification": "REVIEW",
+      "warnings": [
+        "Top-N set evaluated at refresh (static); ranks rows of 'Customers' (one row per [Customer Name] assumed)."
+      ],
+      "overridden": false
+    }
+  ],
+  "parameters": [
+    {
+      "id": "p_sales_target",
+      "name": "Sales Target",
+      "type": "real",
+      "current_value": 250000.0,
+      "domain": "range",
+      "members": [],
+      "min": 50000.0,
+      "max": 500000.0,
+      "step": 50000.0,
+      "xml_path": "/workbook/datasources/datasource[1]/column[1]"
+    },
+    {
+      "id": "p_top_n_customers",
+      "name": "Top N Customers",
+      "type": "integer",
+      "current_value": 10,
+      "domain": "list",
+      "members": [
+        5,
+        10,
+        15,
+        20
+      ],
+      "min": null,
+      "max": null,
+      "step": null,
+      "xml_path": "/workbook/datasources/datasource[1]/column[2]"
+    },
+    {
+      "id": "p_discount_threshold",
+      "name": "Discount Threshold",
+      "type": "real",
+      "current_value": 0.2,
+      "domain": "range",
+      "members": [],
+      "min": 0.0,
+      "max": 0.5,
+      "step": 0.05,
+      "xml_path": "/workbook/datasources/datasource[1]/column[3]"
+    },
+    {
+      "id": "p_metric_selector",
+      "name": "Metric Selector",
+      "type": "string",
+      "current_value": "Sales",
+      "domain": "list",
+      "members": [
+        "Sales",
+        "Profit",
+        "Quantity"
+      ],
+      "min": null,
+      "max": null,
+      "step": null,
+      "xml_path": "/workbook/datasources/datasource[1]/column[4]"
+    }
+  ],
+  "worksheets": [
+    {
+      "id": "ws_sales_by_region",
+      "name": "Sales by Region",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[1]",
+      "rows": [
+        "none:Region:nk"
+      ],
+      "columns": [
+        "sum:Sales:qk"
+      ],
+      "encodings": {
+        "color": [
+          "none:Category:nk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "stackedBarChart"
+    },
+    {
+      "id": "ws_monthly_trend",
+      "name": "Monthly Trend",
+      "mark": "line",
+      "xml_path": "/workbook/worksheets/worksheet[2]",
+      "rows": [
+        "sum:Sales:qk",
+        "sum:Profit:qk"
+      ],
+      "columns": [
+        "tmn:Order Date:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "quantitative",
+          "field": "yr:Order Date:ok",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[2]/table/view/filter"
+        }
+      ],
+      "target_visual": "lineChart"
+    },
+    {
+      "id": "ws_category_profitability",
+      "name": "Category Profitability",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[3]",
+      "rows": [
+        "none:Category:nk"
+      ],
+      "columns": [
+        "sum:Profit:qk",
+        "usr:Calculation_0001:qk"
+      ],
+      "encodings": {
+        "label": [
+          "usr:Calculation_0010:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "clusteredBarChart"
+    },
+    {
+      "id": "ws_segment_matrix",
+      "name": "Segment Matrix",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[4]",
+      "rows": [
+        "none:Segment:nk",
+        "none:Calculation_0002:nk"
+      ],
+      "columns": [
+        "yr:Order Date:ok"
+      ],
+      "encodings": {
+        "text": [
+          "sum:Sales:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Region:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[4]/table/view/filter"
+        }
+      ],
+      "target_visual": "pivotTable"
+    },
+    {
+      "id": "ws_top_customers",
+      "name": "Top Customers",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[5]",
+      "rows": [
+        "none:Customer Name:nk"
+      ],
+      "columns": [
+        "sum:Sales:qk"
+      ],
+      "encodings": {
+        "color": [
+          "none:Calculation_0014:nk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "top",
+          "field": "none:Customer Name:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[5]/table/view/filter"
+        }
+      ],
+      "target_visual": "stackedBarChart"
+    },
+    {
+      "id": "ws_sales_share",
+      "name": "Sales Share",
+      "mark": "pie",
+      "xml_path": "/workbook/worksheets/worksheet[6]",
+      "rows": [],
+      "columns": [],
+      "encodings": {
+        "color": [
+          "none:Category:nk"
+        ],
+        "size": [
+          "sum:Sales:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "pieChart"
+    },
+    {
+      "id": "ws_profit_vs_sales",
+      "name": "Profit vs Sales",
+      "mark": "circle",
+      "xml_path": "/workbook/worksheets/worksheet[7]",
+      "rows": [
+        "sum:Profit:qk"
+      ],
+      "columns": [
+        "sum:Sales:qk"
+      ],
+      "encodings": {
+        "lod": [
+          "none:Sub-Category:nk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "scatterChart"
+    },
+    {
+      "id": "ws_kpi_summary",
+      "name": "KPI Summary",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[8]",
+      "rows": [],
+      "columns": [],
+      "encodings": {
+        "text": [
+          "sum:Sales:qk",
+          "usr:Calculation_0001:qk",
+          "usr:Calculation_0010:qk",
+          "usr:Calculation_0007:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "multiRowCard"
+    },
+    {
+      "id": "ws_running_sales_by_quarter",
+      "name": "Running Sales by Quarter",
+      "mark": "line",
+      "xml_path": "/workbook/worksheets/worksheet[9]",
+      "rows": [
+        "sum:Sales:qk",
+        "usr:Calculation_0008:qk"
+      ],
+      "columns": [
+        "tqr:Order Date:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "target_visual": "lineChart"
+    },
+    {
+      "id": "ws_state_map",
+      "name": "State Map",
+      "mark": "multipolygon",
+      "xml_path": "/workbook/worksheets/worksheet[10]",
+      "rows": [],
+      "columns": [],
+      "encodings": {
+        "lod": [
+          "none:State:nk"
+        ],
+        "color": [
+          "sum:Sales:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "filledMap"
+    },
+    {
+      "id": "ws_sub_category_rank",
+      "name": "Sub-Category Rank",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[11]",
+      "rows": [
+        "none:Sub-Category:nk"
+      ],
+      "columns": [
+        "sum:Sales:qk",
+        "usr:Calculation_0009:qk",
+        "usr:Calculation_0020:qk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:Sales:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_customer_tiers",
+      "name": "Customer Tiers",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[12]",
+      "rows": [
+        "none:Calculation_0014:nk",
+        "none:Region (group):nk"
+      ],
+      "columns": [
+        "ctd:Customer Name:qk",
+        "avg:Calculation_0005:qk",
+        "avg:Calculation_0017:qk"
+      ],
+      "encodings": {
+        "text": [
+          "ctd:Customer Name:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_discount_analysis",
+      "name": "Discount Analysis",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[13]",
+      "rows": [
+        "none:Calculation_0003:nk",
+        "none:Ship Mode:nk"
+      ],
+      "columns": [
+        "sum:Calculation_0013:qk",
+        "avg:Discount:qk",
+        "avg:Calculation_0004:qk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:Calculation_0013:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Ship Mode:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[13]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_region_share",
+      "name": "Region Share",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[14]",
+      "rows": [
+        "none:Region:nk",
+        "none:Category:nk"
+      ],
+      "columns": [
+        "usr:Calculation_0018:qk",
+        "sum:Calculation_0006:qk",
+        "usr:Calculation_0011:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_0018:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "quantitative",
+          "field": "sum:Sales:qk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[14]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_sales_distribution",
+      "name": "Sales Distribution",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[15]",
+      "rows": [
+        "none:Sales (bin):ok"
+      ],
+      "columns": [
+        "cnt:Order ID:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "quantitative",
+          "field": "none:Sales (bin):ok",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[15]/table/view/filter"
+        }
+      ],
+      "target_visual": "clusteredBarChart"
+    },
+    {
+      "id": "ws_key_states_selected_metric",
+      "name": "Key States Selected Metric",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[16]",
+      "rows": [
+        "none:Key States:nk",
+        "none:Calculation_0016:nk"
+      ],
+      "columns": [
+        "usr:Calculation_0012:qk",
+        "usr:Calculation_0022:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_0012:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Category:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[16]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "db_executive_overview",
+      "name": "Executive Overview",
+      "width": 1400,
+      "height": 800,
+      "xml_path": "/workbook/dashboards/dashboard[1]",
+      "zones": [
+        {
+          "id": "2",
+          "type": "text",
+          "name": null,
+          "x": 0.0,
+          "y": 0.0,
+          "w": 100000.0,
+          "h": 8000.0
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "KPI Summary",
+          "x": 0.0,
+          "y": 8000.0,
+          "w": 100000.0,
+          "h": 16000.0
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Sales by Region",
+          "x": 0.0,
+          "y": 24000.0,
+          "w": 50000.0,
+          "h": 38000.0
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "Monthly Trend",
+          "x": 50000.0,
+          "y": 24000.0,
+          "w": 50000.0,
+          "h": 38000.0
+        },
+        {
+          "id": "6",
+          "type": "worksheet",
+          "name": "Category Profitability",
+          "x": 0.0,
+          "y": 62000.0,
+          "w": 50000.0,
+          "h": 38000.0
+        },
+        {
+          "id": "7",
+          "type": "worksheet",
+          "name": "Sales Share",
+          "x": 50000.0,
+          "y": 62000.0,
+          "w": 34000.0,
+          "h": 38000.0
+        },
+        {
+          "id": "8",
+          "type": "filter",
+          "name": "Sales by Region",
+          "x": 84000.0,
+          "y": 62000.0,
+          "w": 16000.0,
+          "h": 19000.0
+        },
+        {
+          "id": "9",
+          "type": "paramctrl",
+          "name": null,
+          "x": 84000.0,
+          "y": 81000.0,
+          "w": 16000.0,
+          "h": 19000.0
+        }
+      ]
+    },
+    {
+      "id": "db_customer_insights",
+      "name": "Customer Insights",
+      "width": 1366,
+      "height": 768,
+      "xml_path": "/workbook/dashboards/dashboard[2]",
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Top Customers",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 60000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Customer Tiers",
+          "x": 60000.0,
+          "y": 0.0,
+          "w": 40000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Profit vs Sales",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 60000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "State Map",
+          "x": 60000.0,
+          "y": 50000.0,
+          "w": 40000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "6",
+          "type": "bitmap",
+          "name": "logo.png",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 0.0,
+          "h": 0.0
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "name": "Filter by Region",
+      "type": "filter",
+      "source": "Sales by Region",
+      "xml_path": "/workbook/actions/action[1]"
+    },
+    {
+      "name": "Highlight Category",
+      "type": "highlight",
+      "source": "Category Profitability",
+      "xml_path": "/workbook/actions/action[2]"
+    },
+    {
+      "name": "Open CRM",
+      "type": "url",
+      "source": "Top Customers",
+      "xml_path": "/workbook/actions/action[3]"
+    }
+  ],
+  "security": {
+    "rules": [],
+    "roles": [],
+    "requires_identity_review": false
+  },
+  "unknown_nodes": [],
+  "warnings": [
+    "Calculated column uses parameter 'Discount Threshold': it is evaluated at refresh with the default value. Use a measure for interactive behaviour.",
+    "Aggregation over 'Customers' is filtered through 'Orders' so that filters on other dimensions apply (Tableau relationship semantics).",
+    "DATENAME() output depends on the model culture (FORMAT locale).",
+    "TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures.",
+    "Top-N set evaluated at refresh (static); ranks rows of 'Customers' (one row per [Customer Name] assumed).",
+    "URL action -> add a button/URL column (https://crm.example.com/customer/<Customer Name>)."
+  ],
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: sqlserver",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Data source",
+      "item": "Relationships (logical layer)",
+      "count": 2,
+      "status": "supported",
+      "note": "star schema"
+    },
+    {
+      "category": "Calculations",
+      "item": "Bins",
+      "count": 1,
+      "status": "supported",
+      "note": "1 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 11,
+      "status": "review",
+      "note": "9 PASS / 2 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Groups",
+      "count": 1,
+      "status": "supported",
+      "note": "1 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 11,
+      "status": "review",
+      "note": "9 PASS / 2 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Parameters",
+      "count": 4,
+      "status": "supported",
+      "note": "4 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Sets",
+      "count": 2,
+      "status": "review",
+      "note": "1 PASS / 1 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "LOD expressions",
+      "count": 3,
+      "status": "review",
+      "note": "context must be proven by validation"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 3,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 4,
+      "status": "supported",
+      "note": "-> clusteredBarChart, stackedBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Circle",
+      "count": 1,
+      "status": "supported",
+      "note": "-> scatterChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Line",
+      "count": 2,
+      "status": "supported",
+      "note": "-> lineChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Multipolygon",
+      "count": 1,
+      "status": "supported",
+      "note": "-> filledMap"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Pie",
+      "count": 1,
+      "status": "supported",
+      "note": "-> pieChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 7,
+      "status": "supported",
+      "note": "-> multiRowCard, pivotTable, tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 3,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Filters",
+      "item": "quantitative",
+      "count": 3,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Filters",
+      "item": "top",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 2,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: bitmap",
+      "count": 1,
+      "status": "review",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: paramctrl",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: text",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 9,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Actions",
+      "item": "filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Actions",
+      "item": "highlight",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Actions",
+      "item": "url",
+      "count": 1,
+      "status": "review",
+      "note": ""
+    }
+  ],
+  "validation": {
+    "summary": {
+      "PASS": 47,
+      "WARN": 2,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "PENDING": 3,
+      "N/A": 1,
+      "total": 53,
+      "pass_rate": 95.9,
+      "overall": "WARN"
+    },
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 10,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "WARN",
+        "automated_checks": 28,
+        "passed": 27,
+        "failed": 0,
+        "warnings": 1,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "WARN",
+        "automated_checks": 11,
+        "passed": 10,
+        "failed": 0,
+        "warnings": 1,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 1,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Confirm no row-level security requirement"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ]
+  }
+}

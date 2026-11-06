@@ -1,0 +1,63 @@
+table DimVendor
+	lineageTag: afd5948a-fee7-599c-95cd-36922b412d13
+
+	column 'Vendor Key'
+		dataType: string
+		lineageTag: 2f6c06c6-8ca6-5826-8164-5b6563855b43
+		summarizeBy: none
+		sourceColumn: Vendor Key
+
+		annotation TableauSource = Vendor Key (DimVendor)
+
+	column 'Vendor Name'
+		dataType: string
+		lineageTag: 6f8db6f3-ecca-5d26-9241-70f90c61d19e
+		summarizeBy: none
+		sourceColumn: Vendor Name
+
+		annotation TableauSource = Vendor Name
+
+	column 'Vendor Category'
+		dataType: string
+		lineageTag: f2f62a26-ea6f-59b4-a83b-0229d6b54df2
+		summarizeBy: none
+		sourceColumn: Vendor Category
+
+		annotation TableauSource = Vendor Category
+
+	column Region
+		dataType: string
+		lineageTag: 5e9068cf-3bba-562a-9907-e5c91e321ff0
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation TableauSource = Region
+
+	hierarchy 'Vendor Hierarchy'
+		lineageTag: cf520fae-62ef-5c8a-897d-ed39325cd443
+
+		level Region
+			lineageTag: c776523f-24f6-5cb6-bffb-cebf471f2315
+			column: Region
+
+		level 'Vendor Category'
+			lineageTag: 380d7436-133c-5e08-a832-c96881259056
+			column: 'Vendor Category'
+
+		level 'Vendor Name'
+			lineageTag: 954a893c-cf24-5629-88e5-11e6657bfb9e
+			column: 'Vendor Name'
+
+	partition DimVendor = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Invoice Health Server", #"Invoice Health Database"),
+				    Data = Source{[Schema = "dbo", Item = "DimVendor"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"vendor_key", "vendor_name", "category", "region"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"vendor_key", "Vendor Key"}, {"vendor_name", "Vendor Name"}, {"category", "Vendor Category"}, {"region", "Region"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Vendor Key", type text}, {"Vendor Name", type text}, {"Vendor Category", type text}, {"Region", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

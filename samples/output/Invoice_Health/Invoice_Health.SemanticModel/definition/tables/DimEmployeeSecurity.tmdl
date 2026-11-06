@@ -1,0 +1,57 @@
+table DimEmployeeSecurity
+	lineageTag: 07922e8e-5451-5044-8fa3-a1ff97c29b9a
+
+	column 'Employee Key'
+		dataType: string
+		lineageTag: 6239bd67-6386-5fa1-923f-3476f04f71c8
+		summarizeBy: none
+		sourceColumn: Employee Key
+
+		annotation TableauSource = Employee Key (DimEmployeeSecurity)
+
+	column 'Employee Name'
+		dataType: string
+		lineageTag: 9f46e580-d9ce-5264-87b5-7a58e98cb50a
+		summarizeBy: none
+		sourceColumn: Employee Name
+
+		annotation TableauSource = Employee Name
+
+	column 'Email UPN'
+		dataType: string
+		isHidden
+		lineageTag: bc9cc861-cabe-5cd0-abea-95283de4df8f
+		summarizeBy: none
+		sourceColumn: Email UPN
+
+		annotation TableauSource = Email UPN
+
+	column 'Manager UPN'
+		dataType: string
+		lineageTag: fac00fc2-c7f2-530c-9cb8-e53a69eabc13
+		summarizeBy: none
+		sourceColumn: Manager UPN
+
+		annotation TableauSource = Manager UPN
+
+	column Role
+		dataType: string
+		lineageTag: bfeeb7a3-ba5c-55a7-9cbf-30db76ed5c8d
+		summarizeBy: none
+		sourceColumn: Role
+
+		annotation TableauSource = Role
+
+	partition DimEmployeeSecurity = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Invoice Health Server", #"Invoice Health Database"),
+				    Data = Source{[Schema = "dbo", Item = "DimEmployeeSecurity"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"employee_key", "employee_name", "email_upn", "manager_upn", "role"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"employee_key", "Employee Key"}, {"employee_name", "Employee Name"}, {"email_upn", "Email UPN"}, {"manager_upn", "Manager UPN"}, {"role", "Role"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Employee Key", type text}, {"Employee Name", type text}, {"Email UPN", type text}, {"Manager UPN", type text}, {"Role", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

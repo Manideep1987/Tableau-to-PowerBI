@@ -1,0 +1,78 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "name": "723b95bb74a2551c21f8",
+  "position": {
+    "x": 512.0,
+    "y": 453.6,
+    "z": 5000,
+    "width": 512.0,
+    "height": 266.4,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "pieChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactInvoices"
+                    }
+                  },
+                  "Property": "Payment Status"
+                }
+              },
+              "queryRef": "FactInvoices.Payment Status",
+              "nativeQueryRef": "Payment Status"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sum of Invoice Amount"
+                }
+              },
+              "queryRef": "_Measures.Sum of Invoice Amount",
+              "nativeQueryRef": "Sum of Invoice Amount"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Payment Status Mix'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

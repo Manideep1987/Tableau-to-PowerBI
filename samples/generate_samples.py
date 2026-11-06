@@ -701,6 +701,27 @@ def main():
         z.write(os.path.join(DATA, "csv", "employees.csv"), "Data/hr/employees.csv")
     with open(os.path.join(WB, "HR_Analytics.twbx"), "wb") as f:
         f.write(buf.getvalue())
+    # finance showcase (Invoice Payment Health, procure-to-pay)
+    import sys
+    sys.path.insert(0, HERE)
+    import invoice_health
+    inv = invoice_health.build()
+    con = sqlite3.connect(os.path.join(DATA, "superstore.db"))
+    for name, rows in inv.items():
+        cols = list(rows[0])
+        con.execute(f"DROP TABLE IF EXISTS {name}")
+        con.execute(f"CREATE TABLE {name} ({', '.join(cols)})")
+        con.executemany(f"INSERT INTO {name} VALUES ({', '.join('?' * len(cols))})",
+                        [tuple(r[c] for c in cols) for r in rows])
+        with open(os.path.join(DATA, "csv", f"{name}.csv"), "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=cols)
+            w.writeheader()
+            for r in rows:
+                w.writerow({k: ("" if v is None else v) for k, v in r.items()})
+    con.commit()
+    con.close()
+    with open(os.path.join(WB, "Invoice_Health.twb"), "w", encoding="utf-8") as f:
+        f.write(invoice_health.twb(sys.modules[__name__]))
     print("Samples written to", WB)
 
 

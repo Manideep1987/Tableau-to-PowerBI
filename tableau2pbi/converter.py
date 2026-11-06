@@ -113,6 +113,7 @@ class PbiModel:
     tables: list = field(default_factory=list)
     relationships: list = field(default_factory=list)
     expressions: list = field(default_factory=list)   # (name, M expression, description)
+    roles: list = field(default_factory=list)         # list[PbiRole]
 
     def table(self, name) -> Optional[PbiTable]:
         return next((t for t in self.tables if t.name == name), None)
@@ -206,6 +207,38 @@ class CalcMapping:
     status: str
     warnings: list = field(default_factory=list)
     functions: list = field(default_factory=list)
+    xml_path: Optional[str] = None
+    strategy: str = ""                  # deterministic rule (or override / ai) that produced the DAX
+    confidence: str = "high"           # high | medium | low
+    tableau_id: str = ""
+    overridden: bool = False
+    original_dax: Optional[str] = None
+    override_note: Optional[str] = None
+
+    @property
+    def classification(self) -> str:
+        """PASS / REVIEW / UNSUPPORTED (build guide, translation workflow step 05)."""
+        if self.status in ("Failed",) or (self.status == "Manual review" and self.confidence == "low"):
+            return "UNSUPPORTED"
+        if self.kind == "rls-role":
+            return "REVIEW"            # security always needs live-identity acceptance
+        if self.status == "Converted" and not self.overridden:
+            return "PASS"
+        return "REVIEW"
+
+
+STRATEGY = {"measure": "rule:aggregate-measure", "column": "rule:row-level-calculated-column",
+            "group": "rule:group-switch-in", "bin": "rule:bin-floor", "set": "rule:set-membership",
+            "base-measure": "rule:explicit-base-measure", "date-part": "rule:date-part-column",
+            "parameter": "rule:parameter-table+selectedvalue", "rls-role": "rule:user-filter-to-rls-role"}
+
+
+@dataclass
+class PbiRole:
+    name: str
+    table_permissions: dict                 # table -> DAX filter expression
+    tableau_ref: Optional[str] = None
+    description: Optional[str] = None
 
 
 @dataclass
@@ -346,6 +379,11 @@ class Converter:
         visuals = {ws.name: self._visual(ws) for ws in self.wb.worksheets}
         pages = self._pages(visuals)
         self._actions()
+        for m in self.calc_mappings:
+            if not m.strategy:
+                m.strategy = STRATEGY.get(m.kind, "rule")
+            if m.status == "Failed":
+                m.confidence = "low"
         for w in self.wb.warnings:
             self.issue("info", "Workbook", self.wb.name, w)
         return ConversionResult(self.wb, self.model, pages, self.calc_mappings, self.issues,
@@ -523,6 +561,9 @@ class Converter:
             self.issue("info", "Data source", ds.caption,
                        "Data source uses a Tableau extract; Power BI imports from the live source instead.")
         for f in ds.datasource_filters:
+            cf = ds.calculations.get(f.field.field)
+            if cf is not None and cf.extra.get("security"):
+                continue        # user filter -> RLS role (see _translate_calcs)
             self.issue("warning", "Data source", ds.caption,
                        f"Data source filter on [{f.field.field}] must be applied in Power Query or RLS.")
 
@@ -695,6 +736,10 @@ class Converter:
                 continue
             agg = is_aggregate(ast, lk)
             kind = "measure" if agg else "column"
+            if cf.extra.get("security_filter") and not agg:
+                self.calc_info[(ds.name, name)] = CalcInfo("security", self._host_for(ds, ast, lookup),
+                                                           tidy(cf.caption), "boolean", ast)
+                continue
             if isinstance(ast, LOD) and ast.kind in ("INCLUDE", "EXCLUDE"):
                 self.lod_measures.add((ds.name, name))
                 agg, kind = True, "measure"
@@ -752,6 +797,8 @@ class Converter:
                     res = self._bin_dax(ds, cf, resolver)
                 elif cf.kind == "set":
                     res = self._set_dax(ds, cf, resolver)
+                elif info.kind == "security":
+                    res = DaxTranslator(resolver).translate(info.ast, "row", host=info.table)
                 else:
                     tr = DaxTranslator(resolver)
                     addressing = self.addressing.get((ds.name, name))
@@ -767,6 +814,21 @@ class Converter:
                 self.issue("error", "Calculation", cf.caption, f"Not converted: {e}")
                 continue
             fmt = tableau_format_to_pbi(cf.default_format)
+            if info.kind == "security":
+                expr = res.expression
+                if expr.startswith("(") and expr.endswith(")"):
+                    expr = expr[1:-1]
+                self.model.roles.append(PbiRole(info.name, {info.table: expr}, cf.internal_name,
+                                                f"Converted from Tableau user filter {cf.formula!r}"))
+                self.calc_mappings.append(CalcMapping(
+                    ds.caption, cf.caption, cf.formula, "rls-role", info.name, info.table, expr, res.status,
+                    res.warnings + ["Tableau USERNAME() data source filter -> Power BI RLS role (USERPRINCIPALNAME). "
+                                    "Assign Entra users/groups to the role in the service and test with real identities."],
+                    sorted(res.functions), cf.xml_path, STRATEGY["rls-role"], res.confidence, cf.internal_name))
+                self.issue("warning", "Security", info.name,
+                           f"Row-level security role '{info.name}' created on '{info.table}'. Security parity "
+                           f"is a hard gate: test with permitted and forbidden real users before go-live.")
+                continue
             if info.kind == "measure":
                 tbl = self.model.table(self.measure_table)
                 tbl.measures.append(PbiMeasure(info.name, res.expression, fmt, cf.description,
@@ -782,7 +844,13 @@ class Converter:
             self.calc_mappings.append(CalcMapping(
                 ds.caption, cf.caption, formula,
                 cf.kind if cf.kind != "formula" else info.kind, info.name, info.table,
-                res.expression, res.status, res.warnings, sorted(res.functions)))
+                res.expression, res.status, res.warnings, sorted(res.functions), cf.xml_path,
+                ("rule:fixed-lod-column" if isinstance(info.ast, LOD) and info.ast.kind == "FIXED" else
+                 "rule:include-exclude-lod-measure" if (ds.name, name) in self.lod_measures else
+                 "rule:table-calc-window" if info.ast is not None and contains(
+                     info.ast, lambda n: isinstance(n, Func) and n.name in TABLE_CALCS) else
+                 STRATEGY.get(cf.kind if cf.kind != "formula" else info.kind, "rule")),
+                res.confidence, cf.internal_name))
             for w in res.warnings:
                 self.issue("warning" if res.confidence != "low" else "error", "Calculation", cf.caption, w)
 
@@ -971,6 +1039,12 @@ class Converter:
             if not date_cols:
                 continue
             if self.model.table("Date") is not None:
+                return
+            date_dims = [r.to_table for r in self.model.relationships if r.from_table == fact.name and any(
+                c.datatype == "dateTime" and c.expression is None for c in self.model.table(r.to_table).columns)]
+            if date_dims:
+                self.issue("info", "Model", date_dims[0],
+                           f"'{date_dims[0]}' is used as the date dimension: mark it as a date table in Power BI.")
                 return
             dc = date_cols[0]
             expr = (f"ADDCOLUMNS(CALENDARAUTO(), \"Year\", YEAR([Date]), \"Quarter\", \"Q\" & QUARTER([Date]), "
@@ -1374,3 +1448,41 @@ def _vid(s: str) -> str:
 
 def convert(wb: Workbook, join_strategy: str = "flatten") -> ConversionResult:
     return Converter(wb, join_strategy).convert()
+
+
+def apply_override(res: ConversionResult, pbi_object: str, dax: str, note: str = "", source: str = "manual") -> CalcMapping:
+    """Replace the DAX of a measure / calculated column / RLS role after review.
+
+    The expression must parse and reference existing model objects. The original DAX is
+    kept for lineage; the mapping becomes REVIEW until validation is re-run."""
+    from .ai_assist import check_dax
+    check = check_dax(res, dax)
+    if not check["parse_ok"] or not check["references_ok"]:
+        raise ValueError("; ".join(check["problems"]))
+    target = None
+    for t in res.model.tables:
+        for m in t.measures:
+            if m.name == pbi_object:
+                target = m
+        for c in t.columns:
+            if c.name == pbi_object and c.expression:
+                target = c
+    role = next((r for r in res.model.roles if r.name == pbi_object), None)
+    if target is None and role is None:
+        raise KeyError(f"No measure, calculated column or role named '{pbi_object}'")
+    if target is not None:
+        target.expression = dax
+    else:
+        table = next(iter(role.table_permissions))
+        role.table_permissions[table] = dax
+    hit = None
+    for m in res.calc_mappings:
+        if m.pbi_object == pbi_object:
+            if not m.overridden:
+                m.original_dax = m.dax
+            m.dax, m.overridden, m.override_note = dax, True, note or None
+            m.strategy = "ai:suggestion-reviewed" if source == "ai" else "override:manual"
+            hit = m
+    if hit is None:
+        raise KeyError(f"'{pbi_object}' has no Tableau mapping")
+    return hit

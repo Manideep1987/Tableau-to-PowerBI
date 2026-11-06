@@ -1,0 +1,13 @@
+employee_key,employee_name,email_upn,manager_upn,role
+E01,AP Clerk 1,clerk01@contoso.com,raj.patel@contoso.com,AP Clerk
+E02,AP Clerk 2,clerk02@contoso.com,li.wong@contoso.com,AP Clerk
+E03,AP Clerk 3,clerk03@contoso.com,anna.lee@contoso.com,AP Clerk
+E04,AP Clerk 4,clerk04@contoso.com,raj.patel@contoso.com,AP Clerk
+E05,AP Clerk 5,clerk05@contoso.com,li.wong@contoso.com,AP Clerk
+E06,AP Clerk 6,clerk06@contoso.com,anna.lee@contoso.com,AP Clerk
+E07,AP Clerk 7,clerk07@contoso.com,raj.patel@contoso.com,AP Clerk
+E08,AP Clerk 8,clerk08@contoso.com,li.wong@contoso.com,AP Clerk
+E09,AP Clerk 9,clerk09@contoso.com,anna.lee@contoso.com,AP Clerk
+E10,AP Clerk 10,clerk10@contoso.com,raj.patel@contoso.com,AP Clerk
+E11,AP Clerk 11,clerk11@contoso.com,li.wong@contoso.com,AP Clerk
+E12,AP Clerk 12,clerk12@contoso.com,anna.lee@contoso.com,AP Clerk

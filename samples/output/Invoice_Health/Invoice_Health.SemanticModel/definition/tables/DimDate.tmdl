@@ -1,0 +1,48 @@
+table DimDate
+	lineageTag: 5ec7734d-08a0-59ec-bb99-c5b98c661c31
+
+	column 'Date Key'
+		dataType: int64
+		lineageTag: 5689c4f2-d6a1-53f6-8388-eb2f3ed18bd4
+		summarizeBy: none
+		sourceColumn: Date Key
+
+		annotation TableauSource = Date Key (DimDate)
+
+	column 'Calendar Date'
+		dataType: dateTime
+		lineageTag: 11d22d62-2dc8-590f-89cd-ed059a3ad7a0
+		summarizeBy: none
+		sourceColumn: Calendar Date
+
+		annotation TableauSource = Calendar Date
+
+	column Month
+		dataType: string
+		lineageTag: 21324ccb-1cb5-5b0e-b5c7-4e9310330530
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation TableauSource = Month
+
+	column 'Fiscal Period'
+		dataType: string
+		lineageTag: 0d2fa8ec-0724-5b5d-91ef-b5838670ec83
+		summarizeBy: none
+		sourceColumn: Fiscal Period
+
+		annotation TableauSource = Fiscal Period
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(#"Invoice Health Server", #"Invoice Health Database"),
+				    Data = Source{[Schema = "dbo", Item = "DimDate"]}[Data],
+				    Selected = Table.SelectColumns(Data, {"date_key", "date", "month", "fiscal_period"}, MissingField.UseNull),
+				    Renamed = Table.RenameColumns(Selected, {{"date_key", "Date Key"}, {"date", "Calendar Date"}, {"month", "Month"}, {"fiscal_period", "Fiscal Period"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Date Key", Int64.Type}, {"Calendar Date", type date}, {"Month", type text}, {"Fiscal Period", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

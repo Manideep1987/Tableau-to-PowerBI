@@ -1,0 +1,41 @@
+vendor_key,vendor_name,category,region
+V001,Quantum Systems 1,Marketing,South
+V002,Apex Supplies 2,Professional Services,East
+V003,Blue Partners 3,Professional Services,West
+V004,Apex Services 4,Facilities,North
+V005,Apex Supplies 5,Marketing,South
+V006,Harbor Supplies 6,Facilities,East
+V007,Blue Services 7,Marketing,West
+V008,Apex Services 8,IT,North
+V009,Summit Labs 9,Professional Services,South
+V010,Apex Services 10,Professional Services,East
+V011,Harbor Supplies 11,Facilities,West
+V012,Apex Services 12,Facilities,North
+V013,Vertex Logistics 13,Facilities,South
+V014,Blue Services 14,Logistics,East
+V015,Nordic Supplies 15,Professional Services,West
+V016,Summit Partners 16,IT,North
+V017,Blue Services 17,IT,South
+V018,Summit Logistics 18,Professional Services,East
+V019,Harbor Partners 19,Marketing,West
+V020,Pioneer Partners 20,Logistics,North
+V021,Summit Systems 21,Facilities,South
+V022,Blue Services 22,Logistics,East
+V023,Pioneer Partners 23,Marketing,West
+V024,Vertex Services 24,IT,North
+V025,Blue Services 25,Marketing,South
+V026,Nordic Partners 26,Facilities,East
+V027,Pioneer Logistics 27,IT,West
+V028,Blue Services 28,Professional Services,North
+V029,Quantum Partners 29,Logistics,South
+V030,Pioneer Services 30,Marketing,East
+V031,Blue Supplies 31,Logistics,West
+V032,Pioneer Labs 32,IT,North
+V033,Apex Labs 33,Logistics,South
+V034,Pioneer Partners 34,Marketing,East
+V035,Quantum Supplies 35,Marketing,West
+V036,Quantum Systems 36,Professional Services,North
+V037,Blue Logistics 37,IT,South
+V038,Summit Partners 38,Facilities,East
+V039,Summit Logistics 39,Marketing,West
+V040,Pioneer Supplies 40,Facilities,North

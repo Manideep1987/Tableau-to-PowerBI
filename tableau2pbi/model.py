@@ -27,6 +27,7 @@ class Column:
     default_format: Optional[str] = None
     semantic_role: Optional[str] = None   # e.g. [State].[Name] for geo roles
 
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
     @property
     def display(self) -> str:
         return self.caption or self.name
@@ -46,6 +47,7 @@ class CalculatedField:
     folder: Optional[str] = None
     default_format: Optional[str] = None
     extra: dict = field(default_factory=dict)   # group bins, bin size, set members ...
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -60,6 +62,7 @@ class Parameter:
     step: Any = None
     members: list = field(default_factory=list)   # list of (value, alias)
     formula: Optional[str] = None
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -127,6 +130,7 @@ class Datasource:
     model_style: str = "relationships"   # relationships|joins|single
     aliases: dict = field(default_factory=dict)         # column -> {key: alias}
     datasource_filters: list = field(default_factory=list)
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -173,6 +177,7 @@ class Filter:
     top_param: Optional[str] = None
     is_context: bool = False
     raw: Optional[str] = None
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -188,6 +193,7 @@ class Worksheet:
     title: Optional[str] = None
     dual_axis: bool = False
 
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
     def all_fields(self):
         out = list(self.rows) + list(self.cols)
         for v in self.encodings.values():
@@ -215,6 +221,7 @@ class Dashboard:
     width: int = 1200
     height: int = 800
     zones: list = field(default_factory=list)
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -226,6 +233,7 @@ class Action:
     activation: str = "on-select"
     fields: list = field(default_factory=list)
     url: Optional[str] = None
+    xml_path: Optional[str] = None   # XPath of the source element (lineage)
 
 
 @dataclass
@@ -240,6 +248,9 @@ class Workbook:
     actions: list = field(default_factory=list)
     packaged_files: dict = field(default_factory=dict)  # name -> bytes (for twbx)
     warnings: list = field(default_factory=list)
+    unknown_nodes: list = field(default_factory=list)   # [{"path", "tag"}] preserved for review
+    parse_stats: dict = field(default_factory=dict)     # known / unknown element counts
+    security_findings: list = field(default_factory=list)
 
     def datasource(self, name: str) -> Optional[Datasource]:
         for ds in self.datasources:

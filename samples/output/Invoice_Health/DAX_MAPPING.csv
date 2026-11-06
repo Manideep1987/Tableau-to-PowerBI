@@ -1,0 +1,32 @@
+Data source,Tableau field,Tableau formula,Kind,Power BI table,Power BI object,DAX,Status,Classification,Strategy,Confidence,Notes
+Parameters,Status Selector,"""All""",parameter,Status Selector,Status Selector Value,"Status Selector = SELECTCOLUMNS({""All"", ""Late invoices"", ""On time""}, ""Status Selector"", [Value])
+
+[Status Selector Value] = SELECTEDVALUE('Status Selector'[Status Selector], ""All"")",Converted,PASS,rule:parameter-table+selectedvalue,high,List parameter -> disconnected table + slicer + value measure
+Invoice Health,TMN([Invoice Date]),"DATETRUNC('month', [Invoice Date])",date-part,FactInvoices,Invoice Date Month Start,"DATE(YEAR('FactInvoices'[Invoice Date]), MONTH('FactInvoices'[Invoice Date]), 1)",Converted,PASS,rule:date-part-column,high,
+Invoice Health,Total Invoice Amount,SUM([Invoice Amount]),measure,_Measures,Total Invoice Amount,SUM('FactInvoices'[Invoice Amount]),Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,On Time Paid Amount,SUM(IF [Paid Flag] = TRUE AND [Payment Date] <= [Due Date] THEN [Invoice Amount] ELSE 0 END),measure,_Measures,On Time Paid Amount,"SUMX('FactInvoices', IF((('FactInvoices'[Paid Flag] = TRUE()) && IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), 'FactInvoices'[Invoice Amount], 0))",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Paid Amount,SUM(IF [Paid Flag] THEN [Invoice Amount] END),measure,_Measures,Paid Amount,"SUMX('FactInvoices', IF('FactInvoices'[Paid Flag], 'FactInvoices'[Invoice Amount]))",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,On-time %,[On Time Paid Amount] / [Paid Amount],measure,_Measures,On-time %,"DIVIDE([On Time Paid Amount], [Paid Amount])",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Days Late,"DATEDIFF('day', [Due Date], [Payment Date])",column,FactInvoices,Days Late,"DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY)",Converted,PASS,rule:row-level-calculated-column,high,
+Invoice Health,Payment Status,IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Payment Date] <= [Due Date] THEN 'On time' ELSE 'Late' END,column,FactInvoices,Payment Status,"SWITCH(TRUE(),
+        ISBLANK('FactInvoices'[Payment Date]), ""Unpaid"",
+        IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])), ""On time"",
+        ""Late""
+    )",Converted,PASS,rule:row-level-calculated-column,high,
+Invoice Health,Aging Bucket,IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Days Late] <= 0 THEN 'Not late' ELSEIF [Days Late] <= 15 THEN '1-15 days' ELSEIF [Days Late] <= 30 THEN '16-30 days' ELSE '30+ days' END,column,FactInvoices,Aging Bucket,"SWITCH(TRUE(),
+        ISBLANK('FactInvoices'[Payment Date]), ""Unpaid"",
+        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 0)), ""Not late"",
+        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 15)), ""1-15 days"",
+        IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 30)), ""16-30 days"",
+        ""30+ days""
+    )",Converted,PASS,rule:row-level-calculated-column,high,
+Invoice Health,Vendor Fixed Amount,{ FIXED [Vendor Name] : SUM([Invoice Amount]) },column,FactInvoices,Vendor Fixed Amount,"(VAR __lod1 = RELATED('DimVendor'[Vendor Name]) RETURN CALCULATE(SUM('FactInvoices'[Invoice Amount]), REMOVEFILTERS(), 'DimVendor'[Vendor Name] = __lod1))",Converted,PASS,rule:fixed-lod-column,high,
+Invoice Health,Overdue Invoices,SUM(IF ISNULL([Payment Date]) AND [Due Date] < #2025-12-31# THEN 1 ELSE 0 END),measure,_Measures,Overdue Invoices,"SUMX('FactInvoices', IF((ISBLANK('FactInvoices'[Payment Date]) && ('FactInvoices'[Due Date] < DATE(2025, 12, 31))), 1, 0))",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Invoice Count,COUNTD([Invoice ID]),measure,_Measures,Invoice Count,DISTINCTCOUNTNOBLANK('FactInvoices'[Invoice ID]),Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Avg Days to Pay,"AVG(DATEDIFF('day', [Invoice Date], [Payment Date]))",measure,_Measures,Avg Days to Pay,"AVERAGEX('FactInvoices', DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY))",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Selected Metric Amount,CASE [Parameters].[Status Selector] WHEN 'Late invoices' THEN SUM(IF [Payment Status] = 'Late' THEN [Invoice Amount] END) WHEN 'On time' THEN [On Time Paid Amount] ELSE SUM([Invoice Amount]) END,measure,_Measures,Selected Metric Amount,"SWITCH([Status Selector Value], ""Late invoices"", SUMX('FactInvoices', IF(('FactInvoices'[Payment Status] = ""Late""), 'FactInvoices'[Invoice Amount])), ""On time"", [On Time Paid Amount], SUM('FactInvoices'[Invoice Amount]))",Converted,PASS,rule:aggregate-measure,high,
+Invoice Health,Manager Security,[Manager UPN] = USERNAME(),rls-role,DimEmployeeSecurity,Manager Security,'DimEmployeeSecurity'[Manager UPN] = USERPRINCIPALNAME(),Converted,REVIEW,rule:user-filter-to-rls-role,high,Tableau USERNAME() data source filter -> Power BI RLS role (USERPRINCIPALNAME). Assign Entra users/groups to the role in the service and test with real identities.
+Invoice Health,Vendor Share of Region,SUM([Invoice Amount]) / TOTAL(SUM([Invoice Amount])),measure,_Measures,Vendor Share of Region,"DIVIDE(SUM('FactInvoices'[Invoice Amount]), CALCULATE(SUM('FactInvoices'[Invoice Amount]), ALLSELECTED('DimVendor'[Vendor Name])))",Converted with notes,REVIEW,rule:table-calc-window,medium,TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures.
+Invoice Health,Sum of Invoice Amount,SUM([Invoice Amount]),base-measure,_Measures,Sum of Invoice Amount,SUM('FactInvoices'[Invoice Amount]),Converted,PASS,rule:explicit-base-measure,high,
+Invoice Health,Average of Days Late,AVG([Calculation_I05]),base-measure,_Measures,Average of Days Late,AVERAGE('FactInvoices'[Days Late]),Converted,PASS,rule:explicit-base-measure,high,
+Invoice Health,Max of Vendor Fixed Amount,MAX([Calculation_I08]),base-measure,_Measures,Max of Vendor Fixed Amount,MAX('FactInvoices'[Vendor Fixed Amount]),Converted,PASS,rule:explicit-base-measure,high,

@@ -1,0 +1,107 @@
+gate,check,scenario,metric,power_bi_object,tableau_value,powerbi_value,delta,tolerance,root_cause_category,status,owner,approval_notes
+1,Calculated fields converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Parameters converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Worksheets converted to visuals,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Dashboards converted to pages,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Worksheet filters converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Columns mapped,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Relationships converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Row count - Invoice Health,,L2 Data,,,,,,,PASS,BI migration engineer,
+1,Column profile - Invoice Health,,L2 Data,,,,,,,PASS,BI migration engineer,
+1,SQL ground truth - FactInvoices,,L2 Data,,,,,,,PASS,BI migration engineer,
+2,Worksheet 'KPI Overview',Total of all rows,Total Invoice Amount,Total Invoice Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'KPI Overview',Total of all rows,On-time %,On-time %,0.478796,0.478796,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'KPI Overview',Total of all rows,Overdue Invoices,Overdue Invoices,69.0,69.0,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'KPI Overview',Total of all rows,Invoice Count,Invoice Count,1500.0,1500.0,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Invoice Amount by Vendor',Total of all rows,Total Invoice Amount,Total Invoice Amount,2691423.51,2691423.51,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Monthly Payment Trend',Total of all rows,Total Invoice Amount,Total Invoice Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Monthly Payment Trend',Total of all rows,On Time Paid Amount,On Time Paid Amount,3741370.05,3741370.05,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Aging by Region',Total of all rows,SUM(Invoice Amount),Sum of Invoice Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Category Performance',Total of all rows,Total Invoice Amount,Total Invoice Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Category Performance',Total of all rows,On-time %,On-time %,2.406301,2.406301,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Category Performance',Total of all rows,Avg Days to Pay,Avg Days to Pay,239.544517,239.544517,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Category Performance',Total of all rows,AVG(Days Late),Average of Days Late,34.645066,34.645066,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Payment Status Mix',Total of all rows,SUM(Invoice Amount),Sum of Invoice Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Selected Status by Region',Total of all rows,Selected Metric Amount,Selected Metric Amount,8222130.46,8222130.46,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Concentration',Total of all rows,MAX(Vendor Fixed Amount),Max of Vendor Fixed Amount,1423339.42,1423339.42,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Vendor Concentration',Total of all rows,Vendor Share of Region,Vendor Share of Region,3.0,3.0,0.0,0.01,,PASS,BI migration engineer,
+2,Worksheet 'Fiscal Period South',Total of all rows,Total Invoice Amount,Total Invoice Amount,1931312.31,1931312.31,0.0,0.01,,PASS,BI migration engineer,
+2,'Selected Status by Region' with Status Selector = Late invoices,Total of all rows,Selected Metric Amount,Selected Metric Amount,4072752.9,4072752.9,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,Total Invoice Amount,Total Invoice Amount,8222130.46,8222130.46,0.0,8.222130459999999,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,On-time %,On-time %,0.4787959024883272,0.4787959024883272,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,Overdue Invoices,Overdue Invoices,69.0,69.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,Invoice Count,Invoice Count,1500.0,1500.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,On Time Paid Amount,On Time Paid Amount,3741370.05,3741370.05,0.0,3.7413700499999996,,PASS,BI migration engineer,
+2,KPI scenario: All data,All data,SUM(Invoice Amount),Sum of Invoice Amount,8222130.46,8222130.46,0.0,8.222130459999999,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,Total Invoice Amount,Total Invoice Amount,2111372.33,2111372.33,0.0,2.11137233,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,On-time %,On-time %,0.5142171781808651,0.5142171781808651,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,Overdue Invoices,Overdue Invoices,18.0,18.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,Invoice Count,Invoice Count,359.0,359.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,On Time Paid Amount,On Time Paid Amount,1016773.33,1016773.33,0.0,1.01677333,,PASS,BI migration engineer,
+2,KPI scenario: Region = East,Region = East,SUM(Invoice Amount),Sum of Invoice Amount,2111372.33,2111372.33,0.0,2.11137233,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,Total Invoice Amount,Total Invoice Amount,2032825.88,2032825.88,0.0,2.03282588,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,On-time %,On-time %,0.4640177718835428,0.4640177718835428,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,Overdue Invoices,Overdue Invoices,22.0,22.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,Invoice Count,Invoice Count,386.0,386.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,On Time Paid Amount,On Time Paid Amount,883024.4,883024.4,0.0,0.8830243999999999,,PASS,BI migration engineer,
+2,KPI scenario: Region = North,Region = North,SUM(Invoice Amount),Sum of Invoice Amount,2032825.88,2032825.88,0.0,2.03282588,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,Total Invoice Amount,Total Invoice Amount,2057089.77,2057089.77,0.0,2.0570897699999997,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,On-time %,On-time %,0.47417966428881786,0.47417966428881786,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,Overdue Invoices,Overdue Invoices,22.0,22.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,Invoice Count,Invoice Count,351.0,351.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,On Time Paid Amount,On Time Paid Amount,884644.58,884644.58,0.0,0.8846445799999999,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = Facilities,Vendor Category = Facilities,SUM(Invoice Amount),Sum of Invoice Amount,2057089.77,2057089.77,0.0,2.0570897699999997,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,Total Invoice Amount,Total Invoice Amount,1423339.42,1423339.42,0.0,1.4233394199999998,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,On-time %,On-time %,0.5082484785764507,0.5082484785764507,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,Overdue Invoices,Overdue Invoices,10.0,10.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,Invoice Count,Invoice Count,283.0,283.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,On Time Paid Amount,On Time Paid Amount,702349.34,702349.34,0.0,0.7023493399999999,,PASS,BI migration engineer,
+2,KPI scenario: Vendor Category = IT,Vendor Category = IT,SUM(Invoice Amount),Sum of Invoice Amount,1423339.42,1423339.42,0.0,1.4233394199999998,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,Total Invoice Amount,Total Invoice Amount,8222130.46,8222130.46,0.0,8.222130459999999,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,On-time %,On-time %,0.4787959024883272,0.4787959024883272,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,Overdue Invoices,Overdue Invoices,69.0,69.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,Invoice Count,Invoice Count,1500.0,1500.0,0.0,0.01,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,On Time Paid Amount,On Time Paid Amount,3741370.05,3741370.05,0.0,3.7413700499999996,,PASS,BI migration engineer,
+2,KPI scenario: Parameter Status Selector = Late invoices,Parameter Status Selector = Late invoices,SUM(Invoice Amount),Sum of Invoice Amount,8222130.46,8222130.46,0.0,8.222130459999999,,PASS,BI migration engineer,
+3,Report field references (PBIR),,Interactions,,,,,,,PASS,BI migration engineer,
+3,Quick filters and parameter controls -> slicers,,Interactions,,,,,,,PASS,BI migration engineer,
+3,Dashboard actions -> interactions,,Interactions,,,,,,,PASS,BI migration engineer,
+3,Sort order,,Interactions,,,,,,,PASS,BI migration engineer,
+3,Filter propagation design,,Interactions,,,,,,,PASS,BI migration engineer,
+3,"Click paths, slicer defaults, tooltips, drillthrough",,Interactions,,,,,,Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.,PENDING,BI migration engineer,
+3,'KPI Overview' sliced by Status = Disputed,Total of all rows,Total Invoice Amount,Total Invoice Amount,84127.55,84127.55,0.0,0.01,,PASS,BI migration engineer,
+3,'KPI Overview' sliced by Status = Disputed,Total of all rows,On-time %,On-time %,0.0,0.0,0.0,0.01,,PASS,BI migration engineer,
+3,'KPI Overview' sliced by Status = Disputed,Total of all rows,Overdue Invoices,Overdue Invoices,18.0,18.0,0.0,0.01,,PASS,BI migration engineer,
+3,'KPI Overview' sliced by Status = Disputed,Total of all rows,Invoice Count,Invoice Count,19.0,19.0,0.0,0.01,,PASS,BI migration engineer,
+3,'Invoice Amount by Vendor' sliced by Status = Disputed,Total of all rows,Total Invoice Amount,Total Invoice Amount,24977.68,24977.68,0.0,0.01,,PASS,BI migration engineer,
+3,'Monthly Payment Trend' sliced by Status = Disputed,Total of all rows,Total Invoice Amount,Total Invoice Amount,84127.55,84127.55,0.0,0.01,,PASS,BI migration engineer,
+3,'Monthly Payment Trend' sliced by Status = Disputed,Total of all rows,On Time Paid Amount,On Time Paid Amount,0.0,0.0,0.0,0.01,,PASS,BI migration engineer,
+3,'Aging by Region' sliced by Status = Disputed,Total of all rows,SUM(Invoice Amount),Sum of Invoice Amount,84127.55,84127.55,0.0,0.01,,PASS,BI migration engineer,
+3,'Vendor Category Performance' sliced by Status = Disputed,Total of all rows,Total Invoice Amount,Total Invoice Amount,84127.55,84127.55,0.0,0.01,,PASS,BI migration engineer,
+3,'Vendor Category Performance' sliced by Status = Disputed,Total of all rows,On-time %,On-time %,0.0,0.0,0.0,0.01,,PASS,BI migration engineer,
+3,'Vendor Category Performance' sliced by Status = Disputed,Total of all rows,Avg Days to Pay,Avg Days to Pay,0.0,0.0,0.0,0.01,,PASS,BI migration engineer,
+3,'Vendor Category Performance' sliced by Status = Disputed,Total of all rows,AVG(Days Late),Average of Days Late,0.0,0.0,0.0,0.01,,PASS,BI migration engineer,
+3,'Payment Status Mix' sliced by Status = Disputed,Total of all rows,SUM(Invoice Amount),Sum of Invoice Amount,84127.55,84127.55,0.0,0.01,,PASS,BI migration engineer,
+4,RLS role lint: Manager Security,,Security,,,,,,,PASS,BI migration engineer,
+4,Identity anna.lee@contoso.com (permitted user),user = anna.lee@contoso.com,Visible FactInvoices rows,,544,544,,0,,PASS,Security owner,Simulated identity
+4,Identity anna.lee@contoso.com (permitted user),user = anna.lee@contoso.com,Total Invoice Amount,,2832892.39,2832892.39,,0,,PASS,Security owner,Simulated identity
+4,Identity anna.lee@contoso.com (permitted user),user = anna.lee@contoso.com,On-time %,,0.4856536967390973,0.4856536967390973,,0,,PASS,Security owner,Simulated identity
+4,Identity anna.lee@contoso.com (permitted user),user = anna.lee@contoso.com,Overdue Invoices,,22.0,22.0,,0,,PASS,Security owner,Simulated identity
+4,Identity anna.lee@contoso.com (permitted user),user = anna.lee@contoso.com,Invoice Count,,544.0,544.0,,0,,PASS,Security owner,Simulated identity
+4,Identity li.wong@contoso.com (permitted user),user = li.wong@contoso.com,Visible FactInvoices rows,,490,490,,0,,PASS,Security owner,Simulated identity
+4,Identity li.wong@contoso.com (permitted user),user = li.wong@contoso.com,Total Invoice Amount,,2717002.42,2717002.42,,0,,PASS,Security owner,Simulated identity
+4,Identity li.wong@contoso.com (permitted user),user = li.wong@contoso.com,On-time %,,0.48831173813631706,0.48831173813631706,,0,,PASS,Security owner,Simulated identity
+4,Identity li.wong@contoso.com (permitted user),user = li.wong@contoso.com,Overdue Invoices,,19.0,19.0,,0,,PASS,Security owner,Simulated identity
+4,Identity li.wong@contoso.com (permitted user),user = li.wong@contoso.com,Invoice Count,,490.0,490.0,,0,,PASS,Security owner,Simulated identity
+4,Identity raj.patel@contoso.com (permitted user),user = raj.patel@contoso.com,Visible FactInvoices rows,,466,466,,0,,PASS,Security owner,Simulated identity
+4,Identity raj.patel@contoso.com (permitted user),user = raj.patel@contoso.com,Total Invoice Amount,,2672235.65,2672235.65,,0,,PASS,Security owner,Simulated identity
+4,Identity raj.patel@contoso.com (permitted user),user = raj.patel@contoso.com,On-time %,,0.46139587098748824,0.46139587098748824,,0,,PASS,Security owner,Simulated identity
+4,Identity raj.patel@contoso.com (permitted user),user = raj.patel@contoso.com,Overdue Invoices,,28.0,28.0,,0,,PASS,Security owner,Simulated identity
+4,Identity raj.patel@contoso.com (permitted user),user = raj.patel@contoso.com,Invoice Count,,466.0,466.0,,0,,PASS,Security owner,Simulated identity
+4,Identity no.access@contoso.com (forbidden user),user = no.access@contoso.com,Visible FactInvoices rows,,0,0,,0,,PASS,Security owner,Simulated identity
+4,Identity no.access@contoso.com (forbidden user),user = no.access@contoso.com,Total Invoice Amount,,,,,0,,PASS,Security owner,Simulated identity
+4,Identity no.access@contoso.com (forbidden user),user = no.access@contoso.com,On-time %,,,,,0,,PASS,Security owner,Simulated identity
+4,Identity no.access@contoso.com (forbidden user),user = no.access@contoso.com,Overdue Invoices,,,,,0,,PASS,Security owner,Simulated identity
+4,Identity no.access@contoso.com (forbidden user),user = no.access@contoso.com,Invoice Count,,,,,0,,PASS,Security owner,Simulated identity
+4,"Live identity test (real users, groups, SSO)",,Security,,,,,,Assign Entra ID users/groups to each role in the Power BI service and test permitted and forbidden users with 'View as'. Simulation does not replace this test.,PENDING,BI migration engineer,
+5,Business owner sign-off,,Business UAT,,,,,,Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.,PENDING,Business owner,

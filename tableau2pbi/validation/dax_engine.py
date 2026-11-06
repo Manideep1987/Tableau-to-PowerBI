@@ -410,6 +410,7 @@ class DaxEngine:
         calc_columns:  {table: [(column, DAX expression)]} evaluated on load
         """
         self.today = today or date.today()
+        self.user = None
         self.base = {}
         for t, df in tables.items():
             d = df.copy()
@@ -1410,9 +1411,51 @@ class DaxEngine:
             return math.pi
         if name in ("SIN", "COS", "TAN", "ASIN", "ACOS", "ATAN", "DEGREES", "RADIANS"):
             return getattr(math, name.lower())(v0)
-        if name == "USERPRINCIPALNAME" or name == "USERNAME":
-            return "validator@local"
+        if name in ("USERPRINCIPALNAME", "USERNAME"):
+            return self.user if self.user is not None else "validator@local"
         raise DaxError(f"Unsupported DAX function {name}()")
+
+    # ============================================================== RLS ==
+    def with_rls(self, permissions: dict, user: str) -> "DaxEngine":
+        """Engine as seen by ``user`` under a role: table permissions remove rows of the secured
+        tables and the filter propagates to the many-side tables through relationships
+        (calculated columns keep their refresh-time values, as in Power BI)."""
+        import copy as _copy
+        eng = _copy.copy(self)
+        eng.base = {t: df.copy() for t, df in self.base.items()}
+        eng.user = user
+        eng.errors = []
+        eng._invalidate()
+        filtered = set()
+        for table, expr in permissions.items():
+            if table not in eng.base:
+                eng.errors.append(f"RLS table '{table}' not in model")
+                continue
+            ast = parse_dax(expr)
+            own = eng.own_keys(table)
+            keep = []
+            for rec in eng.expanded(table).to_dict("records"):
+                rec = {k: _py(v) for k, v in rec.items()}
+                keep.append(_truthy(eng.eval(ast, Ctx((), (RowCtx(table, rec, own),), {}))))
+            eng.base[table] = eng.base[table][np.array(keep, dtype=bool)].reset_index(drop=True)
+            filtered.add(table)
+            eng._invalidate()
+        changed = True
+        while changed:
+            changed = False
+            for ft, fc, tt, tc in eng.rels:
+                if tt not in filtered:
+                    continue
+                allowed = set(eng.base[tt][_key(tt, tc)].tolist())
+                m = eng.base[ft][_key(ft, fc)].isin(allowed)
+                if not m.all():
+                    eng.base[ft] = eng.base[ft][m.values].reset_index(drop=True)
+                    changed = True
+                if ft not in filtered:
+                    filtered.add(ft)
+                    changed = True
+            eng._invalidate()
+        return eng
 
     # ============================================================ query ==
     def query(self, dims: list, measures: list, filters: list = (), value_filters: list = ()):

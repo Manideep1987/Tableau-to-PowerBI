@@ -1,0 +1,1007 @@
+{
+  "ir_version": "0.1.0",
+  "workbook": {
+    "id": "wb_hr_analytics",
+    "name": "HR_Analytics",
+    "version": "18.1",
+    "source_build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [
+      "Data/hr/employees.csv"
+    ],
+    "parse_stats": {
+      "known_elements": 228,
+      "unknown_elements": 0,
+      "completeness": 100.0
+    }
+  },
+  "sources": [
+    {
+      "id": "src_employees",
+      "name": "Employees",
+      "kind": "file",
+      "model_style": "single",
+      "xml_path": "/workbook/datasources/datasource",
+      "connections": [
+        {
+          "class": "textscan",
+          "server": "",
+          "database": null,
+          "schema": null,
+          "file": "Data/hr/employees.csv",
+          "supported": true
+        }
+      ],
+      "tables": [
+        {
+          "id": "tbl_employees_csv",
+          "name": "employees.csv",
+          "type": "table",
+          "physical": "[employees#csv]",
+          "sql": null
+        }
+      ],
+      "relationships": []
+    }
+  ],
+  "fields": [
+    {
+      "id": "f_employees_csv_employee_id",
+      "name": "Employee ID",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "employee_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_employee_name",
+      "name": "Employee Name",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "employee_name",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_department",
+      "name": "Department",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "department",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_job_level",
+      "name": "Job Level",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "job_level",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_gender",
+      "name": "Gender",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "gender",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_location",
+      "name": "Location",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "location",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_hire_date",
+      "name": "Hire Date",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "hire_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_termination_date",
+      "name": "Termination Date",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "termination_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": true,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_salary",
+      "name": "Salary",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "salary",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_employees_csv_performance_score",
+      "name": "Performance Score",
+      "source_id": "src_employees",
+      "table": "employees.csv",
+      "remote_name": "performance_score",
+      "type": "integer",
+      "role": "measure",
+      "nullable": true,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    }
+  ],
+  "calculations": [
+    {
+      "id": "c_headcount",
+      "name": "Headcount",
+      "internal_name": "Calculation_H01",
+      "source_id": "src_employees",
+      "category": "measure",
+      "tableau": "COUNTD([Employee ID])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "COUNTD",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Employee ID",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_employees_csv_employee_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[1]",
+      "pbi_object": "Headcount",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_is_active",
+      "name": "Is Active",
+      "internal_name": "Calculation_H02",
+      "source_id": "src_employees",
+      "category": "column",
+      "tableau": "ISNULL([Termination Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "ISNULL",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Termination Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_employees_csv_termination_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[2]",
+      "pbi_object": "Is Active",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "ISBLANK('employees.csv'[Termination Date])",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_attrition_rate",
+      "name": "Attrition Rate",
+      "internal_name": "Calculation_H03",
+      "source_id": "src_employees",
+      "category": "measure",
+      "tableau": "SUM(IF NOT ISNULL([Termination Date]) THEN 1 ELSE 0 END) / COUNTD([Employee ID])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "If",
+              "branches": [
+                [
+                  {
+                    "node": "Unary",
+                    "op": "NOT",
+                    "operand": {
+                      "node": "Func",
+                      "name": "ISNULL",
+                      "args": [
+                        {
+                          "node": "Field",
+                          "name": "Termination Date",
+                          "datasource": null
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "node": "Num",
+                    "value": 1
+                  }
+                ]
+              ],
+              "else_": {
+                "node": "Num",
+                "value": 0
+              }
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "COUNTD",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Employee ID",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_employees_csv_termination_date",
+        "f_employees_csv_employee_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[3]",
+      "pbi_object": "Attrition Rate",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_tenure_years",
+      "name": "Tenure Years",
+      "internal_name": "Calculation_H04",
+      "source_id": "src_employees",
+      "category": "column",
+      "tableau": "DATEDIFF('day', [Hire Date], IFNULL([Termination Date], #2025-12-31#)) / 365.25",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "DATEDIFF",
+          "args": [
+            {
+              "node": "Str",
+              "value": "day"
+            },
+            {
+              "node": "Field",
+              "name": "Hire Date",
+              "datasource": null
+            },
+            {
+              "node": "Func",
+              "name": "IFNULL",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "Termination Date",
+                  "datasource": null
+                },
+                {
+                  "node": "DateLit",
+                  "value": "2025-12-31"
+                }
+              ]
+            }
+          ]
+        },
+        "right": {
+          "node": "Num",
+          "value": 365.25
+        }
+      },
+      "deps": [
+        "f_employees_csv_hire_date",
+        "f_employees_csv_termination_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[4]",
+      "pbi_object": "Tenure Years",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_tenure_band",
+      "name": "Tenure Band",
+      "internal_name": "Calculation_H05",
+      "source_id": "src_employees",
+      "category": "column",
+      "tableau": "IF [Tenure Years] < 2 THEN '0-2 yrs' ELSEIF [Tenure Years] < 5 THEN '2-5 yrs' ELSE '5+ yrs' END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "BinOp",
+              "op": "<",
+              "left": {
+                "node": "Field",
+                "name": "Tenure Years",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 2
+              }
+            },
+            {
+              "node": "Str",
+              "value": "0-2 yrs"
+            }
+          ],
+          [
+            {
+              "node": "BinOp",
+              "op": "<",
+              "left": {
+                "node": "Field",
+                "name": "Tenure Years",
+                "datasource": null
+              },
+              "right": {
+                "node": "Num",
+                "value": 5
+              }
+            },
+            {
+              "node": "Str",
+              "value": "2-5 yrs"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "5+ yrs"
+        }
+      },
+      "deps": [
+        "c_tenure_years"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[5]",
+      "pbi_object": "Tenure Band",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "SWITCH(TRUE(),\n        ('employees.csv'[Tenure Years] < 2), \"0-2 yrs\",\n        ('employees.csv'[Tenure Years] < 5), \"2-5 yrs\",\n        \"5+ yrs\"\n    )",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_dept_avg_salary",
+      "name": "Dept Avg Salary",
+      "internal_name": "Calculation_H06",
+      "source_id": "src_employees",
+      "category": "lod",
+      "tableau": "{FIXED [Department] : AVG([Salary])}",
+      "expression_ast": {
+        "node": "LOD",
+        "kind": "FIXED",
+        "dims": [
+          {
+            "node": "Field",
+            "name": "Department",
+            "datasource": null
+          }
+        ],
+        "expr": {
+          "node": "Func",
+          "name": "AVG",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Salary",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_employees_csv_department",
+        "f_employees_csv_salary"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[6]",
+      "pbi_object": "Dept Avg Salary",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "(VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))",
+      "strategy": "rule:fixed-lod-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_salary_vs_dept",
+      "name": "Salary vs Dept",
+      "internal_name": "Calculation_H07",
+      "source_id": "src_employees",
+      "category": "measure",
+      "tableau": "AVG([Salary]) - AVG([Dept Avg Salary])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "-",
+        "left": {
+          "node": "Func",
+          "name": "AVG",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Salary",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "AVG",
+          "args": [
+            {
+              "node": "Field",
+              "name": "Dept Avg Salary",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_employees_csv_salary",
+        "c_dept_avg_salary"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[7]",
+      "pbi_object": "Salary vs Dept",
+      "pbi_table": "_Measures",
+      "pbi_dax": "(AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_high_performer",
+      "name": "High Performer",
+      "internal_name": "Calculation_H08",
+      "source_id": "src_employees",
+      "category": "column",
+      "tableau": "[Performance Score] >= 4",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": ">=",
+        "left": {
+          "node": "Field",
+          "name": "Performance Score",
+          "datasource": null
+        },
+        "right": {
+          "node": "Num",
+          "value": 4
+        }
+      },
+      "deps": [
+        "f_employees_csv_performance_score"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[8]",
+      "pbi_object": "High Performer",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_hire_year",
+      "name": "Hire Year",
+      "internal_name": "Calculation_H09",
+      "source_id": "src_employees",
+      "category": "column",
+      "tableau": "YEAR([Hire Date])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "YEAR",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Hire Date",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_employees_csv_hire_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[9]",
+      "pbi_object": "Hire Year",
+      "pbi_table": "employees.csv",
+      "pbi_dax": "YEAR('employees.csv'[Hire Date])",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_median_salary",
+      "name": "Median Salary",
+      "internal_name": "Calculation_H10",
+      "source_id": "src_employees",
+      "category": "measure",
+      "tableau": "MEDIAN([Salary])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "MEDIAN",
+        "args": [
+          {
+            "node": "Field",
+            "name": "Salary",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_employees_csv_salary"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[10]",
+      "pbi_object": "Median Salary",
+      "pbi_table": "_Measures",
+      "pbi_dax": "MEDIAN('employees.csv'[Salary])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_hires_running_total",
+      "name": "Hires Running Total",
+      "internal_name": "Calculation_H11",
+      "source_id": "src_employees",
+      "category": "table_calc",
+      "tableau": "RUNNING_SUM(COUNTD([Employee ID]))",
+      "expression_ast": {
+        "node": "Func",
+        "name": "RUNNING_SUM",
+        "args": [
+          {
+            "node": "Func",
+            "name": "COUNTD",
+            "args": [
+              {
+                "node": "Field",
+                "name": "Employee ID",
+                "datasource": null
+              }
+            ]
+          }
+        ]
+      },
+      "deps": [
+        "f_employees_csv_employee_id"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[11]",
+      "pbi_object": "Hires Running Total",
+      "pbi_table": "_Measures",
+      "pbi_dax": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    }
+  ],
+  "parameters": [],
+  "worksheets": [
+    {
+      "id": "ws_headcount_by_department",
+      "name": "Headcount by Department",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[1]",
+      "rows": [
+        "none:Department:nk"
+      ],
+      "columns": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H03:qk",
+        "usr:Calculation_H10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_tenure_distribution",
+      "name": "Tenure Distribution",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[2]",
+      "rows": [
+        "none:Calculation_H05:nk",
+        "none:Calculation_H02:nk"
+      ],
+      "columns": [
+        "usr:Calculation_H01:qk",
+        "avg:Calculation_H04:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_salary_benchmark",
+      "name": "Salary Benchmark",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[3]",
+      "rows": [
+        "none:Department:nk",
+        "none:Job Level:nk"
+      ],
+      "columns": [
+        "avg:Salary:qk",
+        "usr:Calculation_H07:qk",
+        "avg:Performance Score:qk"
+      ],
+      "encodings": {
+        "text": [
+          "avg:Salary:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Location:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[3]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_hiring_trend",
+      "name": "Hiring Trend",
+      "mark": "line",
+      "xml_path": "/workbook/worksheets/worksheet[4]",
+      "rows": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H11:qk"
+      ],
+      "columns": [
+        "none:Calculation_H09:ok"
+      ],
+      "encodings": {},
+      "filters": [],
+      "target_visual": "lineChart"
+    },
+    {
+      "id": "ws_performance_mix",
+      "name": "Performance Mix",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[5]",
+      "rows": [
+        "none:Calculation_H08:nk"
+      ],
+      "columns": [
+        "cnt:Employee ID:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Department:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[5]/table/view/filter"
+        }
+      ],
+      "target_visual": "clusteredBarChart"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "db_hr_overview",
+      "name": "HR Overview",
+      "width": 1200,
+      "height": 800,
+      "xml_path": "/workbook/dashboards/dashboard",
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Headcount by Department",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Hiring Trend",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Salary Benchmark",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "Tenure Distribution",
+          "x": 50000.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "6",
+          "type": "filter",
+          "name": "Headcount by Department",
+          "x": 80000.0,
+          "y": 0.0,
+          "w": 20000.0,
+          "h": 10000.0
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "security": {
+    "rules": [],
+    "roles": [],
+    "requires_identity_review": false
+  },
+  "unknown_nodes": [],
+  "warnings": [],
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: textscan",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 6,
+      "status": "supported",
+      "note": "6 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 5,
+      "status": "supported",
+      "note": "5 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "LOD expressions",
+      "count": 1,
+      "status": "review",
+      "note": "context must be proven by validation"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 1,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 1,
+      "status": "supported",
+      "note": "-> clusteredBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Line",
+      "count": 1,
+      "status": "supported",
+      "note": "-> lineChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 3,
+      "status": "supported",
+      "note": "-> tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 2,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 1,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 4,
+      "status": "supported",
+      "note": ""
+    }
+  ],
+  "validation": {
+    "summary": {
+      "PASS": 27,
+      "WARN": 0,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "PENDING": 3,
+      "N/A": 1,
+      "total": 31,
+      "pass_rate": 100.0,
+      "overall": "PASS"
+    },
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 9,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 10,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "PENDING",
+        "automated_checks": 8,
+        "passed": 8,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 1,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Confirm no row-level security requirement"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ]
+  }
+}

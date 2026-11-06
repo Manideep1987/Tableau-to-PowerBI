@@ -1,0 +1,1046 @@
+{
+  "ir_version": "0.1.0",
+  "workbook": {
+    "id": "wb_finance_customsql",
+    "name": "Finance_CustomSQL",
+    "version": "18.1",
+    "source_build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [],
+    "parse_stats": {
+      "known_elements": 206,
+      "unknown_elements": 0,
+      "completeness": 100.0
+    }
+  },
+  "sources": [
+    {
+      "id": "src_finance_orders",
+      "name": "Finance Orders",
+      "kind": "extract",
+      "model_style": "joins",
+      "xml_path": "/workbook/datasources/datasource[2]",
+      "connections": [
+        {
+          "class": "postgres",
+          "server": "pg-finance.corp.local",
+          "database": "finance",
+          "schema": null,
+          "file": null,
+          "supported": true
+        }
+      ],
+      "tables": [
+        {
+          "id": "tbl_custom_sql_query",
+          "name": "Custom SQL Query",
+          "type": "text",
+          "physical": null,
+          "sql": "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= <Parameters.Min Quantity>"
+        },
+        {
+          "id": "tbl_targets",
+          "name": "Targets",
+          "type": "table",
+          "physical": "[public].[Targets]",
+          "sql": null
+        }
+      ],
+      "relationships": [
+        {
+          "left": "Custom SQL Query.region",
+          "right": "Targets.region",
+          "type": "inner"
+        }
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "id": "f_custom_sql_query_order_id",
+      "name": "order_id",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "order_id",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_order_date",
+      "name": "order_date",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "order_date",
+      "type": "date",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_sales",
+      "name": "sales",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "sales",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_profit",
+      "name": "profit",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "profit",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_quantity",
+      "name": "quantity",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "quantity",
+      "type": "integer",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_region",
+      "name": "region",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "region",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_custom_sql_query_segment",
+      "name": "segment",
+      "source_id": "src_finance_orders",
+      "table": "Custom SQL Query",
+      "remote_name": "segment",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_targets_region_targets",
+      "name": "region (Targets)",
+      "source_id": "src_finance_orders",
+      "table": "Targets",
+      "remote_name": "region",
+      "type": "string",
+      "role": "dimension",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    },
+    {
+      "id": "f_targets_sales_target",
+      "name": "sales_target",
+      "source_id": "src_finance_orders",
+      "table": "Targets",
+      "remote_name": "sales_target",
+      "type": "real",
+      "role": "measure",
+      "nullable": false,
+      "hidden": false,
+      "description": null,
+      "xml_path": null
+    }
+  ],
+  "calculations": [
+    {
+      "id": "c_target_attainment",
+      "name": "Target Attainment",
+      "internal_name": "Calculation_F01",
+      "source_id": "src_finance_orders",
+      "category": "measure",
+      "tableau": "SUM([sales]) / SUM([sales_target])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "/",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "sales_target",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_sales",
+        "f_targets_sales_target"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[1]",
+      "pbi_object": "Target Attainment",
+      "pbi_table": "_Measures",
+      "pbi_dax": "DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_projected_sales",
+      "name": "Projected Sales",
+      "internal_name": "Calculation_F02",
+      "source_id": "src_finance_orders",
+      "category": "measure",
+      "tableau": "SUM([sales]) * (1 + [Parameters].[Growth Rate])",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "*",
+        "left": {
+          "node": "Func",
+          "name": "SUM",
+          "args": [
+            {
+              "node": "Field",
+              "name": "sales",
+              "datasource": null
+            }
+          ]
+        },
+        "right": {
+          "node": "BinOp",
+          "op": "+",
+          "left": {
+            "node": "Num",
+            "value": 1
+          },
+          "right": {
+            "node": "Field",
+            "name": "Growth Rate",
+            "datasource": "Parameters"
+          }
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_sales",
+        "p_growth_rate"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[2]",
+      "pbi_object": "Projected Sales",
+      "pbi_table": "_Measures",
+      "pbi_dax": "(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_margin",
+      "name": "Margin %",
+      "internal_name": "Calculation_F03",
+      "source_id": "src_finance_orders",
+      "category": "measure",
+      "tableau": "IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "BinOp",
+              "op": "=",
+              "left": {
+                "node": "Func",
+                "name": "SUM",
+                "args": [
+                  {
+                    "node": "Field",
+                    "name": "sales",
+                    "datasource": null
+                  }
+                ]
+              },
+              "right": {
+                "node": "Num",
+                "value": 0
+              }
+            },
+            {
+              "node": "Null"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "BinOp",
+          "op": "/",
+          "left": {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "profit",
+                "datasource": null
+              }
+            ]
+          },
+          "right": {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "sales",
+                "datasource": null
+              }
+            ]
+          }
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_sales",
+        "f_custom_sql_query_profit"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[3]",
+      "pbi_object": "Margin %",
+      "pbi_table": "_Measures",
+      "pbi_dax": "IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_fiscal_year",
+      "name": "Fiscal Year",
+      "internal_name": "Calculation_F04",
+      "source_id": "src_finance_orders",
+      "category": "column",
+      "tableau": "IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END",
+      "expression_ast": {
+        "node": "If",
+        "branches": [
+          [
+            {
+              "node": "BinOp",
+              "op": ">=",
+              "left": {
+                "node": "Func",
+                "name": "DATEPART",
+                "args": [
+                  {
+                    "node": "Str",
+                    "value": "month"
+                  },
+                  {
+                    "node": "Field",
+                    "name": "order_date",
+                    "datasource": null
+                  }
+                ]
+              },
+              "right": {
+                "node": "Num",
+                "value": 7
+              }
+            },
+            {
+              "node": "BinOp",
+              "op": "+",
+              "left": {
+                "node": "Func",
+                "name": "YEAR",
+                "args": [
+                  {
+                    "node": "Field",
+                    "name": "order_date",
+                    "datasource": null
+                  }
+                ]
+              },
+              "right": {
+                "node": "Num",
+                "value": 1
+              }
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Func",
+          "name": "YEAR",
+          "args": [
+            {
+              "node": "Field",
+              "name": "order_date",
+              "datasource": null
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_order_date"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[4]",
+      "pbi_object": "Fiscal Year",
+      "pbi_table": "Finance Orders",
+      "pbi_dax": "IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_sales_yoy_prior",
+      "name": "Sales YoY Prior",
+      "internal_name": "Calculation_F05",
+      "source_id": "src_finance_orders",
+      "category": "table_calc",
+      "tableau": "LOOKUP(SUM([sales]), -1)",
+      "expression_ast": {
+        "node": "Func",
+        "name": "LOOKUP",
+        "args": [
+          {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "sales",
+                "datasource": null
+              }
+            ]
+          },
+          {
+            "node": "Num",
+            "value": -1
+          }
+        ]
+      },
+      "deps": [
+        "f_custom_sql_query_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[5]",
+      "pbi_object": "Sales YoY Prior",
+      "pbi_table": "_Measures",
+      "pbi_dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_order_size",
+      "name": "Order Size",
+      "internal_name": "Calculation_F06",
+      "source_id": "src_finance_orders",
+      "category": "column",
+      "tableau": "CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END",
+      "expression_ast": {
+        "node": "Case",
+        "subject": {
+          "node": "Field",
+          "name": "quantity",
+          "datasource": null
+        },
+        "whens": [
+          [
+            {
+              "node": "Num",
+              "value": 1
+            },
+            {
+              "node": "Str",
+              "value": "Single"
+            }
+          ],
+          [
+            {
+              "node": "Num",
+              "value": 2
+            },
+            {
+              "node": "Str",
+              "value": "Pair"
+            }
+          ]
+        ],
+        "else_": {
+          "node": "Str",
+          "value": "Bulk"
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_quantity"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[6]",
+      "pbi_object": "Order Size",
+      "pbi_table": "Finance Orders",
+      "pbi_dax": "SWITCH('Finance Orders'[quantity], 1, \"Single\", 2, \"Pair\", \"Bulk\")",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_loss_orders",
+      "name": "Loss Orders",
+      "internal_name": "Calculation_F07",
+      "source_id": "src_finance_orders",
+      "category": "measure",
+      "tableau": "SUM(IF [profit] < 0 THEN 1 ELSE 0 END)",
+      "expression_ast": {
+        "node": "Func",
+        "name": "SUM",
+        "args": [
+          {
+            "node": "If",
+            "branches": [
+              [
+                {
+                  "node": "BinOp",
+                  "op": "<",
+                  "left": {
+                    "node": "Field",
+                    "name": "profit",
+                    "datasource": null
+                  },
+                  "right": {
+                    "node": "Num",
+                    "value": 0
+                  }
+                },
+                {
+                  "node": "Num",
+                  "value": 1
+                }
+              ]
+            ],
+            "else_": {
+              "node": "Num",
+              "value": 0
+            }
+          }
+        ]
+      },
+      "deps": [
+        "f_custom_sql_query_profit"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[7]",
+      "pbi_object": "Loss Orders",
+      "pbi_table": "_Measures",
+      "pbi_dax": "SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_region_code",
+      "name": "Region Code",
+      "internal_name": "Calculation_F08",
+      "source_id": "src_finance_orders",
+      "category": "column",
+      "tableau": "UPPER(LEFT([region], 1)) + STR(LEN([region]))",
+      "expression_ast": {
+        "node": "BinOp",
+        "op": "+",
+        "left": {
+          "node": "Func",
+          "name": "UPPER",
+          "args": [
+            {
+              "node": "Func",
+              "name": "LEFT",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "region",
+                  "datasource": null
+                },
+                {
+                  "node": "Num",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        "right": {
+          "node": "Func",
+          "name": "STR",
+          "args": [
+            {
+              "node": "Func",
+              "name": "LEN",
+              "args": [
+                {
+                  "node": "Field",
+                  "name": "region",
+                  "datasource": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "deps": [
+        "f_custom_sql_query_region"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[8]",
+      "pbi_object": "Region Code",
+      "pbi_table": "Finance Orders",
+      "pbi_dax": "UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_avg_monthly_sales",
+      "name": "Avg Monthly Sales",
+      "internal_name": "Calculation_F09",
+      "source_id": "src_finance_orders",
+      "category": "table_calc",
+      "tableau": "WINDOW_AVG(SUM([sales]))",
+      "expression_ast": {
+        "node": "Func",
+        "name": "WINDOW_AVG",
+        "args": [
+          {
+            "node": "Func",
+            "name": "SUM",
+            "args": [
+              {
+                "node": "Field",
+                "name": "sales",
+                "datasource": null
+              }
+            ]
+          }
+        ]
+      },
+      "deps": [
+        "f_custom_sql_query_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[9]",
+      "pbi_object": "Avg Monthly Sales",
+      "pbi_table": "_Measures",
+      "pbi_dax": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    },
+    {
+      "id": "c_max_order_value",
+      "name": "Max Order Value",
+      "internal_name": "Calculation_F10",
+      "source_id": "src_finance_orders",
+      "category": "measure",
+      "tableau": "MAX([sales])",
+      "expression_ast": {
+        "node": "Func",
+        "name": "MAX",
+        "args": [
+          {
+            "node": "Field",
+            "name": "sales",
+            "datasource": null
+          }
+        ]
+      },
+      "deps": [
+        "f_custom_sql_query_sales"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[10]",
+      "pbi_object": "Max Order Value",
+      "pbi_table": "_Measures",
+      "pbi_dax": "MAX('Finance Orders'[sales])",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "status": "Converted",
+      "classification": "PASS",
+      "warnings": [],
+      "overridden": false
+    }
+  ],
+  "parameters": [
+    {
+      "id": "p_min_quantity",
+      "name": "Min Quantity",
+      "type": "integer",
+      "current_value": 2,
+      "domain": "range",
+      "members": [],
+      "min": 1,
+      "max": 9,
+      "step": 1,
+      "xml_path": "/workbook/datasources/datasource[1]/column[1]"
+    },
+    {
+      "id": "p_growth_rate",
+      "name": "Growth Rate",
+      "type": "real",
+      "current_value": 0.08,
+      "domain": "any",
+      "members": [],
+      "min": null,
+      "max": null,
+      "step": null,
+      "xml_path": "/workbook/datasources/datasource[1]/column[2]"
+    }
+  ],
+  "worksheets": [
+    {
+      "id": "ws_attainment_by_region",
+      "name": "Attainment by Region",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[1]",
+      "rows": [
+        "none:region:nk"
+      ],
+      "columns": [
+        "sum:sales:qk",
+        "sum:sales_target:qk",
+        "usr:Calculation_F01:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_F01:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_fiscal_year_sales",
+      "name": "Fiscal Year Sales",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[2]",
+      "rows": [
+        "none:Calculation_F04:ok"
+      ],
+      "columns": [
+        "sum:sales:qk",
+        "usr:Calculation_F02:qk",
+        "usr:Calculation_F05:qk",
+        "usr:Calculation_F09:qk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:sales:qk"
+        ]
+      },
+      "filters": [],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_order_size_mix",
+      "name": "Order Size Mix",
+      "mark": "text",
+      "xml_path": "/workbook/worksheets/worksheet[3]",
+      "rows": [
+        "none:Calculation_F06:nk",
+        "none:segment:nk"
+      ],
+      "columns": [
+        "cnt:order_id:qk",
+        "usr:Calculation_F03:qk",
+        "usr:Calculation_F07:qk",
+        "usr:Calculation_F10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "cnt:order_id:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:segment:nk",
+          "context": false,
+          "xml_path": "/workbook/worksheets/worksheet[3]/table/view/filter"
+        }
+      ],
+      "target_visual": "tableEx"
+    },
+    {
+      "id": "ws_region_codes",
+      "name": "Region Codes",
+      "mark": "bar",
+      "xml_path": "/workbook/worksheets/worksheet[4]",
+      "rows": [
+        "none:Calculation_F08:nk"
+      ],
+      "columns": [
+        "sum:profit:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "target_visual": "clusteredBarChart"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "db_finance_summary",
+      "name": "Finance Summary",
+      "width": 1280,
+      "height": 720,
+      "xml_path": "/workbook/dashboards/dashboard",
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Attainment by Region",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Fiscal Year Sales",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Order Size Mix",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 100000.0,
+          "h": 50000.0
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "security": {
+    "rules": [],
+    "roles": [],
+    "requires_identity_review": false
+  },
+  "unknown_nodes": [],
+  "warnings": [],
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: postgres",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Data source",
+      "item": "Custom SQL",
+      "count": 1,
+      "status": "supported",
+      "note": "Value.NativeQuery with folding"
+    },
+    {
+      "category": "Data source",
+      "item": "Physical joins",
+      "count": 1,
+      "status": "supported",
+      "note": "flattened with Table.Join (numbers preserved)"
+    },
+    {
+      "category": "Data source",
+      "item": "Extracts",
+      "count": 1,
+      "status": "review",
+      "note": "import from the live source"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 3,
+      "status": "supported",
+      "note": "3 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 7,
+      "status": "supported",
+      "note": "7 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Parameters",
+      "count": 2,
+      "status": "supported",
+      "note": "2 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 2,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 1,
+      "status": "supported",
+      "note": "-> clusteredBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 3,
+      "status": "supported",
+      "note": "-> tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 1,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 3,
+      "status": "supported",
+      "note": ""
+    }
+  ],
+  "validation": {
+    "summary": {
+      "PASS": 25,
+      "WARN": 0,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 1,
+      "PENDING": 3,
+      "N/A": 1,
+      "total": 30,
+      "pass_rate": 100.0,
+      "overall": "PASS"
+    },
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 9,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "PENDING",
+        "automated_checks": 7,
+        "passed": 7,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 1,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Confirm no row-level security requirement"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ]
+  }
+}

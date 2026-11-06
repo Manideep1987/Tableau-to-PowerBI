@@ -164,3 +164,15 @@ details.expander > div { padding: 0 12px 12px; }
   .brand span { display: none; }
   .panel { padding: 16px; }
 }
+
+/* inventory meter, gates, overrides */
+.meter { height: 10px; background: var(--surface-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line); margin: 8px 0; }
+.meter span { display: block; height: 100%; background: var(--pass); }
+.gates { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 0 0 20px; }
+.gate { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 4px; }
+.gate .k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.gate .s { font-size: 12px; color: var(--muted); }
+.gate.pass { border-top-color: var(--pass); } .gate.warn { border-top-color: var(--warn); }
+.gate.fail { border-top-color: var(--fail); } .gate.info { border-top-color: var(--info); }
+.override { margin-top: 8px; padding: 10px; border: 1px dashed var(--accent); border-radius: 8px; background: var(--accent-soft); }
+.override textarea { min-height: 80px; margin-bottom: 6px; }

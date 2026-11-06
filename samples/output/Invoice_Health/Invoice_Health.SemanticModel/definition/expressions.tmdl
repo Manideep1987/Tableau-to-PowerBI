@@ -1,0 +1,12 @@
+/// Converted from Tableau connection
+expression 'Invoice Health Server' = "findw-sql.contoso.local" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 343664ab-1594-561c-9cd1-3faab6c7ecf0
+
+	annotation PBI_ResultType = Text
+
+/// Converted from Tableau connection
+expression 'Invoice Health Database' = "FinanceDW" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: aa25eff8-fe6c-54c3-a2d2-f75ec6fa972a
+
+	annotation PBI_ResultType = Text
+

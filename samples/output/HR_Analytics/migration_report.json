@@ -1,0 +1,6316 @@
+{
+  "workbook": {
+    "name": "HR_Analytics",
+    "version": "18.1",
+    "build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": [
+      "Data/hr/employees.csv"
+    ]
+  },
+  "stats": {
+    "datasources": 1,
+    "tables": 1,
+    "columns": 10,
+    "relationships": 1,
+    "calculations": 11,
+    "parameters": 0,
+    "worksheets": 5,
+    "dashboards": 1,
+    "filters": 2,
+    "measures": 9,
+    "calc_columns": 6,
+    "pages": 2,
+    "visuals": 6,
+    "converted": 11,
+    "converted_with_notes": 0,
+    "manual": 0
+  },
+  "datasources": [
+    {
+      "name": "federated.hr01csvsource",
+      "caption": "Employees",
+      "model_style": "single",
+      "is_extract": false,
+      "connections": [
+        {
+          "name": "textscan.0hr",
+          "class": "textscan",
+          "server": "",
+          "database": null,
+          "schema": null,
+          "file": "Data/hr/employees.csv"
+        }
+      ],
+      "tables": [
+        {
+          "name": "employees.csv",
+          "type": "table",
+          "table": "[employees#csv]",
+          "sql": null
+        }
+      ],
+      "relationships": [],
+      "columns": [
+        {
+          "name": "Employee ID",
+          "table": "employees.csv",
+          "remote": "employee_id",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Employee Name",
+          "table": "employees.csv",
+          "remote": "employee_name",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Department",
+          "table": "employees.csv",
+          "remote": "department",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Job Level",
+          "table": "employees.csv",
+          "remote": "job_level",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Gender",
+          "table": "employees.csv",
+          "remote": "gender",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Location",
+          "table": "employees.csv",
+          "remote": "location",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Hire Date",
+          "table": "employees.csv",
+          "remote": "hire_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Termination Date",
+          "table": "employees.csv",
+          "remote": "termination_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": true,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Salary",
+          "table": "employees.csv",
+          "remote": "salary",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "Performance Score",
+          "table": "employees.csv",
+          "remote": "performance_score",
+          "datatype": "integer",
+          "role": "measure",
+          "nullable": true,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        }
+      ],
+      "hierarchies": []
+    }
+  ],
+  "model": {
+    "tables": [
+      {
+        "name": "_Measures",
+        "kind": "measures",
+        "m": null,
+        "dax_source": "ROW(\"Measures\", BLANK())",
+        "columns": [
+          {
+            "name": "Measures",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [
+          {
+            "name": "Headcount",
+            "expression": "DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H01"
+          },
+          {
+            "name": "Attrition Rate",
+            "expression": "DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))",
+            "format": "0%",
+            "folder": null,
+            "tableau": "Calculation_H03"
+          },
+          {
+            "name": "Salary vs Dept",
+            "expression": "(AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H07"
+          },
+          {
+            "name": "Median Salary",
+            "expression": "MEDIAN('employees.csv'[Salary])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H10"
+          },
+          {
+            "name": "Hires Running Total",
+            "expression": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_H11"
+          },
+          {
+            "name": "Average of Tenure Years",
+            "expression": "AVERAGE('employees.csv'[Tenure Years])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Calculation_H04"
+          },
+          {
+            "name": "Average of Salary",
+            "expression": "AVERAGE('employees.csv'[Salary])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Salary"
+          },
+          {
+            "name": "Average of Performance Score",
+            "expression": "AVERAGE('employees.csv'[Performance Score])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "avg:Performance Score"
+          },
+          {
+            "name": "Count of Employee ID",
+            "expression": "COUNTA('employees.csv'[Employee ID])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "cnt:Employee ID"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "employees.csv",
+        "kind": "single",
+        "m": "let\n    Source = File.Contents(\"Data/hr/employees.csv\"),\n    Csv = Csv.Document(Source, [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),\n    Selected = Table.SelectColumns(Data, {\"employee_id\", \"employee_name\", \"department\", \"job_level\", \"gender\", \"location\", \"hire_date\", \"termination_date\", \"salary\", \"performance_score\"}, MissingField.UseNull),\n    Renamed = Table.RenameColumns(Selected, {{\"employee_id\", \"Employee ID\"}, {\"employee_name\", \"Employee Name\"}, {\"department\", \"Department\"}, {\"job_level\", \"Job Level\"}, {\"gender\", \"Gender\"}, {\"location\", \"Location\"}, {\"hire_date\", \"Hire Date\"}, {\"termination_date\", \"Termination Date\"}, {\"salary\", \"Salary\"}, {\"performance_score\", \"Performance Score\"}}),\n    Typed = Table.TransformColumnTypes(Renamed, {{\"Employee ID\", type text}, {\"Employee Name\", type text}, {\"Department\", type text}, {\"Job Level\", type text}, {\"Gender\", type text}, {\"Location\", type text}, {\"Hire Date\", type date}, {\"Termination Date\", type date}, {\"Salary\", type number}, {\"Performance Score\", Int64.Type}})\nin\n    Typed",
+        "dax_source": null,
+        "columns": [
+          {
+            "name": "Employee ID",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Employee ID"
+          },
+          {
+            "name": "Employee Name",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Employee Name"
+          },
+          {
+            "name": "Department",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Department"
+          },
+          {
+            "name": "Job Level",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Job Level"
+          },
+          {
+            "name": "Gender",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Gender"
+          },
+          {
+            "name": "Location",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Location"
+          },
+          {
+            "name": "Hire Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Hire Date"
+          },
+          {
+            "name": "Termination Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Termination Date"
+          },
+          {
+            "name": "Salary",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "Salary"
+          },
+          {
+            "name": "Performance Score",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "average",
+            "tableau": "Performance Score"
+          },
+          {
+            "name": "Is Active",
+            "datatype": "boolean",
+            "expression": "ISBLANK('employees.csv'[Termination Date])",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H02"
+          },
+          {
+            "name": "Tenure Years",
+            "datatype": "double",
+            "expression": "DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H04"
+          },
+          {
+            "name": "Tenure Band",
+            "datatype": "string",
+            "expression": "SWITCH(TRUE(),\n        ('employees.csv'[Tenure Years] < 2), \"0-2 yrs\",\n        ('employees.csv'[Tenure Years] < 5), \"2-5 yrs\",\n        \"5+ yrs\"\n    )",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H05"
+          },
+          {
+            "name": "Dept Avg Salary",
+            "datatype": "double",
+            "expression": "(VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H06"
+          },
+          {
+            "name": "High Performer",
+            "datatype": "boolean",
+            "expression": "IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H08"
+          },
+          {
+            "name": "Hire Year",
+            "datatype": "int64",
+            "expression": "YEAR('employees.csv'[Hire Date])",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_H09"
+          }
+        ],
+        "measures": [],
+        "hierarchies": []
+      },
+      {
+        "name": "Date",
+        "kind": "date",
+        "m": null,
+        "dax_source": "ADDCOLUMNS(CALENDARAUTO(), \"Year\", YEAR([Date]), \"Quarter\", \"Q\" & QUARTER([Date]), \"Month Number\", MONTH([Date]), \"Month\", FORMAT([Date], \"MMM\"), \"Month Start\", DATE(YEAR([Date]), MONTH([Date]), 1))",
+        "columns": [
+          {
+            "name": "Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Year",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Quarter",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Number",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Start",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [],
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              "Year",
+              "Quarter",
+              "Month"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "from_table": "employees.csv",
+        "from_column": "Hire Date",
+        "to_table": "Date",
+        "to_column": "Date",
+        "cross_filter": "oneDirection",
+        "active": true,
+        "tableau_join": "relationship"
+      }
+    ],
+    "expressions": []
+  },
+  "calculations": [
+    {
+      "datasource": "Employees",
+      "tableau_name": "Headcount",
+      "tableau_formula": "COUNTD([Employee ID])",
+      "kind": "measure",
+      "pbi_object": "Headcount",
+      "pbi_table": "_Measures",
+      "dax": "DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DISTINCTCOUNTNOBLANK"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[1]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_H01",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Is Active",
+      "tableau_formula": "ISNULL([Termination Date])",
+      "kind": "column",
+      "pbi_object": "Is Active",
+      "pbi_table": "employees.csv",
+      "dax": "ISBLANK('employees.csv'[Termination Date])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ISBLANK"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[2]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H02",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Attrition Rate",
+      "tableau_formula": "SUM(IF NOT ISNULL([Termination Date]) THEN 1 ELSE 0 END) / COUNTD([Employee ID])",
+      "kind": "measure",
+      "pbi_object": "Attrition Rate",
+      "pbi_table": "_Measures",
+      "dax": "DIVIDE(SUMX('employees.csv', IF(NOT(ISBLANK('employees.csv'[Termination Date])), 1, 0)), DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DISTINCTCOUNTNOBLANK",
+        "DIVIDE",
+        "IF",
+        "ISBLANK",
+        "SUMX"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[3]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_H03",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Tenure Years",
+      "tableau_formula": "DATEDIFF('day', [Hire Date], IFNULL([Termination Date], #2025-12-31#)) / 365.25",
+      "kind": "column",
+      "pbi_object": "Tenure Years",
+      "pbi_table": "employees.csv",
+      "dax": "DIVIDE(DATEDIFF('employees.csv'[Hire Date], COALESCE('employees.csv'[Termination Date], DATE(2025, 12, 31)), DAY), 365.25)",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COALESCE",
+        "DATEDIFF",
+        "DIVIDE"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[4]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H04",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Tenure Band",
+      "tableau_formula": "IF [Tenure Years] < 2 THEN '0-2 yrs' ELSEIF [Tenure Years] < 5 THEN '2-5 yrs' ELSE '5+ yrs' END",
+      "kind": "column",
+      "pbi_object": "Tenure Band",
+      "pbi_table": "employees.csv",
+      "dax": "SWITCH(TRUE(),\n        ('employees.csv'[Tenure Years] < 2), \"0-2 yrs\",\n        ('employees.csv'[Tenure Years] < 5), \"2-5 yrs\",\n        \"5+ yrs\"\n    )",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SWITCH",
+        "TRUE"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[5]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H05",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Dept Avg Salary",
+      "tableau_formula": "{FIXED [Department] : AVG([Salary])}",
+      "kind": "column",
+      "pbi_object": "Dept Avg Salary",
+      "pbi_table": "employees.csv",
+      "dax": "(VAR __lod1 = 'employees.csv'[Department] RETURN CALCULATE(AVERAGE('employees.csv'[Salary]), REMOVEFILTERS(), 'employees.csv'[Department] = __lod1))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE",
+        "CALCULATE",
+        "REMOVEFILTERS"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[6]",
+      "strategy": "rule:fixed-lod-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H06",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Salary vs Dept",
+      "tableau_formula": "AVG([Salary]) - AVG([Dept Avg Salary])",
+      "kind": "measure",
+      "pbi_object": "Salary vs Dept",
+      "pbi_table": "_Measures",
+      "dax": "(AVERAGE('employees.csv'[Salary]) - AVERAGE('employees.csv'[Dept Avg Salary]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[7]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_H07",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "High Performer",
+      "tableau_formula": "[Performance Score] >= 4",
+      "kind": "column",
+      "pbi_object": "High Performer",
+      "pbi_table": "employees.csv",
+      "dax": "IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ISBLANK"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[8]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H08",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Hire Year",
+      "tableau_formula": "YEAR([Hire Date])",
+      "kind": "column",
+      "pbi_object": "Hire Year",
+      "pbi_table": "employees.csv",
+      "dax": "YEAR('employees.csv'[Hire Date])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "YEAR"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[9]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_H09",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Median Salary",
+      "tableau_formula": "MEDIAN([Salary])",
+      "kind": "measure",
+      "pbi_object": "Median Salary",
+      "pbi_table": "_Measures",
+      "dax": "MEDIAN('employees.csv'[Salary])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "MEDIAN"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[10]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_H10",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Hires Running Total",
+      "tableau_formula": "RUNNING_SUM(COUNTD([Employee ID]))",
+      "kind": "measure",
+      "pbi_object": "Hires Running Total",
+      "pbi_table": "_Measures",
+      "dax": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "DISTINCTCOUNTNOBLANK",
+        "WINDOW"
+      ],
+      "xml_path": "/workbook/datasources/datasource/column[11]",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "tableau_id": "Calculation_H11",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Tenure Years",
+      "tableau_formula": "AVG([Calculation_H04])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Tenure Years",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Tenure Years])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Salary",
+      "tableau_formula": "AVG([Salary])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Salary",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Salary])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Average of Performance Score",
+      "tableau_formula": "AVG([Performance Score])",
+      "kind": "base-measure",
+      "pbi_object": "Average of Performance Score",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGE('employees.csv'[Performance Score])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "AVERAGE"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Employees",
+      "tableau_name": "Count of Employee ID",
+      "tableau_formula": "COUNT([Employee ID])",
+      "kind": "base-measure",
+      "pbi_object": "Count of Employee ID",
+      "pbi_table": "_Measures",
+      "dax": "COUNTA('employees.csv'[Employee ID])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COUNTA"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    }
+  ],
+  "roles": [],
+  "security_findings": [],
+  "unknown_nodes": [],
+  "parse_stats": {
+    "known_elements": 228,
+    "unknown_elements": 0,
+    "completeness": 100.0
+  },
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: textscan",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 6,
+      "status": "supported",
+      "note": "6 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 5,
+      "status": "supported",
+      "note": "5 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "LOD expressions",
+      "count": 1,
+      "status": "review",
+      "note": "context must be proven by validation"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 1,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 1,
+      "status": "supported",
+      "note": "-> clusteredBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Line",
+      "count": 1,
+      "status": "supported",
+      "note": "-> lineChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 3,
+      "status": "supported",
+      "note": "-> tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 2,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 1,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: filter",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 4,
+      "status": "supported",
+      "note": ""
+    }
+  ],
+  "parameters": [],
+  "worksheets": [
+    {
+      "name": "Headcount by Department",
+      "mark": "Text",
+      "rows": [
+        "none:Department:nk"
+      ],
+      "cols": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H03:qk",
+        "usr:Calculation_H10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "993eccefe61322c8013e",
+        "type": "tableEx",
+        "worksheet": "Headcount by Department",
+        "title": "Headcount by Department",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Department"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Attrition Rate"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Median Salary"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Tenure Distribution",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_H05:nk",
+        "none:Calculation_H02:nk"
+      ],
+      "cols": [
+        "usr:Calculation_H01:qk",
+        "avg:Calculation_H04:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_H01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "7c606b2fc616745bd46f",
+        "type": "tableEx",
+        "worksheet": "Tenure Distribution",
+        "title": "Tenure Distribution",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Tenure Band"
+            },
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Is Active"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Tenure Years"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Salary Benchmark",
+      "mark": "Text",
+      "rows": [
+        "none:Department:nk",
+        "none:Job Level:nk"
+      ],
+      "cols": [
+        "avg:Salary:qk",
+        "usr:Calculation_H07:qk",
+        "avg:Performance Score:qk"
+      ],
+      "encodings": {
+        "text": [
+          "avg:Salary:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Location:nk",
+          "members": [
+            "Austin",
+            "Seattle"
+          ],
+          "exclude": false,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "90d7b4bfdaa47df54104",
+        "type": "tableEx",
+        "worksheet": "Salary Benchmark",
+        "title": "Salary Benchmark",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Department"
+            },
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Job Level"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Salary"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Salary vs Dept"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Average of Performance Score"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "employees.csv",
+            "column": "Location",
+            "measure": null,
+            "values": [
+              "Austin",
+              "Seattle"
+            ],
+            "exclude": false,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Hiring Trend",
+      "mark": "Line",
+      "rows": [
+        "usr:Calculation_H01:qk",
+        "usr:Calculation_H11:qk"
+      ],
+      "cols": [
+        "none:Calculation_H09:ok"
+      ],
+      "encodings": {},
+      "filters": [],
+      "visual": {
+        "name": "346a6db51077fff0d9bd",
+        "type": "lineChart",
+        "worksheet": "Hiring Trend",
+        "title": "Hiring Trend",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "Hire Year"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Headcount"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Hires Running Total"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Performance Mix",
+      "mark": "Bar",
+      "rows": [
+        "none:Calculation_H08:nk"
+      ],
+      "cols": [
+        "cnt:Employee ID:qk"
+      ],
+      "encodings": {},
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:Department:nk",
+          "members": [
+            "HR"
+          ],
+          "exclude": true,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "c4c825aa5e4a743b5023",
+        "type": "clusteredBarChart",
+        "worksheet": "Performance Mix",
+        "title": "Performance Mix",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "employees.csv",
+              "name": "High Performer"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Count of Employee ID"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "employees.csv",
+            "column": "Department",
+            "measure": null,
+            "values": [
+              "HR"
+            ],
+            "exclude": true,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "8722fc4a3338703e2d94",
+      "display_name": "HR Overview",
+      "width": 1280,
+      "height": 720,
+      "source": "dashboard",
+      "visuals": [
+        {
+          "name": "fb1f18c00578f2ed3f4b",
+          "type": "tableEx",
+          "worksheet": "Headcount by Department",
+          "title": "Headcount by Department",
+          "x": 0,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Attrition Rate"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Median Salary"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "6922df68889e29571681",
+          "type": "lineChart",
+          "worksheet": "Hiring Trend",
+          "title": "Hiring Trend",
+          "x": 640,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Hire Year"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Hires Running Total"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "448d2b0ba68cabc5aa2a",
+          "type": "tableEx",
+          "worksheet": "Salary Benchmark",
+          "title": "Salary Benchmark",
+          "x": 0,
+          "y": 360,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              },
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Job Level"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Salary"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Salary vs Dept"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Performance Score"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "employees.csv",
+              "column": "Location",
+              "measure": null,
+              "values": [
+                "Austin",
+                "Seattle"
+              ],
+              "exclude": false,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "062be3c5c81ed0ad9a08",
+          "type": "tableEx",
+          "worksheet": "Tenure Distribution",
+          "title": "Tenure Distribution",
+          "x": 640,
+          "y": 360,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Tenure Band"
+              },
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Is Active"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Headcount"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Average of Tenure Years"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "9e48016c1de01f682b53",
+          "type": "slicer",
+          "worksheet": null,
+          "title": "Department",
+          "x": 1024,
+          "y": 0,
+          "w": 256,
+          "h": 72,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "Department"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    },
+    {
+      "name": "6af85021afc5098d11ad",
+      "display_name": "Performance Mix",
+      "width": 1280,
+      "height": 720,
+      "source": "worksheet",
+      "visuals": [
+        {
+          "name": "c4c825aa5e4a743b5023",
+          "type": "clusteredBarChart",
+          "worksheet": "Performance Mix",
+          "title": "Performance Mix",
+          "x": 20,
+          "y": 20,
+          "w": 1240,
+          "h": 680,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "employees.csv",
+                "name": "High Performer"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Count of Employee ID"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "employees.csv",
+              "column": "Department",
+              "measure": null,
+              "values": [
+                "HR"
+              ],
+              "exclude": true,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "HR Overview",
+      "width": 1200,
+      "height": 800,
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Headcount by Department",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Hiring Trend",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Salary Benchmark",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "5",
+          "type": "worksheet",
+          "name": "Tenure Distribution",
+          "x": 50000.0,
+          "y": 50000.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "6",
+          "type": "filter",
+          "name": "Headcount by Department",
+          "x": 80000.0,
+          "y": 0.0,
+          "w": 20000.0,
+          "h": 10000.0,
+          "param": "[federated.hr01csvsource].[none:Department:nk]",
+          "text": null,
+          "mode": null
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "issues": [
+    {
+      "severity": "info",
+      "area": "Model",
+      "object": "Date",
+      "message": "Added a Date table (CALENDARAUTO) related to employees.csv[Hire Date] for time intelligence."
+    }
+  ],
+  "sql": [],
+  "validation": {
+    "workbook": "HR_Analytics",
+    "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
+    "started": "2026-11-06T17:26:56",
+    "duration_s": 0.38,
+    "tolerance": {
+      "absolute": 0.01,
+      "relative": 1e-06
+    },
+    "summary": {
+      "PASS": 27,
+      "WARN": 0,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 0,
+      "PENDING": 3,
+      "N/A": 1,
+      "total": 31,
+      "pass_rate": 100.0,
+      "overall": "PASS"
+    },
+    "checks": [
+      {
+        "layer": "L1 Metadata",
+        "name": "Calculated fields converted",
+        "status": "PASS",
+        "detail": "11/11 Tableau calculations (incl. groups, bins, sets) have a DAX equivalent",
+        "data": {
+          "expected": 11,
+          "actual": 11,
+          "manual": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Parameters converted",
+        "status": "PASS",
+        "detail": "0/0 parameters -> parameter tables + value measures",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Worksheets converted to visuals",
+        "status": "PASS",
+        "detail": "5/5 worksheets have a visual",
+        "data": {
+          "missing": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Dashboards converted to pages",
+        "status": "PASS",
+        "detail": "1/1 dashboards -> report pages",
+        "data": {
+          "missing": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Worksheet filters converted",
+        "status": "PASS",
+        "detail": "2/2 worksheet filters -> visual-level filters",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Columns mapped",
+        "status": "PASS",
+        "detail": "10/10 source columns in the semantic model",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Relationships converted",
+        "status": "PASS",
+        "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 0)",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L2 Data",
+        "name": "Row count - Employees",
+        "status": "PASS",
+        "detail": "Tableau data source rows 400 vs Power BI 'employees.csv' rows 400",
+        "data": {
+          "tableau": 400,
+          "powerbi": 400
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L2 Data",
+        "name": "Column profile - Employees",
+        "status": "PASS",
+        "detail": "10 columns profiled (sum / null count / distinct count)",
+        "data": {
+          "columns": [
+            {
+              "column": "Employee ID",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 400,
+              "powerbi_distinct": 400,
+              "status": "PASS"
+            },
+            {
+              "column": "Employee Name",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 20,
+              "powerbi_distinct": 20,
+              "status": "PASS"
+            },
+            {
+              "column": "Department",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 6,
+              "powerbi_distinct": 6,
+              "status": "PASS"
+            },
+            {
+              "column": "Job Level",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 5,
+              "powerbi_distinct": 5,
+              "status": "PASS"
+            },
+            {
+              "column": "Gender",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 3,
+              "powerbi_distinct": 3,
+              "status": "PASS"
+            },
+            {
+              "column": "Location",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 4,
+              "powerbi_distinct": 4,
+              "status": "PASS"
+            },
+            {
+              "column": "Hire Date",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 374,
+              "powerbi_distinct": 374,
+              "status": "PASS"
+            },
+            {
+              "column": "Termination Date",
+              "tableau_nulls": 332,
+              "powerbi_nulls": 332,
+              "tableau_distinct": 68,
+              "powerbi_distinct": 68,
+              "status": "PASS"
+            },
+            {
+              "column": "Salary",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 400,
+              "powerbi_distinct": 400,
+              "tableau_sum": 39438620.0,
+              "powerbi_sum": 39438620.0,
+              "status": "PASS"
+            },
+            {
+              "column": "Performance Score",
+              "tableau_nulls": 14,
+              "powerbi_nulls": 14,
+              "tableau_distinct": 5,
+              "powerbi_distinct": 5,
+              "tableau_sum": 1199.0,
+              "powerbi_sum": 1199.0,
+              "status": "PASS"
+            }
+          ]
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Headcount by Department'",
+        "status": "PASS",
+        "detail": "tableEx | 6 vs 6 rows | 18/18 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Department:nk"
+          ],
+          "labels": {
+            "none:Department:nk": "Department",
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H03:qk": "Attrition Rate",
+            "usr:Calculation_H10:qk": "Median Salary"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "usr:Calculation_H03:qk",
+            "usr:Calculation_H10:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H03:qk": "Attrition Rate",
+            "usr:Calculation_H10:qk": "Median Salary"
+          },
+          "dimension_map": {
+            "none:Department:nk": [
+              "employees.csv",
+              "Department"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Department],\n    \"Headcount\", [Headcount],\n    \"Attrition Rate\", [Attrition Rate],\n    \"Median Salary\", [Median Salary]\n)\nORDER BY 'employees.csv'[Department]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 6,
+            "powerbi_rows": 6,
+            "matched_rows": 6,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 18,
+            "total_cells": 18,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 400.0,
+                "powerbi": 400.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_H03:qk": {
+                "tableau": 1.01132,
+                "powerbi": 1.01132,
+                "diff": 0.0
+              },
+              "usr:Calculation_H10:qk": {
+                "tableau": 532030.5,
+                "powerbi": 532030.5,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Department:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Engineering"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 66.0,
+                  "powerbi": 66.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.13636363636363635,
+                  "powerbi": 0.13636363636363635,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 97661.5,
+                  "powerbi": 97661.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 60.0,
+                  "powerbi": 60.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.15,
+                  "powerbi": 0.15,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 90200.0,
+                  "powerbi": 90200.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 68.0,
+                  "powerbi": 68.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.17647058823529413,
+                  "powerbi": 0.17647058823529413,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 93341.0,
+                  "powerbi": 93341.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 72.0,
+                  "powerbi": 72.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.2361111111111111,
+                  "powerbi": 0.2361111111111111,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 84786.0,
+                  "powerbi": 84786.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 69.0,
+                  "powerbi": 69.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.17391304347826086,
+                  "powerbi": 0.17391304347826086,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 84291.0,
+                  "powerbi": 84291.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 65.0,
+                  "powerbi": 65.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.13846153846153847,
+                  "powerbi": 0.13846153846153847,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 81751.0,
+                  "powerbi": 81751.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Tenure Distribution'",
+        "status": "PASS",
+        "detail": "tableEx | 6 vs 6 rows | 12/12 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_H05:nk",
+            "none:Calculation_H02:nk"
+          ],
+          "labels": {
+            "none:Calculation_H05:nk": "Tenure Band",
+            "none:Calculation_H02:nk": "Is Active",
+            "usr:Calculation_H01:qk": "Headcount",
+            "avg:Calculation_H04:qk": "AVG(Tenure Years)"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "avg:Calculation_H04:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "avg:Calculation_H04:qk": "Average of Tenure Years"
+          },
+          "dimension_map": {
+            "none:Calculation_H05:nk": [
+              "employees.csv",
+              "Tenure Band"
+            ],
+            "none:Calculation_H02:nk": [
+              "employees.csv",
+              "Is Active"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Tenure Band],\n    'employees.csv'[Is Active],\n    \"Headcount\", [Headcount],\n    \"Average of Tenure Years\", [Average of Tenure Years]\n)\nORDER BY 'employees.csv'[Tenure Band], 'employees.csv'[Is Active]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 6,
+            "powerbi_rows": 6,
+            "matched_rows": 6,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 12,
+            "total_cells": 12,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 400.0,
+                "powerbi": 400.0,
+                "diff": 0.0
+              },
+              "avg:Calculation_H04:qk": {
+                "tableau": 23.636716,
+                "powerbi": 23.636716,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H05:nk",
+            "none:Calculation_H02:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "0-2 yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 22.0,
+                  "powerbi": 22.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 1.3029680791487772,
+                  "powerbi": 1.3029680791487772,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "0-2 yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 36.0,
+                  "powerbi": 36.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 1.6249904935736559,
+                  "powerbi": 1.6249904935736559,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2-5 yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 35.0,
+                  "powerbi": 35.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 3.4666666666666663,
+                  "powerbi": 3.4666666666666663,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2-5 yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 101.0,
+                  "powerbi": 101.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 3.4667696749141035,
+                  "powerbi": 3.4667696749141035,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "5+ yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 11.0,
+                  "powerbi": 11.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 5.689253935660506,
+                  "powerbi": 5.689253935660506,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "5+ yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 195.0,
+                  "powerbi": 195.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 8.086066796539075,
+                  "powerbi": 8.086066796539075,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Salary Benchmark'",
+        "status": "PASS",
+        "detail": "tableEx | 30 vs 30 rows | 90/90 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Department:nk",
+            "none:Job Level:nk"
+          ],
+          "labels": {
+            "none:Department:nk": "Department",
+            "none:Job Level:nk": "Job Level",
+            "avg:Salary:qk": "AVG(Salary)",
+            "usr:Calculation_H07:qk": "Salary vs Dept",
+            "avg:Performance Score:qk": "AVG(Performance Score)"
+          },
+          "measures": [
+            "avg:Salary:qk",
+            "usr:Calculation_H07:qk",
+            "avg:Performance Score:qk"
+          ],
+          "measure_map": {
+            "avg:Salary:qk": "Average of Salary",
+            "usr:Calculation_H07:qk": "Salary vs Dept",
+            "avg:Performance Score:qk": "Average of Performance Score"
+          },
+          "dimension_map": {
+            "none:Department:nk": [
+              "employees.csv",
+              "Department"
+            ],
+            "none:Job Level:nk": [
+              "employees.csv",
+              "Job Level"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Department],\n    'employees.csv'[Job Level],\n    KEEPFILTERS(TREATAS({\"Austin\", \"Seattle\"}, 'employees.csv'[Location])),\n    \"Average of Salary\", [Average of Salary],\n    \"Salary vs Dept\", [Salary vs Dept],\n    \"Average of Performance Score\", [Average of Performance Score]\n)\nORDER BY 'employees.csv'[Department], 'employees.csv'[Job Level]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 30,
+            "powerbi_rows": 30,
+            "matched_rows": 30,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 90,
+            "total_cells": 90,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "avg:Salary:qk": {
+                "tableau": 3065229.505556,
+                "powerbi": 3065229.505556,
+                "diff": 0.0
+              },
+              "usr:Calculation_H07:qk": {
+                "tableau": 105120.548219,
+                "powerbi": 105120.548219,
+                "diff": 0.0
+              },
+              "avg:Performance Score:qk": {
+                "tableau": 96.542424,
+                "powerbi": 96.542424,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Department:nk",
+            "none:Job Level:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Engineering",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 64231.0,
+                  "powerbi": 64231.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -45454.803030303025,
+                  "powerbi": -45454.803030303025,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.25,
+                  "powerbi": 3.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 79869.83333333333,
+                  "powerbi": 79869.83333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -29815.969696969696,
+                  "powerbi": -29815.969696969696,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 108144.0,
+                  "powerbi": 108144.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -1541.8030303030246,
+                  "powerbi": -1541.8030303030246,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.8333333333333335,
+                  "powerbi": 3.8333333333333335,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 131216.625,
+                  "powerbi": 131216.625,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 21530.821969696975,
+                  "powerbi": 21530.821969696975,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 178153.83333333334,
+                  "powerbi": 178153.83333333334,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 68468.03030303032,
+                  "powerbi": 68468.03030303032,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.6666666666666665,
+                  "powerbi": 3.6666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 51008.25,
+                  "powerbi": 51008.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -47732.316666666666,
+                  "powerbi": -47732.316666666666,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.25,
+                  "powerbi": 3.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 74068.33333333333,
+                  "powerbi": 74068.33333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -24672.233333333337,
+                  "powerbi": -24672.233333333337,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 94211.33333333333,
+                  "powerbi": 94211.33333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -4529.233333333337,
+                  "powerbi": -4529.233333333337,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.3333333333333335,
+                  "powerbi": 3.3333333333333335,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 125763.77777777778,
+                  "powerbi": 125763.77777777778,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 27023.211111111115,
+                  "powerbi": 27023.211111111115,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.4444444444444446,
+                  "powerbi": 2.4444444444444446,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 174115.66666666666,
+                  "powerbi": 174115.66666666666,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 75375.09999999999,
+                  "powerbi": 75375.09999999999,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.6666666666666665,
+                  "powerbi": 2.6666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 51718.0,
+                  "powerbi": 51718.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -48128.91176470589,
+                  "powerbi": -48128.91176470589,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.3636363636363638,
+                  "powerbi": 3.3636363636363638,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 71131.75,
+                  "powerbi": 71131.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -28715.16176470589,
+                  "powerbi": -28715.16176470589,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.25,
+                  "powerbi": 3.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 87959.5,
+                  "powerbi": 87959.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -11887.411764705888,
+                  "powerbi": -11887.411764705888,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5,
+                  "powerbi": 2.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 115239.0,
+                  "powerbi": 115239.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 15392.088235294112,
+                  "powerbi": 15392.088235294112,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.25,
+                  "powerbi": 2.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 157464.0,
+                  "powerbi": 157464.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 57617.08823529411,
+                  "powerbi": 57617.08823529411,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5454545454545454,
+                  "powerbi": 2.5454545454545454,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 53466.2,
+                  "powerbi": 53466.2,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -42241.00833333333,
+                  "powerbi": -42241.00833333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.3,
+                  "powerbi": 3.3,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 75397.5,
+                  "powerbi": 75397.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -20309.70833333333,
+                  "powerbi": -20309.70833333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.3333333333333335,
+                  "powerbi": 3.3333333333333335,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 90903.75,
+                  "powerbi": 90903.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -4803.4583333333285,
+                  "powerbi": -4803.4583333333285,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.125,
+                  "powerbi": 3.125,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 122803.33333333333,
+                  "powerbi": 122803.33333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 27096.125,
+                  "powerbi": 27096.125,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 179118.33333333334,
+                  "powerbi": 179118.33333333334,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 83411.12500000001,
+                  "powerbi": 83411.12500000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.1666666666666665,
+                  "powerbi": 3.1666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 53730.11111111111,
+                  "powerbi": 53730.11111111111,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -39202.23671497585,
+                  "powerbi": -39202.23671497585,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.888888888888889,
+                  "powerbi": 3.888888888888889,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 70569.0,
+                  "powerbi": 70569.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -22363.34782608696,
+                  "powerbi": -22363.34782608696,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.75,
+                  "powerbi": 3.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 90572.0,
+                  "powerbi": 90572.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -2360.3478260869597,
+                  "powerbi": -2360.3478260869597,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.75,
+                  "powerbi": 2.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 123984.8,
+                  "powerbi": 123984.8,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 31052.452173913043,
+                  "powerbi": 31052.452173913043,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 155229.2,
+                  "powerbi": 155229.2,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 62296.85217391305,
+                  "powerbi": 62296.85217391305,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.8,
+                  "powerbi": 2.8,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 50438.0,
+                  "powerbi": 50438.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -44670.95384615385,
+                  "powerbi": -44670.95384615385,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.75,
+                  "powerbi": 2.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 70506.8,
+                  "powerbi": 70506.8,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -24602.153846153844,
+                  "powerbi": -24602.153846153844,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.6,
+                  "powerbi": 3.6,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 86344.2,
+                  "powerbi": 86344.2,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -8764.75384615385,
+                  "powerbi": -8764.75384615385,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.6,
+                  "powerbi": 3.6,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 126400.375,
+                  "powerbi": 126400.375,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 31291.421153846153,
+                  "powerbi": 31291.421153846153,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.125,
+                  "powerbi": 3.125,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 151471.0,
+                  "powerbi": 151471.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 56362.04615384615,
+                  "powerbi": 56362.04615384615,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Hiring Trend'",
+        "status": "PASS",
+        "detail": "lineChart | 10 vs 10 rows | 20/20 cells match",
+        "data": {
+          "visual_type": "lineChart",
+          "dimensions": [
+            "none:Calculation_H09:ok"
+          ],
+          "labels": {
+            "none:Calculation_H09:ok": "Hire Year",
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H11:qk": "Hires Running Total"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "usr:Calculation_H11:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H11:qk": "Hires Running Total"
+          },
+          "dimension_map": {
+            "none:Calculation_H09:ok": [
+              "employees.csv",
+              "Hire Year"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Hire Year],\n    \"Headcount\", [Headcount],\n    \"Hires Running Total\", [Hires Running Total]\n)\nORDER BY 'employees.csv'[Hire Year]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 10,
+            "powerbi_rows": 10,
+            "matched_rows": 10,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 20,
+            "total_cells": 20,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 400.0,
+                "powerbi": 400.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_H11:qk": {
+                "tableau": 2220.0,
+                "powerbi": 2220.0,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H09:ok"
+          ],
+          "rows": [
+            {
+              "key": [
+                "2015"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 45.0,
+                  "powerbi": 45.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 45.0,
+                  "powerbi": 45.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2016"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 46.0,
+                  "powerbi": 46.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 91.0,
+                  "powerbi": 91.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2017"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 27.0,
+                  "powerbi": 27.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 118.0,
+                  "powerbi": 118.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2018"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 38.0,
+                  "powerbi": 38.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 156.0,
+                  "powerbi": 156.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2019"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 47.0,
+                  "powerbi": 47.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 203.0,
+                  "powerbi": 203.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2020"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 38.0,
+                  "powerbi": 38.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 241.0,
+                  "powerbi": 241.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2021"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 40.0,
+                  "powerbi": 40.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 281.0,
+                  "powerbi": 281.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2022"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 42.0,
+                  "powerbi": 42.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 323.0,
+                  "powerbi": 323.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2023"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 39.0,
+                  "powerbi": 39.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 362.0,
+                  "powerbi": 362.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2024"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 38.0,
+                  "powerbi": 38.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 400.0,
+                  "powerbi": 400.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Performance Mix'",
+        "status": "PASS",
+        "detail": "clusteredBarChart | 3 vs 3 rows | 3/3 cells match",
+        "data": {
+          "visual_type": "clusteredBarChart",
+          "dimensions": [
+            "none:Calculation_H08:nk"
+          ],
+          "labels": {
+            "none:Calculation_H08:nk": "High Performer",
+            "cnt:Employee ID:qk": "CNT(Employee ID)"
+          },
+          "measures": [
+            "cnt:Employee ID:qk"
+          ],
+          "measure_map": {
+            "cnt:Employee ID:qk": "Count of Employee ID"
+          },
+          "dimension_map": {
+            "none:Calculation_H08:nk": [
+              "employees.csv",
+              "High Performer"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[High Performer],\n    KEEPFILTERS(FILTER(ALL('employees.csv'[Department]), NOT('employees.csv'[Department] IN {\"HR\"}))),\n    \"Count of Employee ID\", [Count of Employee ID]\n)\nORDER BY 'employees.csv'[High Performer]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 3,
+            "powerbi_rows": 3,
+            "matched_rows": 3,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 3,
+            "total_cells": 3,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "cnt:Employee ID:qk": {
+                "tableau": 332.0,
+                "powerbi": 332.0,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H08:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "(null)"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 12.0,
+                  "powerbi": 12.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 189.0,
+                  "powerbi": 189.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 131.0,
+                  "powerbi": 131.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: All data",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "All data",
+              "metric": "Headcount",
+              "measure": "Headcount",
+              "tableau": 400.0,
+              "powerbi": 400.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Attrition Rate",
+              "measure": "Attrition Rate",
+              "tableau": 0.17,
+              "powerbi": 0.17,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Median Salary",
+              "measure": "Median Salary",
+              "tableau": 90047.5,
+              "powerbi": 90047.5,
+              "delta": 0.0,
+              "tolerance": 0.0900475,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "AVG(Tenure Years)",
+              "measure": "Average of Tenure Years",
+              "tableau": 5.49501711156742,
+              "powerbi": 5.49501711156742,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "AVG(Salary)",
+              "measure": "Average of Salary",
+              "tableau": 98596.55,
+              "powerbi": 98596.55,
+              "delta": 0.0,
+              "tolerance": 0.09859655,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Salary vs Dept",
+              "measure": "Salary vs Dept",
+              "tableau": 0.0,
+              "powerbi": 0.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: Department = Engineering",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "Department = Engineering",
+              "metric": "Headcount",
+              "measure": "Headcount",
+              "tableau": 66.0,
+              "powerbi": 66.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Engineering",
+              "metric": "Attrition Rate",
+              "measure": "Attrition Rate",
+              "tableau": 0.13636363636363635,
+              "powerbi": 0.13636363636363635,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Engineering",
+              "metric": "Median Salary",
+              "measure": "Median Salary",
+              "tableau": 97661.5,
+              "powerbi": 97661.5,
+              "delta": 0.0,
+              "tolerance": 0.0976615,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Engineering",
+              "metric": "AVG(Tenure Years)",
+              "measure": "Average of Tenure Years",
+              "tableau": 5.671291975193412,
+              "powerbi": 5.671291975193412,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Engineering",
+              "metric": "AVG(Salary)",
+              "measure": "Average of Salary",
+              "tableau": 109685.80303030302,
+              "powerbi": 109685.80303030302,
+              "delta": 0.0,
+              "tolerance": 0.10968580303030302,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Engineering",
+              "metric": "Salary vs Dept",
+              "measure": "Salary vs Dept",
+              "tableau": 0.0,
+              "powerbi": 0.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: Department = Finance",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "Department = Finance",
+              "metric": "Headcount",
+              "measure": "Headcount",
+              "tableau": 60.0,
+              "powerbi": 60.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Finance",
+              "metric": "Attrition Rate",
+              "measure": "Attrition Rate",
+              "tableau": 0.15,
+              "powerbi": 0.15,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Finance",
+              "metric": "Median Salary",
+              "measure": "Median Salary",
+              "tableau": 90200.0,
+              "powerbi": 90200.0,
+              "delta": 0.0,
+              "tolerance": 0.0902,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Finance",
+              "metric": "AVG(Tenure Years)",
+              "measure": "Average of Tenure Years",
+              "tableau": 5.537075062742414,
+              "powerbi": 5.537075062742414,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Finance",
+              "metric": "AVG(Salary)",
+              "measure": "Average of Salary",
+              "tableau": 98740.56666666667,
+              "powerbi": 98740.56666666667,
+              "delta": 0.0,
+              "tolerance": 0.09874056666666667,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Department = Finance",
+              "metric": "Salary vs Dept",
+              "measure": "Salary vs Dept",
+              "tableau": 0.0,
+              "powerbi": 0.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: Job Level = L1",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "Job Level = L1",
+              "metric": "Headcount",
+              "measure": "Headcount",
+              "tableau": 97.0,
+              "powerbi": 97.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L1",
+              "metric": "Attrition Rate",
+              "measure": "Attrition Rate",
+              "tableau": 0.15463917525773196,
+              "powerbi": 0.15463917525773196,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L1",
+              "metric": "Median Salary",
+              "measure": "Median Salary",
+              "tableau": 53420.0,
+              "powerbi": 53420.0,
+              "delta": 0.0,
+              "tolerance": 0.053419999999999995,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L1",
+              "metric": "AVG(Tenure Years)",
+              "measure": "Average of Tenure Years",
+              "tableau": 5.634948524171412,
+              "powerbi": 5.634948524171412,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L1",
+              "metric": "AVG(Salary)",
+              "measure": "Average of Salary",
+              "tableau": 54715.536082474224,
+              "powerbi": 54715.536082474224,
+              "delta": 0.0,
+              "tolerance": 0.054715536082474224,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L1",
+              "metric": "Salary vs Dept",
+              "measure": "Salary vs Dept",
+              "tableau": -43673.436033359816,
+              "powerbi": -43673.436033359816,
+              "delta": 0.0,
+              "tolerance": 0.04367343603335981,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: Job Level = L2",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "Job Level = L2",
+              "metric": "Headcount",
+              "measure": "Headcount",
+              "tableau": 79.0,
+              "powerbi": 79.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L2",
+              "metric": "Attrition Rate",
+              "measure": "Attrition Rate",
+              "tableau": 0.189873417721519,
+              "powerbi": 0.189873417721519,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L2",
+              "metric": "Median Salary",
+              "measure": "Median Salary",
+              "tableau": 70958.0,
+              "powerbi": 70958.0,
+              "delta": 0.0,
+              "tolerance": 0.070958,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L2",
+              "metric": "AVG(Tenure Years)",
+              "measure": "Average of Tenure Years",
+              "tableau": 5.206837695700015,
+              "powerbi": 5.206837695700015,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L2",
+              "metric": "AVG(Salary)",
+              "measure": "Average of Salary",
+              "tableau": 72262.69620253165,
+              "powerbi": 72262.69620253165,
+              "delta": 0.0,
+              "tolerance": 0.07226269620253165,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "Job Level = L2",
+              "metric": "Salary vs Dept",
+              "measure": "Salary vs Dept",
+              "tableau": -26258.35739189561,
+              "powerbi": -26258.35739189561,
+              "delta": 0.0,
+              "tolerance": 0.02625835739189561,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "Interactions",
+        "name": "Report field references (PBIR)",
+        "status": "PASS",
+        "detail": "21/21 visual and filter field references resolve to model objects",
+        "data": {
+          "missing": []
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Quick filters and parameter controls -> slicers",
+        "status": "PASS",
+        "detail": "1 slicers for 1 dashboard controls",
+        "data": {
+          "columns": [
+            {
+              "dashboard": "HR Overview",
+              "quick_filters_and_parameter_controls": 1,
+              "slicers": 1,
+              "status": "PASS"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Filter propagation design",
+        "status": "PASS",
+        "detail": "All relationships many-to-one, single direction (no ambiguous paths)",
+        "data": {},
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Click paths, slicer defaults, tooltips, drillthrough",
+        "status": "PENDING",
+        "detail": "Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.",
+        "data": {},
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Headcount by Department' sliced by Job Level = L1",
+        "status": "PASS",
+        "detail": "tableEx | 6 vs 6 rows | 18/18 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Department:nk"
+          ],
+          "labels": {
+            "none:Department:nk": "Department",
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H03:qk": "Attrition Rate",
+            "usr:Calculation_H10:qk": "Median Salary"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "usr:Calculation_H03:qk",
+            "usr:Calculation_H10:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H03:qk": "Attrition Rate",
+            "usr:Calculation_H10:qk": "Median Salary"
+          },
+          "dimension_map": {
+            "none:Department:nk": [
+              "employees.csv",
+              "Department"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Department],\n    \"Headcount\", [Headcount],\n    \"Attrition Rate\", [Attrition Rate],\n    \"Median Salary\", [Median Salary]\n)\nORDER BY 'employees.csv'[Department]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 6,
+            "powerbi_rows": 6,
+            "matched_rows": 6,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 18,
+            "total_cells": 18,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 97.0,
+                "powerbi": 97.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_H03:qk": {
+                "tableau": 0.900092,
+                "powerbi": 0.900092,
+                "diff": 0.0
+              },
+              "usr:Calculation_H10:qk": {
+                "tableau": 325172.0,
+                "powerbi": 325172.0,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Department:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Engineering"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 14.0,
+                  "powerbi": 14.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.07142857142857142,
+                  "powerbi": 0.07142857142857142,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 61644.0,
+                  "powerbi": 61644.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 17.0,
+                  "powerbi": 17.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.17647058823529413,
+                  "powerbi": 0.17647058823529413,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 52951.0,
+                  "powerbi": 52951.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 16.0,
+                  "powerbi": 16.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.25,
+                  "powerbi": 0.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 51875.5,
+                  "powerbi": 51875.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 19.0,
+                  "powerbi": 19.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.21052631578947367,
+                  "powerbi": 0.21052631578947367,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 54846.0,
+                  "powerbi": 54846.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 16.0,
+                  "powerbi": 16.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.125,
+                  "powerbi": 0.125,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 53165.5,
+                  "powerbi": 53165.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 15.0,
+                  "powerbi": 15.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H03:qk",
+                  "tableau": 0.06666666666666667,
+                  "powerbi": 0.06666666666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H10:qk",
+                  "tableau": 50690.0,
+                  "powerbi": 50690.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Tenure Distribution' sliced by Department = Engineering",
+        "status": "PASS",
+        "detail": "tableEx | 6 vs 6 rows | 12/12 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_H05:nk",
+            "none:Calculation_H02:nk"
+          ],
+          "labels": {
+            "none:Calculation_H05:nk": "Tenure Band",
+            "none:Calculation_H02:nk": "Is Active",
+            "usr:Calculation_H01:qk": "Headcount",
+            "avg:Calculation_H04:qk": "AVG(Tenure Years)"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "avg:Calculation_H04:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "avg:Calculation_H04:qk": "Average of Tenure Years"
+          },
+          "dimension_map": {
+            "none:Calculation_H05:nk": [
+              "employees.csv",
+              "Tenure Band"
+            ],
+            "none:Calculation_H02:nk": [
+              "employees.csv",
+              "Is Active"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Tenure Band],\n    'employees.csv'[Is Active],\n    \"Headcount\", [Headcount],\n    \"Average of Tenure Years\", [Average of Tenure Years]\n)\nORDER BY 'employees.csv'[Tenure Band], 'employees.csv'[Is Active]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 6,
+            "powerbi_rows": 6,
+            "matched_rows": 6,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 12,
+            "total_cells": 12,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 66.0,
+                "powerbi": 66.0,
+                "diff": 0.0
+              },
+              "avg:Calculation_H04:qk": {
+                "tableau": 23.663756,
+                "powerbi": 23.663756,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H05:nk",
+            "none:Calculation_H02:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "0-2 yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 1.216974674880219,
+                  "powerbi": 1.216974674880219,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "0-2 yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 6.0,
+                  "powerbi": 6.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 1.5455167693360712,
+                  "powerbi": 1.5455167693360712,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2-5 yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 3.4332648870636553,
+                  "powerbi": 3.4332648870636553,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2-5 yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 18.0,
+                  "powerbi": 18.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 3.554034527340482,
+                  "powerbi": 3.554034527340482,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "5+ yrs",
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 5.5893223819301845,
+                  "powerbi": 5.5893223819301845,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "5+ yrs",
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 33.0,
+                  "powerbi": 33.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Calculation_H04:qk",
+                  "tableau": 8.324642731213572,
+                  "powerbi": 8.324642731213572,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Salary Benchmark' sliced by Gender = F",
+        "status": "PASS",
+        "detail": "tableEx | 29 vs 29 rows | 87/87 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Department:nk",
+            "none:Job Level:nk"
+          ],
+          "labels": {
+            "none:Department:nk": "Department",
+            "none:Job Level:nk": "Job Level",
+            "avg:Salary:qk": "AVG(Salary)",
+            "usr:Calculation_H07:qk": "Salary vs Dept",
+            "avg:Performance Score:qk": "AVG(Performance Score)"
+          },
+          "measures": [
+            "avg:Salary:qk",
+            "usr:Calculation_H07:qk",
+            "avg:Performance Score:qk"
+          ],
+          "measure_map": {
+            "avg:Salary:qk": "Average of Salary",
+            "usr:Calculation_H07:qk": "Salary vs Dept",
+            "avg:Performance Score:qk": "Average of Performance Score"
+          },
+          "dimension_map": {
+            "none:Department:nk": [
+              "employees.csv",
+              "Department"
+            ],
+            "none:Job Level:nk": [
+              "employees.csv",
+              "Job Level"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Department],\n    'employees.csv'[Job Level],\n    KEEPFILTERS(TREATAS({\"Austin\", \"Seattle\"}, 'employees.csv'[Location])),\n    \"Average of Salary\", [Average of Salary],\n    \"Salary vs Dept\", [Salary vs Dept],\n    \"Average of Performance Score\", [Average of Performance Score]\n)\nORDER BY 'employees.csv'[Department], 'employees.csv'[Job Level]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 29,
+            "powerbi_rows": 29,
+            "matched_rows": 29,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 87,
+            "total_cells": 87,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "avg:Salary:qk": {
+                "tableau": 2937584.75,
+                "powerbi": 2937584.75,
+                "diff": 0.0
+              },
+              "usr:Calculation_H07:qk": {
+                "tableau": 87161.595694,
+                "powerbi": 87161.595694,
+                "diff": 0.0
+              },
+              "avg:Performance Score:qk": {
+                "tableau": 95.666667,
+                "powerbi": 95.666667,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Department:nk",
+            "none:Job Level:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Engineering",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 57749.0,
+                  "powerbi": 57749.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -51936.803030303025,
+                  "powerbi": -51936.803030303025,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 106328.5,
+                  "powerbi": 106328.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -3357.3030303030246,
+                  "powerbi": -3357.3030303030246,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 127492.0,
+                  "powerbi": 127492.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 17806.196969696975,
+                  "powerbi": 17806.196969696975,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.6666666666666665,
+                  "powerbi": 3.6666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Engineering",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 174043.25,
+                  "powerbi": 174043.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 64357.446969696975,
+                  "powerbi": 64357.446969696975,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 50158.0,
+                  "powerbi": 50158.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -48582.566666666666,
+                  "powerbi": -48582.566666666666,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 73164.66666666667,
+                  "powerbi": 73164.66666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -25575.899999999994,
+                  "powerbi": -25575.899999999994,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.666666666666667,
+                  "powerbi": 4.666666666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 91378.0,
+                  "powerbi": 91378.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -7362.566666666666,
+                  "powerbi": -7362.566666666666,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 122239.66666666667,
+                  "powerbi": 122239.66666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 23499.100000000006,
+                  "powerbi": 23499.100000000006,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Finance",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 177790.0,
+                  "powerbi": 177790.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 79049.43333333333,
+                  "powerbi": 79049.43333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 52453.0,
+                  "powerbi": 52453.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -47393.91176470589,
+                  "powerbi": -47393.91176470589,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 73011.5,
+                  "powerbi": 73011.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -26835.41176470589,
+                  "powerbi": -26835.41176470589,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5,
+                  "powerbi": 2.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 92196.5,
+                  "powerbi": 92196.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -7650.411764705888,
+                  "powerbi": -7650.411764705888,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5,
+                  "powerbi": 2.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 122662.0,
+                  "powerbi": 122662.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 22815.08823529411,
+                  "powerbi": 22815.08823529411,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "HR",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 161277.75,
+                  "powerbi": 161277.75,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 61430.83823529411,
+                  "powerbi": 61430.83823529411,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5,
+                  "powerbi": 2.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 55307.5,
+                  "powerbi": 55307.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -40399.70833333333,
+                  "powerbi": -40399.70833333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 69723.66666666667,
+                  "powerbi": 69723.66666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -25983.541666666657,
+                  "powerbi": -25983.541666666657,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.3333333333333335,
+                  "powerbi": 3.3333333333333335,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 92539.66666666667,
+                  "powerbi": 92539.66666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -3167.541666666657,
+                  "powerbi": -3167.541666666657,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.6666666666666665,
+                  "powerbi": 3.6666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 98291.0,
+                  "powerbi": 98291.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 2583.7916666666715,
+                  "powerbi": 2583.7916666666715,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Marketing",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 181447.5,
+                  "powerbi": 181447.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 85740.29166666667,
+                  "powerbi": 85740.29166666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 53708.0,
+                  "powerbi": 53708.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -39224.34782608696,
+                  "powerbi": -39224.34782608696,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 70247.5,
+                  "powerbi": 70247.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -22684.84782608696,
+                  "powerbi": -22684.84782608696,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.5,
+                  "powerbi": 3.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 92320.25,
+                  "powerbi": 92320.25,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -612.0978260869597,
+                  "powerbi": -612.0978260869597,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 112980.0,
+                  "powerbi": 112980.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 20047.65217391304,
+                  "powerbi": 20047.65217391304,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Operations",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 153777.33333333334,
+                  "powerbi": 153777.33333333334,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 60844.98550724638,
+                  "powerbi": 60844.98550724638,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 1.6666666666666667,
+                  "powerbi": 1.6666666666666667,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L1"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 52764.666666666664,
+                  "powerbi": 52764.666666666664,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -42344.28717948718,
+                  "powerbi": -42344.28717948718,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 4.0,
+                  "powerbi": 4.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L2"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 63976.0,
+                  "powerbi": 63976.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -31132.953846153847,
+                  "powerbi": -31132.953846153847,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 5.0,
+                  "powerbi": 5.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L3"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 77039.0,
+                  "powerbi": 77039.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": -18069.953846153847,
+                  "powerbi": -18069.953846153847,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 3.0,
+                  "powerbi": 3.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L4"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 129925.33333333333,
+                  "powerbi": 129925.33333333333,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 34816.37948717948,
+                  "powerbi": 34816.37948717948,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.6666666666666665,
+                  "powerbi": 2.6666666666666665,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Sales",
+                "L5"
+              ],
+              "values": [
+                {
+                  "measure": "avg:Salary:qk",
+                  "tableau": 151593.5,
+                  "powerbi": 151593.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H07:qk",
+                  "tableau": 56484.54615384615,
+                  "powerbi": 56484.54615384615,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "avg:Performance Score:qk",
+                  "tableau": 2.5,
+                  "powerbi": 2.5,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Hiring Trend' sliced by Department = Engineering",
+        "status": "PASS",
+        "detail": "lineChart | 10 vs 10 rows | 20/20 cells match",
+        "data": {
+          "visual_type": "lineChart",
+          "dimensions": [
+            "none:Calculation_H09:ok"
+          ],
+          "labels": {
+            "none:Calculation_H09:ok": "Hire Year",
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H11:qk": "Hires Running Total"
+          },
+          "measures": [
+            "usr:Calculation_H01:qk",
+            "usr:Calculation_H11:qk"
+          ],
+          "measure_map": {
+            "usr:Calculation_H01:qk": "Headcount",
+            "usr:Calculation_H11:qk": "Hires Running Total"
+          },
+          "dimension_map": {
+            "none:Calculation_H09:ok": [
+              "employees.csv",
+              "Hire Year"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[Hire Year],\n    \"Headcount\", [Headcount],\n    \"Hires Running Total\", [Hires Running Total]\n)\nORDER BY 'employees.csv'[Hire Year]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 10,
+            "powerbi_rows": 10,
+            "matched_rows": 10,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 20,
+            "total_cells": 20,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "usr:Calculation_H01:qk": {
+                "tableau": 66.0,
+                "powerbi": 66.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_H11:qk": {
+                "tableau": 374.0,
+                "powerbi": 374.0,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H09:ok"
+          ],
+          "rows": [
+            {
+              "key": [
+                "2015"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 7.0,
+                  "powerbi": 7.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 7.0,
+                  "powerbi": 7.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2016"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 12.0,
+                  "powerbi": 12.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 19.0,
+                  "powerbi": 19.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2017"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 21.0,
+                  "powerbi": 21.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2018"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 7.0,
+                  "powerbi": 7.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 28.0,
+                  "powerbi": 28.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2019"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 8.0,
+                  "powerbi": 8.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 36.0,
+                  "powerbi": 36.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2020"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 38.0,
+                  "powerbi": 38.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2021"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 7.0,
+                  "powerbi": 7.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 45.0,
+                  "powerbi": 45.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2022"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 9.0,
+                  "powerbi": 9.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 54.0,
+                  "powerbi": 54.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2023"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 6.0,
+                  "powerbi": 6.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 60.0,
+                  "powerbi": 60.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2024"
+              ],
+              "values": [
+                {
+                  "measure": "usr:Calculation_H01:qk",
+                  "tableau": 6.0,
+                  "powerbi": 6.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_H11:qk",
+                  "tableau": 66.0,
+                  "powerbi": 66.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Performance Mix' sliced by Job Level = L1",
+        "status": "PASS",
+        "detail": "clusteredBarChart | 3 vs 3 rows | 3/3 cells match",
+        "data": {
+          "visual_type": "clusteredBarChart",
+          "dimensions": [
+            "none:Calculation_H08:nk"
+          ],
+          "labels": {
+            "none:Calculation_H08:nk": "High Performer",
+            "cnt:Employee ID:qk": "CNT(Employee ID)"
+          },
+          "measures": [
+            "cnt:Employee ID:qk"
+          ],
+          "measure_map": {
+            "cnt:Employee ID:qk": "Count of Employee ID"
+          },
+          "dimension_map": {
+            "none:Calculation_H08:nk": [
+              "employees.csv",
+              "High Performer"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'employees.csv'[High Performer],\n    KEEPFILTERS(FILTER(ALL('employees.csv'[Department]), NOT('employees.csv'[Department] IN {\"HR\"}))),\n    \"Count of Employee ID\", [Count of Employee ID]\n)\nORDER BY 'employees.csv'[High Performer]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 3,
+            "powerbi_rows": 3,
+            "matched_rows": 3,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 3,
+            "total_cells": 3,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "cnt:Employee ID:qk": {
+                "tableau": 81.0,
+                "powerbi": 81.0,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_H08:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "(null)"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 2.0,
+                  "powerbi": 2.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "false"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 42.0,
+                  "powerbi": 42.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "true"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:Employee ID:qk",
+                  "tableau": 37.0,
+                  "powerbi": 37.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Security",
+        "name": "User filters / USERNAME()",
+        "status": "N/A",
+        "detail": "No Tableau user filters or user functions found in the workbook.",
+        "data": {},
+        "gate": 4
+      },
+      {
+        "layer": "Security",
+        "name": "Confirm no row-level security requirement",
+        "status": "PENDING",
+        "detail": "Business owner confirms the published Tableau content had no server-side permissions or user filters that must be reproduced.",
+        "data": {},
+        "gate": 4
+      },
+      {
+        "layer": "Business UAT",
+        "name": "Business owner sign-off",
+        "status": "PENDING",
+        "detail": "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.",
+        "data": {},
+        "gate": 5
+      }
+    ],
+    "engine_errors": [],
+    "kpi_register": [
+      {
+        "scenario": "All data",
+        "metric": "Headcount",
+        "measure": "Headcount",
+        "tableau": 400.0,
+        "powerbi": 400.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Attrition Rate",
+        "measure": "Attrition Rate",
+        "tableau": 0.17,
+        "powerbi": 0.17,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Median Salary",
+        "measure": "Median Salary",
+        "tableau": 90047.5,
+        "powerbi": 90047.5,
+        "delta": 0.0,
+        "tolerance": 0.0900475,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "AVG(Tenure Years)",
+        "measure": "Average of Tenure Years",
+        "tableau": 5.49501711156742,
+        "powerbi": 5.49501711156742,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "AVG(Salary)",
+        "measure": "Average of Salary",
+        "tableau": 98596.55,
+        "powerbi": 98596.55,
+        "delta": 0.0,
+        "tolerance": 0.09859655,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Salary vs Dept",
+        "measure": "Salary vs Dept",
+        "tableau": 0.0,
+        "powerbi": 0.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "Headcount",
+        "measure": "Headcount",
+        "tableau": 66.0,
+        "powerbi": 66.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "Attrition Rate",
+        "measure": "Attrition Rate",
+        "tableau": 0.13636363636363635,
+        "powerbi": 0.13636363636363635,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "Median Salary",
+        "measure": "Median Salary",
+        "tableau": 97661.5,
+        "powerbi": 97661.5,
+        "delta": 0.0,
+        "tolerance": 0.0976615,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "AVG(Tenure Years)",
+        "measure": "Average of Tenure Years",
+        "tableau": 5.671291975193412,
+        "powerbi": 5.671291975193412,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "AVG(Salary)",
+        "measure": "Average of Salary",
+        "tableau": 109685.80303030302,
+        "powerbi": 109685.80303030302,
+        "delta": 0.0,
+        "tolerance": 0.10968580303030302,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Engineering",
+        "metric": "Salary vs Dept",
+        "measure": "Salary vs Dept",
+        "tableau": 0.0,
+        "powerbi": 0.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "Headcount",
+        "measure": "Headcount",
+        "tableau": 60.0,
+        "powerbi": 60.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "Attrition Rate",
+        "measure": "Attrition Rate",
+        "tableau": 0.15,
+        "powerbi": 0.15,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "Median Salary",
+        "measure": "Median Salary",
+        "tableau": 90200.0,
+        "powerbi": 90200.0,
+        "delta": 0.0,
+        "tolerance": 0.0902,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "AVG(Tenure Years)",
+        "measure": "Average of Tenure Years",
+        "tableau": 5.537075062742414,
+        "powerbi": 5.537075062742414,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "AVG(Salary)",
+        "measure": "Average of Salary",
+        "tableau": 98740.56666666667,
+        "powerbi": 98740.56666666667,
+        "delta": 0.0,
+        "tolerance": 0.09874056666666667,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Department = Finance",
+        "metric": "Salary vs Dept",
+        "measure": "Salary vs Dept",
+        "tableau": 0.0,
+        "powerbi": 0.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "Headcount",
+        "measure": "Headcount",
+        "tableau": 97.0,
+        "powerbi": 97.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "Attrition Rate",
+        "measure": "Attrition Rate",
+        "tableau": 0.15463917525773196,
+        "powerbi": 0.15463917525773196,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "Median Salary",
+        "measure": "Median Salary",
+        "tableau": 53420.0,
+        "powerbi": 53420.0,
+        "delta": 0.0,
+        "tolerance": 0.053419999999999995,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "AVG(Tenure Years)",
+        "measure": "Average of Tenure Years",
+        "tableau": 5.634948524171412,
+        "powerbi": 5.634948524171412,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "AVG(Salary)",
+        "measure": "Average of Salary",
+        "tableau": 54715.536082474224,
+        "powerbi": 54715.536082474224,
+        "delta": 0.0,
+        "tolerance": 0.054715536082474224,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L1",
+        "metric": "Salary vs Dept",
+        "measure": "Salary vs Dept",
+        "tableau": -43673.436033359816,
+        "powerbi": -43673.436033359816,
+        "delta": 0.0,
+        "tolerance": 0.04367343603335981,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "Headcount",
+        "measure": "Headcount",
+        "tableau": 79.0,
+        "powerbi": 79.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "Attrition Rate",
+        "measure": "Attrition Rate",
+        "tableau": 0.189873417721519,
+        "powerbi": 0.189873417721519,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "Median Salary",
+        "measure": "Median Salary",
+        "tableau": 70958.0,
+        "powerbi": 70958.0,
+        "delta": 0.0,
+        "tolerance": 0.070958,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "AVG(Tenure Years)",
+        "measure": "Average of Tenure Years",
+        "tableau": 5.206837695700015,
+        "powerbi": 5.206837695700015,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "AVG(Salary)",
+        "measure": "Average of Salary",
+        "tableau": 72262.69620253165,
+        "powerbi": 72262.69620253165,
+        "delta": 0.0,
+        "tolerance": 0.07226269620253165,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "Job Level = L2",
+        "metric": "Salary vs Dept",
+        "measure": "Salary vs Dept",
+        "tableau": -26258.35739189561,
+        "powerbi": -26258.35739189561,
+        "delta": 0.0,
+        "tolerance": 0.02625835739189561,
+        "status": "PASS",
+        "note": ""
+      }
+    ],
+    "identity_matrix": [],
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 9,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 10,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "PENDING",
+        "automated_checks": 8,
+        "passed": 8,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 1,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Confirm no row-level security requirement"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ],
+    "readiness": {
+      "metrics": [
+        {
+          "metric": "Parse completeness",
+          "value": 100.0,
+          "detail": "228 known / 0 unknown XML elements (unknown preserved for review)"
+        },
+        {
+          "metric": "Calculation pass rate",
+          "value": 100.0,
+          "detail": "11 of 11 calculations numerically verified in a passing check (11 PASS, 0 REVIEW, 0 UNSUPPORTED by rule)"
+        },
+        {
+          "metric": "Visual openability",
+          "value": null,
+          "detail": "NOT RUN: requires Power BI Desktop on Windows. 5/5 worksheets map to native visuals."
+        },
+        {
+          "metric": "Numeric parity",
+          "value": 100.0,
+          "detail": "10 of 10 visual, scenario and KPI checks pass"
+        },
+        {
+          "metric": "Security acceptance",
+          "value": null,
+          "detail": "No row-level security in the workbook"
+        },
+        {
+          "metric": "Manual effort (estimate)",
+          "value": 0,
+          "unit": "minutes",
+          "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
+        }
+      ],
+      "index": 100.0,
+      "verified_objects": [
+        "Attrition Rate",
+        "Average of Performance Score",
+        "Average of Salary",
+        "Average of Tenure Years",
+        "Count of Employee ID",
+        "Department",
+        "Dept Avg Salary",
+        "Employee ID",
+        "Headcount",
+        "High Performer",
+        "Hire Date",
+        "Hire Year",
+        "Hires Running Total",
+        "Is Active",
+        "Job Level",
+        "Median Salary",
+        "Performance Score",
+        "Salary",
+        "Salary vs Dept",
+        "Tenure Band",
+        "Tenure Years",
+        "Termination Date"
+      ]
+    },
+    "verdict": "Automated gates passed; human checks pending"
+  }
+}

@@ -35,11 +35,18 @@ def _convert(args):
     if args.sqlite or args.csv_dir or args.validate:
         rep = validate(res, DataBinding(args.sqlite, args.csv_dir, packaged=wb.packaged_files),
                        today=_today(args)).to_dict()
+    from .ir import build_ir, lineage_csv
+    from .validation.gates import results_csv, verdict
+    if rep:
+        rep["verdict"] = verdict(rep["gates"])
     files = {"MIGRATION_REPORT.html": migration_report_html(res, rep), "DAX_MAPPING.csv": dax_mapping_csv(res),
-             "conversion.json": json.dumps(conversion_json(res), indent=2, default=str)}
+             "migration_report.json": json.dumps({**conversion_json(res), "validation": rep}, indent=2, default=str),
+             "lineage.csv": lineage_csv(res, rep), "ir.json": json.dumps(build_ir(res, rep), indent=2, default=str),
+             ".gitignore": "*.pbix\n.pbi/localSettings.json\n.pbi/cache.abf\n"}
     if rep:
         files["VALIDATION_REPORT.html"] = validation_report_html(rep)
         files["validation.json"] = json.dumps(rep, indent=2, default=str)
+        files["validation_results.csv"] = results_csv(rep)
     for name, text in files.items():
         with open(os.path.join(args.out, name), "w", encoding="utf-8", newline="") as f:
             f.write(text)
@@ -48,6 +55,8 @@ def _convert(args):
           f"columns, {st['pages']} pages, {st['visuals']} visuals -> {args.out}")
     if rep:
         print("Validation:", rep["summary"])
+        print("Gates:", ", ".join(f"{g['gate']} {g['name']}={g['status']}" for g in rep["gates"]))
+        print("Verdict:", rep["verdict"])
         return 0 if rep["summary"]["overall"] != "FAIL" else 2
     return 0
 

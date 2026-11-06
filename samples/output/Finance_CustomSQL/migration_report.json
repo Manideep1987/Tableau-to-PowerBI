@@ -1,0 +1,4166 @@
+{
+  "workbook": {
+    "name": "Finance_CustomSQL",
+    "version": "18.1",
+    "build": "2024.2.0 (20242.24.0716.1944)",
+    "packaged_files": []
+  },
+  "stats": {
+    "datasources": 1,
+    "tables": 1,
+    "columns": 9,
+    "relationships": 1,
+    "calculations": 10,
+    "parameters": 2,
+    "worksheets": 4,
+    "dashboards": 1,
+    "filters": 1,
+    "measures": 13,
+    "calc_columns": 3,
+    "pages": 2,
+    "visuals": 4,
+    "converted": 12,
+    "converted_with_notes": 0,
+    "manual": 0
+  },
+  "datasources": [
+    {
+      "name": "federated.0fin7qz2x1lb9e0a8m3k",
+      "caption": "Finance Orders",
+      "model_style": "joins",
+      "is_extract": true,
+      "connections": [
+        {
+          "name": "postgres.1abc",
+          "class": "postgres",
+          "server": "pg-finance.corp.local",
+          "database": "finance",
+          "schema": null,
+          "file": null
+        }
+      ],
+      "tables": [
+        {
+          "name": "Custom SQL Query",
+          "type": "text",
+          "table": null,
+          "sql": "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= <Parameters.Min Quantity>"
+        },
+        {
+          "name": "Targets",
+          "type": "table",
+          "table": "[public].[Targets]",
+          "sql": null
+        }
+      ],
+      "relationships": [
+        {
+          "left_table": "Custom SQL Query",
+          "left_column": "region",
+          "right_table": "Targets",
+          "right_column": "region",
+          "join_type": "inner",
+          "cardinality": "many-to-one"
+        }
+      ],
+      "columns": [
+        {
+          "name": "order_id",
+          "table": "Custom SQL Query",
+          "remote": "order_id",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "order_date",
+          "table": "Custom SQL Query",
+          "remote": "order_date",
+          "datatype": "date",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "sales",
+          "table": "Custom SQL Query",
+          "remote": "sales",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "profit",
+          "table": "Custom SQL Query",
+          "remote": "profit",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "quantity",
+          "table": "Custom SQL Query",
+          "remote": "quantity",
+          "datatype": "integer",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "region",
+          "table": "Custom SQL Query",
+          "remote": "region",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "segment",
+          "table": "Custom SQL Query",
+          "remote": "segment",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "region (Targets)",
+          "table": "Targets",
+          "remote": "region",
+          "datatype": "string",
+          "role": "dimension",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        },
+        {
+          "name": "sales_target",
+          "table": "Targets",
+          "remote": "sales_target",
+          "datatype": "real",
+          "role": "measure",
+          "nullable": false,
+          "hidden": false,
+          "caption": null,
+          "description": null
+        }
+      ],
+      "hierarchies": []
+    }
+  ],
+  "model": {
+    "tables": [
+      {
+        "name": "_Measures",
+        "kind": "measures",
+        "m": null,
+        "dax_source": "ROW(\"Measures\", BLANK())",
+        "columns": [
+          {
+            "name": "Measures",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [
+          {
+            "name": "Target Attainment",
+            "expression": "DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",
+            "format": "0.0%",
+            "folder": null,
+            "tableau": "Calculation_F01"
+          },
+          {
+            "name": "Projected Sales",
+            "expression": "(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F02"
+          },
+          {
+            "name": "Margin %",
+            "expression": "IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",
+            "format": "0%",
+            "folder": null,
+            "tableau": "Calculation_F03"
+          },
+          {
+            "name": "Sales YoY Prior",
+            "expression": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F05"
+          },
+          {
+            "name": "Loss Orders",
+            "expression": "SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F07"
+          },
+          {
+            "name": "Avg Monthly Sales",
+            "expression": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F09"
+          },
+          {
+            "name": "Max Order Value",
+            "expression": "MAX('Finance Orders'[sales])",
+            "format": null,
+            "folder": null,
+            "tableau": "Calculation_F10"
+          },
+          {
+            "name": "Sum of sales",
+            "expression": "SUM('Finance Orders'[sales])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:sales"
+          },
+          {
+            "name": "Sum of sales_target",
+            "expression": "SUM('Finance Orders'[sales_target])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:sales_target"
+          },
+          {
+            "name": "Count of order_id",
+            "expression": "COUNTA('Finance Orders'[order_id])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "cnt:order_id"
+          },
+          {
+            "name": "Sum of profit",
+            "expression": "SUM('Finance Orders'[profit])",
+            "format": null,
+            "folder": "Base measures",
+            "tableau": "sum:profit"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Finance Orders",
+        "kind": "single",
+        "m": "let\n    T0 = let\n        Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n        Data = Value.NativeQuery(Source, \"SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\n    FROM Orders o\n    INNER JOIN Customers c ON c.customer_id = o.customer_id\n    WHERE o.quantity >= \" & Text.From(#\"Min Quantity\"), null, [EnableFolding = true]),\n        Selected = Table.SelectColumns(Data, {\"order_id\", \"order_date\", \"sales\", \"profit\", \"quantity\", \"region\", \"segment\"}, MissingField.UseNull),\n        Typed = Table.TransformColumnTypes(Selected, {{\"order_id\", type text}, {\"order_date\", type date}, {\"sales\", type number}, {\"profit\", type number}, {\"quantity\", Int64.Type}, {\"region\", type text}, {\"segment\", type text}})\n    in\n        Typed,\n    T1 = let\n        Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n        Data = Source{[Schema = \"public\", Item = \"Targets\"]}[Data],\n        Selected = Table.SelectColumns(Data, {\"region\", \"sales_target\"}, MissingField.UseNull),\n        Renamed = Table.RenameColumns(Selected, {{\"region\", \"region (Targets)\"}}),\n        Typed = Table.TransformColumnTypes(Renamed, {{\"region (Targets)\", type text}, {\"sales_target\", type number}})\n    in\n        Typed,\n    J0 = Table.Join(T0, {\"region\"}, T1, {\"region (Targets)\"}, JoinKind.Inner)\nin\n    J0",
+        "dax_source": null,
+        "columns": [
+          {
+            "name": "order_id",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "order_id"
+          },
+          {
+            "name": "order_date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "order_date"
+          },
+          {
+            "name": "sales",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "sales"
+          },
+          {
+            "name": "profit",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "profit"
+          },
+          {
+            "name": "quantity",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "quantity"
+          },
+          {
+            "name": "region",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "region"
+          },
+          {
+            "name": "segment",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "segment"
+          },
+          {
+            "name": "region (Targets)",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "region (Targets)"
+          },
+          {
+            "name": "sales_target",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "sum",
+            "tableau": "sales_target"
+          },
+          {
+            "name": "Fiscal Year",
+            "datatype": "int64",
+            "expression": "IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F04"
+          },
+          {
+            "name": "Order Size",
+            "datatype": "string",
+            "expression": "SWITCH('Finance Orders'[quantity], 1, \"Single\", 2, \"Pair\", \"Bulk\")",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F06"
+          },
+          {
+            "name": "Region Code",
+            "datatype": "string",
+            "expression": "UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "Calculation_F08"
+          }
+        ],
+        "measures": [],
+        "hierarchies": []
+      },
+      {
+        "name": "Min Quantity",
+        "kind": "parameter",
+        "m": null,
+        "dax_source": "SELECTCOLUMNS(GENERATESERIES(1, 9, 1), \"Min Quantity\", [Value])",
+        "columns": [
+          {
+            "name": "Min Quantity",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "[Parameters].[Min Quantity]"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Min Quantity Value",
+            "expression": "SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",
+            "format": null,
+            "folder": null,
+            "tableau": "Min Quantity"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Growth Rate",
+        "kind": "parameter",
+        "m": null,
+        "dax_source": "SELECTCOLUMNS({0.08}, \"Growth Rate\", [Value])",
+        "columns": [
+          {
+            "name": "Growth Rate",
+            "datatype": "double",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": "[Parameters].[Growth Rate]"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Growth Rate Value",
+            "expression": "SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",
+            "format": null,
+            "folder": null,
+            "tableau": "Growth Rate"
+          }
+        ],
+        "hierarchies": []
+      },
+      {
+        "name": "Date",
+        "kind": "date",
+        "m": null,
+        "dax_source": "ADDCOLUMNS(CALENDARAUTO(), \"Year\", YEAR([Date]), \"Quarter\", \"Q\" & QUARTER([Date]), \"Month Number\", MONTH([Date]), \"Month\", FORMAT([Date], \"MMM\"), \"Month Start\", DATE(YEAR([Date]), MONTH([Date]), 1))",
+        "columns": [
+          {
+            "name": "Date",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Year",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Quarter",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Number",
+            "datatype": "int64",
+            "expression": null,
+            "format": null,
+            "hidden": true,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month",
+            "datatype": "string",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          },
+          {
+            "name": "Month Start",
+            "datatype": "dateTime",
+            "expression": null,
+            "format": null,
+            "hidden": false,
+            "summarize_by": "none",
+            "tableau": null
+          }
+        ],
+        "measures": [],
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              "Year",
+              "Quarter",
+              "Month"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "from_table": "Finance Orders",
+        "from_column": "order_date",
+        "to_table": "Date",
+        "to_column": "Date",
+        "cross_filter": "oneDirection",
+        "active": true,
+        "tableau_join": "relationship"
+      }
+    ],
+    "expressions": [
+      {
+        "name": "Finance Orders Server",
+        "expression": "\"pg-finance.corp.local\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "Finance Orders Database",
+        "expression": "\"finance\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "Min Quantity",
+        "expression": "2 meta [IsParameterQuery=true, Type=\"Number\", IsParameterQueryRequired=true]"
+      }
+    ]
+  },
+  "calculations": [
+    {
+      "datasource": "Parameters",
+      "tableau_name": "Min Quantity",
+      "tableau_formula": "2",
+      "kind": "parameter",
+      "pbi_object": "Min Quantity Value",
+      "pbi_table": "Min Quantity",
+      "dax": "Min Quantity = SELECTCOLUMNS(GENERATESERIES(1, 9, 1), \"Min Quantity\", [Value])\n\n[Min Quantity Value] = SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",
+      "status": "Converted",
+      "warnings": [
+        "What-if (range) parameter -> disconnected table + slicer + value measure"
+      ],
+      "functions": [],
+      "xml_path": null,
+      "strategy": "rule:parameter-table+selectedvalue",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Parameters",
+      "tableau_name": "Growth Rate",
+      "tableau_formula": "0.08",
+      "kind": "parameter",
+      "pbi_object": "Growth Rate Value",
+      "pbi_table": "Growth Rate",
+      "dax": "Growth Rate = SELECTCOLUMNS({0.08}, \"Growth Rate\", [Value])\n\n[Growth Rate Value] = SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",
+      "status": "Converted",
+      "warnings": [
+        "Any value parameter -> disconnected table + slicer + value measure"
+      ],
+      "functions": [],
+      "xml_path": null,
+      "strategy": "rule:parameter-table+selectedvalue",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Target Attainment",
+      "tableau_formula": "SUM([sales]) / SUM([sales_target])",
+      "kind": "measure",
+      "pbi_object": "Target Attainment",
+      "pbi_table": "_Measures",
+      "dax": "DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DIVIDE",
+        "SUM"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[1]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_F01",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Projected Sales",
+      "tableau_formula": "SUM([sales]) * (1 + [Parameters].[Growth Rate])",
+      "kind": "measure",
+      "pbi_object": "Projected Sales",
+      "pbi_table": "_Measures",
+      "dax": "(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[2]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_F02",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Margin %",
+      "tableau_formula": "IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END",
+      "kind": "measure",
+      "pbi_object": "Margin %",
+      "pbi_table": "_Measures",
+      "dax": "IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "DIVIDE",
+        "IF",
+        "SUM"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[3]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_F03",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Fiscal Year",
+      "tableau_formula": "IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END",
+      "kind": "column",
+      "pbi_object": "Fiscal Year",
+      "pbi_table": "Finance Orders",
+      "dax": "IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "IF",
+        "YEAR"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[4]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_F04",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sales YoY Prior",
+      "tableau_formula": "LOOKUP(SUM([sales]), -1)",
+      "kind": "measure",
+      "pbi_object": "Sales YoY Prior",
+      "pbi_table": "_Measures",
+      "dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "OFFSET",
+        "SUM"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[5]",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "tableau_id": "Calculation_F05",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Order Size",
+      "tableau_formula": "CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END",
+      "kind": "column",
+      "pbi_object": "Order Size",
+      "pbi_table": "Finance Orders",
+      "dax": "SWITCH('Finance Orders'[quantity], 1, \"Single\", 2, \"Pair\", \"Bulk\")",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SWITCH"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[6]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_F06",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Loss Orders",
+      "tableau_formula": "SUM(IF [profit] < 0 THEN 1 ELSE 0 END)",
+      "kind": "measure",
+      "pbi_object": "Loss Orders",
+      "pbi_table": "_Measures",
+      "dax": "SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "IF",
+        "SUMX"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[7]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_F07",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Region Code",
+      "tableau_formula": "UPPER(LEFT([region], 1)) + STR(LEN([region]))",
+      "kind": "column",
+      "pbi_object": "Region Code",
+      "pbi_table": "Finance Orders",
+      "dax": "UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "LEFT",
+        "LEN",
+        "UPPER"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[8]",
+      "strategy": "rule:row-level-calculated-column",
+      "confidence": "high",
+      "tableau_id": "Calculation_F08",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Avg Monthly Sales",
+      "tableau_formula": "WINDOW_AVG(SUM([sales]))",
+      "kind": "measure",
+      "pbi_object": "Avg Monthly Sales",
+      "pbi_table": "_Measures",
+      "dax": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "ALLSELECTED",
+        "AVERAGEX",
+        "SUM"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[9]",
+      "strategy": "rule:table-calc-window",
+      "confidence": "high",
+      "tableau_id": "Calculation_F09",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Max Order Value",
+      "tableau_formula": "MAX([sales])",
+      "kind": "measure",
+      "pbi_object": "Max Order Value",
+      "pbi_table": "_Measures",
+      "dax": "MAX('Finance Orders'[sales])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "MAX"
+      ],
+      "xml_path": "/workbook/datasources/datasource[2]/column[10]",
+      "strategy": "rule:aggregate-measure",
+      "confidence": "high",
+      "tableau_id": "Calculation_F10",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of sales",
+      "tableau_formula": "SUM([sales])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of sales",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[sales])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of sales_target",
+      "tableau_formula": "SUM([sales_target])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of sales_target",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[sales_target])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Count of order_id",
+      "tableau_formula": "COUNT([order_id])",
+      "kind": "base-measure",
+      "pbi_object": "Count of order_id",
+      "pbi_table": "_Measures",
+      "dax": "COUNTA('Finance Orders'[order_id])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "COUNTA"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    },
+    {
+      "datasource": "Finance Orders",
+      "tableau_name": "Sum of profit",
+      "tableau_formula": "SUM([profit])",
+      "kind": "base-measure",
+      "pbi_object": "Sum of profit",
+      "pbi_table": "_Measures",
+      "dax": "SUM('Finance Orders'[profit])",
+      "status": "Converted",
+      "warnings": [],
+      "functions": [
+        "SUM"
+      ],
+      "xml_path": null,
+      "strategy": "rule:explicit-base-measure",
+      "confidence": "high",
+      "tableau_id": "",
+      "overridden": false,
+      "original_dax": null,
+      "override_note": null,
+      "classification": "PASS"
+    }
+  ],
+  "roles": [],
+  "security_findings": [],
+  "unknown_nodes": [],
+  "parse_stats": {
+    "known_elements": 206,
+    "unknown_elements": 0,
+    "completeness": 100.0
+  },
+  "inventory": [
+    {
+      "category": "Data source",
+      "item": "Connector: postgres",
+      "count": 1,
+      "status": "supported",
+      "note": "native Power Query connector"
+    },
+    {
+      "category": "Data source",
+      "item": "Custom SQL",
+      "count": 1,
+      "status": "supported",
+      "note": "Value.NativeQuery with folding"
+    },
+    {
+      "category": "Data source",
+      "item": "Physical joins",
+      "count": 1,
+      "status": "supported",
+      "note": "flattened with Table.Join (numbers preserved)"
+    },
+    {
+      "category": "Data source",
+      "item": "Extracts",
+      "count": 1,
+      "status": "review",
+      "note": "import from the live source"
+    },
+    {
+      "category": "Calculations",
+      "item": "Row-level calculations",
+      "count": 3,
+      "status": "supported",
+      "note": "3 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Aggregate calculations",
+      "count": 7,
+      "status": "supported",
+      "note": "7 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Parameters",
+      "count": 2,
+      "status": "supported",
+      "note": "2 PASS / 0 REVIEW / 0 UNSUPPORTED"
+    },
+    {
+      "category": "Calculations",
+      "item": "Table calculations",
+      "count": 2,
+      "status": "review",
+      "note": "addressing from the first worksheet using it"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Bar",
+      "count": 1,
+      "status": "supported",
+      "note": "-> clusteredBarChart"
+    },
+    {
+      "category": "Worksheets",
+      "item": "Mark: Text",
+      "count": 3,
+      "status": "supported",
+      "note": "-> tableEx"
+    },
+    {
+      "category": "Filters",
+      "item": "categorical",
+      "count": 1,
+      "status": "supported",
+      "note": ""
+    },
+    {
+      "category": "Dashboards",
+      "item": "Dashboards",
+      "count": 1,
+      "status": "supported",
+      "note": "report pages"
+    },
+    {
+      "category": "Dashboards",
+      "item": "Zone: worksheet",
+      "count": 3,
+      "status": "supported",
+      "note": ""
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Min Quantity",
+      "internal": "Min Quantity",
+      "datatype": "integer",
+      "value": 2,
+      "domain": "range",
+      "min": 1,
+      "max": 9,
+      "step": 1,
+      "members": []
+    },
+    {
+      "name": "Growth Rate",
+      "internal": "Growth Rate",
+      "datatype": "real",
+      "value": 0.08,
+      "domain": "any",
+      "min": null,
+      "max": null,
+      "step": null,
+      "members": []
+    }
+  ],
+  "worksheets": [
+    {
+      "name": "Attainment by Region",
+      "mark": "Text",
+      "rows": [
+        "none:region:nk"
+      ],
+      "cols": [
+        "sum:sales:qk",
+        "sum:sales_target:qk",
+        "usr:Calculation_F01:qk"
+      ],
+      "encodings": {
+        "text": [
+          "usr:Calculation_F01:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "c6ce3bf1cd804ec5f519",
+        "type": "tableEx",
+        "worksheet": "Attainment by Region",
+        "title": "Attainment by Region",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "region"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales_target"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Target Attainment"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Fiscal Year Sales",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_F04:ok"
+      ],
+      "cols": [
+        "sum:sales:qk",
+        "usr:Calculation_F02:qk",
+        "usr:Calculation_F05:qk",
+        "usr:Calculation_F09:qk"
+      ],
+      "encodings": {
+        "text": [
+          "sum:sales:qk"
+        ]
+      },
+      "filters": [],
+      "visual": {
+        "name": "9f093f7ecb6eaeb2b51d",
+        "type": "tableEx",
+        "worksheet": "Fiscal Year Sales",
+        "title": "Fiscal Year Sales",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Fiscal Year"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Projected Sales"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sales YoY Prior"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Avg Monthly Sales"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Order Size Mix",
+      "mark": "Text",
+      "rows": [
+        "none:Calculation_F06:nk",
+        "none:segment:nk"
+      ],
+      "cols": [
+        "cnt:order_id:qk",
+        "usr:Calculation_F03:qk",
+        "usr:Calculation_F07:qk",
+        "usr:Calculation_F10:qk"
+      ],
+      "encodings": {
+        "text": [
+          "cnt:order_id:qk"
+        ]
+      },
+      "filters": [
+        {
+          "kind": "categorical",
+          "field": "none:segment:nk",
+          "members": [
+            "Consumer",
+            "Corporate"
+          ],
+          "exclude": false,
+          "min": null,
+          "max": null,
+          "top_n": null,
+          "top_by": null,
+          "context": false
+        }
+      ],
+      "visual": {
+        "name": "36074430a1b33e1150d5",
+        "type": "tableEx",
+        "worksheet": "Order Size Mix",
+        "title": "Order Size Mix",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Values": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Order Size"
+            },
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "segment"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Count of order_id"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Margin %"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Loss Orders"
+            },
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Max Order Value"
+            }
+          ]
+        },
+        "filters": [
+          {
+            "kind": "categorical",
+            "table": "Finance Orders",
+            "column": "segment",
+            "measure": null,
+            "values": [
+              "Consumer",
+              "Corporate"
+            ],
+            "exclude": false,
+            "min": null,
+            "max": null,
+            "include_null": false,
+            "top_n": null,
+            "top_direction": "top",
+            "by_measure": null,
+            "period_type": null,
+            "first_period": null,
+            "last_period": null,
+            "note": null
+          }
+        ],
+        "notes": [],
+        "sort": null
+      }
+    },
+    {
+      "name": "Region Codes",
+      "mark": "Bar",
+      "rows": [
+        "none:Calculation_F08:nk"
+      ],
+      "cols": [
+        "sum:profit:qk"
+      ],
+      "encodings": {},
+      "filters": [],
+      "visual": {
+        "name": "1272438c2844356c76d8",
+        "type": "clusteredBarChart",
+        "worksheet": "Region Codes",
+        "title": "Region Codes",
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 300,
+        "text": null,
+        "roles": {
+          "Category": [
+            {
+              "kind": "column",
+              "table": "Finance Orders",
+              "name": "Region Code"
+            }
+          ],
+          "Y": [
+            {
+              "kind": "measure",
+              "table": "_Measures",
+              "name": "Sum of profit"
+            }
+          ]
+        },
+        "filters": [],
+        "notes": [],
+        "sort": null
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "f4f9b3de0948ddcd1a1e",
+      "display_name": "Finance Summary",
+      "width": 1280,
+      "height": 720,
+      "source": "dashboard",
+      "visuals": [
+        {
+          "name": "d86954da62ee2db3e281",
+          "type": "tableEx",
+          "worksheet": "Attainment by Region",
+          "title": "Attainment by Region",
+          "x": 0,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "region"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales_target"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Target Attainment"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "9d17858aecf6bdbbf8d9",
+          "type": "tableEx",
+          "worksheet": "Fiscal Year Sales",
+          "title": "Fiscal Year Sales",
+          "x": 640,
+          "y": 0,
+          "w": 640,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Fiscal Year"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Projected Sales"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sales YoY Prior"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Avg Monthly Sales"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        },
+        {
+          "name": "f8625342eae50cb7cc20",
+          "type": "tableEx",
+          "worksheet": "Order Size Mix",
+          "title": "Order Size Mix",
+          "x": 0,
+          "y": 360,
+          "w": 1280,
+          "h": 360,
+          "text": null,
+          "roles": {
+            "Values": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Order Size"
+              },
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "segment"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Count of order_id"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Margin %"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Loss Orders"
+              },
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Max Order Value"
+              }
+            ]
+          },
+          "filters": [
+            {
+              "kind": "categorical",
+              "table": "Finance Orders",
+              "column": "segment",
+              "measure": null,
+              "values": [
+                "Consumer",
+                "Corporate"
+              ],
+              "exclude": false,
+              "min": null,
+              "max": null,
+              "include_null": false,
+              "top_n": null,
+              "top_direction": "top",
+              "by_measure": null,
+              "period_type": null,
+              "first_period": null,
+              "last_period": null,
+              "note": null
+            }
+          ],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    },
+    {
+      "name": "299cef0282f50fcce463",
+      "display_name": "Region Codes",
+      "width": 1280,
+      "height": 720,
+      "source": "worksheet",
+      "visuals": [
+        {
+          "name": "1272438c2844356c76d8",
+          "type": "clusteredBarChart",
+          "worksheet": "Region Codes",
+          "title": "Region Codes",
+          "x": 20,
+          "y": 20,
+          "w": 1240,
+          "h": 680,
+          "text": null,
+          "roles": {
+            "Category": [
+              {
+                "kind": "column",
+                "table": "Finance Orders",
+                "name": "Region Code"
+              }
+            ],
+            "Y": [
+              {
+                "kind": "measure",
+                "table": "_Measures",
+                "name": "Sum of profit"
+              }
+            ]
+          },
+          "filters": [],
+          "notes": [],
+          "sort": null
+        }
+      ]
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "Finance Summary",
+      "width": 1280,
+      "height": 720,
+      "zones": [
+        {
+          "id": "2",
+          "type": "worksheet",
+          "name": "Attainment by Region",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "3",
+          "type": "worksheet",
+          "name": "Fiscal Year Sales",
+          "x": 50000.0,
+          "y": 0.0,
+          "w": 50000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        },
+        {
+          "id": "4",
+          "type": "worksheet",
+          "name": "Order Size Mix",
+          "x": 0.0,
+          "y": 50000.0,
+          "w": 100000.0,
+          "h": 50000.0,
+          "param": null,
+          "text": null,
+          "mode": null
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "issues": [
+    {
+      "severity": "info",
+      "area": "Power Query",
+      "object": "Finance Orders",
+      "message": "Custom SQL parameters converted to Power Query parameters: Min Quantity"
+    },
+    {
+      "severity": "info",
+      "area": "Power Query",
+      "object": "Finance Orders",
+      "message": "Custom SQL is sent as a native query (query folding enabled)."
+    },
+    {
+      "severity": "info",
+      "area": "Data source",
+      "object": "Finance Orders",
+      "message": "Physical join of 2 tables flattened into 'Finance Orders' with Table.Join to keep Tableau join semantics (row duplication included). Consider refactoring to a star schema."
+    },
+    {
+      "severity": "info",
+      "area": "Parameter",
+      "object": "Growth Rate",
+      "message": "Free-entry parameter converted to a single-value table; add values or use a field parameter."
+    },
+    {
+      "severity": "info",
+      "area": "Model",
+      "object": "Date",
+      "message": "Added a Date table (CALENDARAUTO) related to Finance Orders[order_date] for time intelligence."
+    }
+  ],
+  "sql": [
+    {
+      "table": "Finance Orders",
+      "datasource": "Finance Orders",
+      "sql": "SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= <Parameters.Min Quantity>",
+      "m": "let\n    Source = PostgreSQL.Database(#\"Finance Orders Server\", #\"Finance Orders Database\"),\n    Data = Value.NativeQuery(Source, \"SELECT o.order_id, o.order_date, o.sales, o.profit, o.quantity, c.region, c.segment\nFROM Orders o\nINNER JOIN Customers c ON c.customer_id = o.customer_id\nWHERE o.quantity >= \" & Text.From(#\"Min Quantity\"), null, [EnableFolding = true]),\n    Selected = Table.SelectColumns(Data, {\"order_id\", \"order_date\", \"sales\", \"profit\", \"quantity\", \"region\", \"segment\"}, MissingField.UseNull),\n    Typed = Table.TransformColumnTypes(Selected, {{\"order_id\", type text}, {\"order_date\", type date}, {\"sales\", type number}, {\"profit\", type number}, {\"quantity\", Int64.Type}, {\"region\", type text}, {\"segment\", type text}})\nin\n    Typed",
+      "findings": [
+        "Tableau parameters in SQL were converted to Power Query parameters (static at refresh)."
+      ]
+    }
+  ],
+  "validation": {
+    "workbook": "Finance_CustomSQL",
+    "binding": "SQLite: superstore.db",
+    "started": "2026-11-06T17:26:55",
+    "duration_s": 0.5,
+    "tolerance": {
+      "absolute": 0.01,
+      "relative": 1e-06
+    },
+    "summary": {
+      "PASS": 25,
+      "WARN": 0,
+      "FAIL": 0,
+      "ERROR": 0,
+      "SKIP": 1,
+      "PENDING": 3,
+      "N/A": 1,
+      "total": 30,
+      "pass_rate": 100.0,
+      "overall": "PASS"
+    },
+    "checks": [
+      {
+        "layer": "L1 Metadata",
+        "name": "Calculated fields converted",
+        "status": "PASS",
+        "detail": "10/10 Tableau calculations (incl. groups, bins, sets) have a DAX equivalent",
+        "data": {
+          "expected": 10,
+          "actual": 10,
+          "manual": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Parameters converted",
+        "status": "PASS",
+        "detail": "2/2 parameters -> parameter tables + value measures",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Worksheets converted to visuals",
+        "status": "PASS",
+        "detail": "4/4 worksheets have a visual",
+        "data": {
+          "missing": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Dashboards converted to pages",
+        "status": "PASS",
+        "detail": "1/1 dashboards -> report pages",
+        "data": {
+          "missing": []
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Worksheet filters converted",
+        "status": "PASS",
+        "detail": "1/1 worksheet filters -> visual-level filters",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Columns mapped",
+        "status": "PASS",
+        "detail": "9/9 source columns in the semantic model",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Relationships converted",
+        "status": "PASS",
+        "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 1)",
+        "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L2 Data",
+        "name": "Row count - Finance Orders",
+        "status": "PASS",
+        "detail": "Tableau data source rows 2,672 vs Power BI 'Finance Orders' rows 2,672",
+        "data": {
+          "tableau": 2672,
+          "powerbi": 2672
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L2 Data",
+        "name": "Column profile - Finance Orders",
+        "status": "PASS",
+        "detail": "9 columns profiled (sum / null count / distinct count)",
+        "data": {
+          "columns": [
+            {
+              "column": "order_id",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 1474,
+              "powerbi_distinct": 1474,
+              "status": "PASS"
+            },
+            {
+              "column": "order_date",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 1000,
+              "powerbi_distinct": 1000,
+              "status": "PASS"
+            },
+            {
+              "column": "sales",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 1548,
+              "powerbi_distinct": 1548,
+              "tableau_sum": 3069043.03,
+              "powerbi_sum": 3069043.03,
+              "status": "PASS"
+            },
+            {
+              "column": "profit",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 2596,
+              "powerbi_distinct": 2596,
+              "tableau_sum": 34864.96,
+              "powerbi_sum": 34864.96,
+              "status": "PASS"
+            },
+            {
+              "column": "quantity",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 8,
+              "powerbi_distinct": 8,
+              "tableau_sum": 14568.0,
+              "powerbi_sum": 14568.0,
+              "status": "PASS"
+            },
+            {
+              "column": "region",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 4,
+              "powerbi_distinct": 4,
+              "status": "PASS"
+            },
+            {
+              "column": "segment",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 3,
+              "powerbi_distinct": 3,
+              "status": "PASS"
+            },
+            {
+              "column": "region (Targets)",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 4,
+              "powerbi_distinct": 4,
+              "status": "PASS"
+            },
+            {
+              "column": "sales_target",
+              "tableau_nulls": 0,
+              "powerbi_nulls": 0,
+              "tableau_distinct": 4,
+              "powerbi_distinct": 4,
+              "tableau_sum": 978800000.0,
+              "powerbi_sum": 978800000.0,
+              "status": "PASS"
+            }
+          ]
+        },
+        "gate": 1
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Attainment by Region'",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 12/12 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:region:nk"
+          ],
+          "labels": {
+            "none:region:nk": "region",
+            "sum:sales:qk": "SUM(sales)",
+            "sum:sales_target:qk": "SUM(sales_target)",
+            "usr:Calculation_F01:qk": "Target Attainment"
+          },
+          "measures": [
+            "sum:sales:qk",
+            "sum:sales_target:qk",
+            "usr:Calculation_F01:qk"
+          ],
+          "measure_map": {
+            "sum:sales:qk": "Sum of sales",
+            "sum:sales_target:qk": "Sum of sales_target",
+            "usr:Calculation_F01:qk": "Target Attainment"
+          },
+          "dimension_map": {
+            "none:region:nk": [
+              "Finance Orders",
+              "region"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[region],\n    \"Sum of sales\", [Sum of sales],\n    \"Sum of sales_target\", [Sum of sales_target],\n    \"Target Attainment\", [Target Attainment]\n)\nORDER BY 'Finance Orders'[region]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 12,
+            "total_cells": 12,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:sales:qk": {
+                "tableau": 3069043.03,
+                "powerbi": 3069043.03,
+                "diff": 0.0
+              },
+              "sum:sales_target:qk": {
+                "tableau": 978800000.0,
+                "powerbi": 978800000.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F01:qk": {
+                "tableau": 0.01281,
+                "powerbi": 0.01281,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:region:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Central"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 674661.42,
+                  "powerbi": 674661.42,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 232560000.0,
+                  "powerbi": 232560000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.0029010208978328175,
+                  "powerbi": 0.0029010208978328175,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "East"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 910389.88,
+                  "powerbi": 910389.88,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 296780000.0,
+                  "powerbi": 296780000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.003067558056472808,
+                  "powerbi": 0.003067558056472808,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "South"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 747386.7,
+                  "powerbi": 747386.7,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 183600000.0,
+                  "powerbi": 183600000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.004070733660130718,
+                  "powerbi": 0.004070733660130718,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "West"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 736605.03,
+                  "powerbi": 736605.03,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 265860000.0,
+                  "powerbi": 265860000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.0027706500789889416,
+                  "powerbi": 0.0027706500789889416,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Fiscal Year Sales'",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_F04:ok"
+          ],
+          "labels": {
+            "none:Calculation_F04:ok": "Fiscal Year",
+            "sum:sales:qk": "SUM(sales)",
+            "usr:Calculation_F02:qk": "Projected Sales",
+            "usr:Calculation_F05:qk": "Sales YoY Prior",
+            "usr:Calculation_F09:qk": "Avg Monthly Sales"
+          },
+          "measures": [
+            "sum:sales:qk",
+            "usr:Calculation_F02:qk",
+            "usr:Calculation_F05:qk",
+            "usr:Calculation_F09:qk"
+          ],
+          "measure_map": {
+            "sum:sales:qk": "Sum of sales",
+            "usr:Calculation_F02:qk": "Projected Sales",
+            "usr:Calculation_F05:qk": "Sales YoY Prior",
+            "usr:Calculation_F09:qk": "Avg Monthly Sales"
+          },
+          "dimension_map": {
+            "none:Calculation_F04:ok": [
+              "Finance Orders",
+              "Fiscal Year"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Fiscal Year],\n    \"Sum of sales\", [Sum of sales],\n    \"Projected Sales\", [Projected Sales],\n    \"Sales YoY Prior\", [Sales YoY Prior],\n    \"Avg Monthly Sales\", [Avg Monthly Sales]\n)\nORDER BY 'Finance Orders'[Fiscal Year]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 16,
+            "total_cells": 16,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:sales:qk": {
+                "tableau": 3069043.03,
+                "powerbi": 3069043.03,
+                "diff": 0.0
+              },
+              "usr:Calculation_F02:qk": {
+                "tableau": 3314566.4724,
+                "powerbi": 3314566.4724,
+                "diff": 0.0
+              },
+              "usr:Calculation_F05:qk": {
+                "tableau": 2540920.82,
+                "powerbi": 2540920.82,
+                "diff": 0.0
+              },
+              "usr:Calculation_F09:qk": {
+                "tableau": 3069043.03,
+                "powerbi": 3069043.03,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F04:ok"
+          ],
+          "rows": [
+            {
+              "key": [
+                "2023"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 520324.0,
+                  "powerbi": 520324.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 561949.92,
+                  "powerbi": 561949.92,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": null,
+                  "powerbi": null,
+                  "diff": null,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 767260.7575000001,
+                  "powerbi": 767260.7575000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2024"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 1015375.29,
+                  "powerbi": 1015375.29,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 1096605.3132000002,
+                  "powerbi": 1096605.3132000002,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 520324.0,
+                  "powerbi": 520324.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 767260.7575000001,
+                  "powerbi": 767260.7575000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2025"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 1005221.53,
+                  "powerbi": 1005221.53,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 1085639.2524,
+                  "powerbi": 1085639.2524,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 1015375.29,
+                  "powerbi": 1015375.29,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 767260.7575000001,
+                  "powerbi": 767260.7575000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2026"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 528122.21,
+                  "powerbi": 528122.21,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 570371.9868,
+                  "powerbi": 570371.9868,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 1005221.53,
+                  "powerbi": 1005221.53,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 767260.7575000001,
+                  "powerbi": 767260.7575000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Order Size Mix'",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_F06:nk",
+            "none:segment:nk"
+          ],
+          "labels": {
+            "none:Calculation_F06:nk": "Order Size",
+            "none:segment:nk": "segment",
+            "cnt:order_id:qk": "CNT(order_id)",
+            "usr:Calculation_F03:qk": "Margin %",
+            "usr:Calculation_F07:qk": "Loss Orders",
+            "usr:Calculation_F10:qk": "Max Order Value"
+          },
+          "measures": [
+            "cnt:order_id:qk",
+            "usr:Calculation_F03:qk",
+            "usr:Calculation_F07:qk",
+            "usr:Calculation_F10:qk"
+          ],
+          "measure_map": {
+            "cnt:order_id:qk": "Count of order_id",
+            "usr:Calculation_F03:qk": "Margin %",
+            "usr:Calculation_F07:qk": "Loss Orders",
+            "usr:Calculation_F10:qk": "Max Order Value"
+          },
+          "dimension_map": {
+            "none:Calculation_F06:nk": [
+              "Finance Orders",
+              "Order Size"
+            ],
+            "none:segment:nk": [
+              "Finance Orders",
+              "segment"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Order Size],\n    'Finance Orders'[segment],\n    KEEPFILTERS(TREATAS({\"Consumer\", \"Corporate\"}, 'Finance Orders'[segment])),\n    \"Count of order_id\", [Count of order_id],\n    \"Margin %\", [Margin %],\n    \"Loss Orders\", [Loss Orders],\n    \"Max Order Value\", [Max Order Value]\n)\nORDER BY 'Finance Orders'[Order Size], 'Finance Orders'[segment]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 16,
+            "total_cells": 16,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "cnt:order_id:qk": {
+                "tableau": 1718.0,
+                "powerbi": 1718.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F03:qk": {
+                "tableau": 0.058013,
+                "powerbi": 0.058013,
+                "diff": 0.0
+              },
+              "usr:Calculation_F07:qk": {
+                "tableau": 896.0,
+                "powerbi": 896.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F10:qk": {
+                "tableau": 14017.24,
+                "powerbi": 14017.24,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F06:nk",
+            "none:segment:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Bulk",
+                "Consumer"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 763.0,
+                  "powerbi": 763.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.01695592009949379,
+                  "powerbi": 0.01695592009949379,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 392.0,
+                  "powerbi": 392.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 5432.58,
+                  "powerbi": 5432.58,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Bulk",
+                "Corporate"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 725.0,
+                  "powerbi": 725.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.0043352708876110545,
+                  "powerbi": 0.0043352708876110545,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 389.0,
+                  "powerbi": 389.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 5919.3,
+                  "powerbi": 5919.3,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Pair",
+                "Consumer"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 113.0,
+                  "powerbi": 113.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.0024409232106591006,
+                  "powerbi": 0.0024409232106591006,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 63.0,
+                  "powerbi": 63.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 1332.68,
+                  "powerbi": 1332.68,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Pair",
+                "Corporate"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 117.0,
+                  "powerbi": 117.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.03428080050669459,
+                  "powerbi": 0.03428080050669459,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 52.0,
+                  "powerbi": 52.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 1332.68,
+                  "powerbi": 1332.68,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L3 Visual",
+        "name": "Worksheet 'Region Codes'",
+        "status": "PASS",
+        "detail": "clusteredBarChart | 4 vs 4 rows | 4/4 cells match",
+        "data": {
+          "visual_type": "clusteredBarChart",
+          "dimensions": [
+            "none:Calculation_F08:nk"
+          ],
+          "labels": {
+            "none:Calculation_F08:nk": "Region Code",
+            "sum:profit:qk": "SUM(profit)"
+          },
+          "measures": [
+            "sum:profit:qk"
+          ],
+          "measure_map": {
+            "sum:profit:qk": "Sum of profit"
+          },
+          "dimension_map": {
+            "none:Calculation_F08:nk": [
+              "Finance Orders",
+              "Region Code"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Region Code],\n    \"Sum of profit\", [Sum of profit]\n)\nORDER BY 'Finance Orders'[Region Code]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 4,
+            "total_cells": 4,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:profit:qk": {
+                "tableau": 34864.96,
+                "powerbi": 34864.96,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F08:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "C7"
+              ],
+              "values": [
+                {
+                  "measure": "sum:profit:qk",
+                  "tableau": 10763.01,
+                  "powerbi": 10763.01,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "E4"
+              ],
+              "values": [
+                {
+                  "measure": "sum:profit:qk",
+                  "tableau": 37.959999999999816,
+                  "powerbi": 37.959999999999816,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "S5"
+              ],
+              "values": [
+                {
+                  "measure": "sum:profit:qk",
+                  "tableau": 4294.780000000001,
+                  "powerbi": 4294.780000000001,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "W4"
+              ],
+              "values": [
+                {
+                  "measure": "sum:profit:qk",
+                  "tableau": 19769.21,
+                  "powerbi": 19769.21,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "L4 Scenario",
+        "name": "Parameter 'Min Quantity' = 3",
+        "status": "SKIP",
+        "detail": "Parameter is used in custom SQL: Power BI applies it at refresh (Power Query parameter); re-run validation after changing it in both tools.",
+        "data": {},
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: All data",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "All data",
+              "metric": "SUM(sales)",
+              "measure": "Sum of sales",
+              "tableau": 3069043.03,
+              "powerbi": 3069043.03,
+              "delta": 0.0,
+              "tolerance": 3.0690430299999996,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "SUM(sales_target)",
+              "measure": "Sum of sales_target",
+              "tableau": 978800000.0,
+              "powerbi": 978800000.0,
+              "delta": 0.0,
+              "tolerance": 978.8,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Target Attainment",
+              "measure": "Target Attainment",
+              "tableau": 0.0031355159685328973,
+              "powerbi": 0.0031355159685328973,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Projected Sales",
+              "measure": "Projected Sales",
+              "tableau": 3314566.4724,
+              "powerbi": 3314566.4724,
+              "delta": 0.0,
+              "tolerance": 3.3145664723999997,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "CNT(order_id)",
+              "measure": "Count of order_id",
+              "tableau": 2672.0,
+              "powerbi": 2672.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "All data",
+              "metric": "Margin %",
+              "measure": "Margin %",
+              "tableau": 0.01136020565993824,
+              "powerbi": 0.01136020565993824,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: region = Central",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "region = Central",
+              "metric": "SUM(sales)",
+              "measure": "Sum of sales",
+              "tableau": 674661.42,
+              "powerbi": 674661.42,
+              "delta": 0.0,
+              "tolerance": 0.67466142,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = Central",
+              "metric": "SUM(sales_target)",
+              "measure": "Sum of sales_target",
+              "tableau": 232560000.0,
+              "powerbi": 232560000.0,
+              "delta": 0.0,
+              "tolerance": 232.56,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = Central",
+              "metric": "Target Attainment",
+              "measure": "Target Attainment",
+              "tableau": 0.0029010208978328175,
+              "powerbi": 0.0029010208978328175,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = Central",
+              "metric": "Projected Sales",
+              "measure": "Projected Sales",
+              "tableau": 728634.3336000001,
+              "powerbi": 728634.3336000001,
+              "delta": 0.0,
+              "tolerance": 0.7286343336000001,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = Central",
+              "metric": "CNT(order_id)",
+              "measure": "Count of order_id",
+              "tableau": 646.0,
+              "powerbi": 646.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = Central",
+              "metric": "Margin %",
+              "measure": "Margin %",
+              "tableau": 0.015953202126186495,
+              "powerbi": 0.015953202126186495,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: region = East",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "region = East",
+              "metric": "SUM(sales)",
+              "measure": "Sum of sales",
+              "tableau": 910389.88,
+              "powerbi": 910389.88,
+              "delta": 0.0,
+              "tolerance": 0.91038988,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = East",
+              "metric": "SUM(sales_target)",
+              "measure": "Sum of sales_target",
+              "tableau": 296780000.0,
+              "powerbi": 296780000.0,
+              "delta": 0.0,
+              "tolerance": 296.78,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = East",
+              "metric": "Target Attainment",
+              "measure": "Target Attainment",
+              "tableau": 0.003067558056472808,
+              "powerbi": 0.003067558056472808,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = East",
+              "metric": "Projected Sales",
+              "measure": "Projected Sales",
+              "tableau": 983221.0704000001,
+              "powerbi": 983221.0704000001,
+              "delta": 0.0,
+              "tolerance": 0.9832210704000001,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = East",
+              "metric": "CNT(order_id)",
+              "measure": "Count of order_id",
+              "tableau": 781.0,
+              "powerbi": 781.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region = East",
+              "metric": "Margin %",
+              "measure": "Margin %",
+              "tableau": 4.1696421317864184e-05,
+              "powerbi": 4.1696421317864184e-05,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: region (Targets) = Central",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "SUM(sales)",
+              "measure": "Sum of sales",
+              "tableau": 674661.42,
+              "powerbi": 674661.42,
+              "delta": 0.0,
+              "tolerance": 0.67466142,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "SUM(sales_target)",
+              "measure": "Sum of sales_target",
+              "tableau": 232560000.0,
+              "powerbi": 232560000.0,
+              "delta": 0.0,
+              "tolerance": 232.56,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "Target Attainment",
+              "measure": "Target Attainment",
+              "tableau": 0.0029010208978328175,
+              "powerbi": 0.0029010208978328175,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "Projected Sales",
+              "measure": "Projected Sales",
+              "tableau": 728634.3336000001,
+              "powerbi": 728634.3336000001,
+              "delta": 0.0,
+              "tolerance": 0.7286343336000001,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "CNT(order_id)",
+              "measure": "Count of order_id",
+              "tableau": 646.0,
+              "powerbi": 646.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = Central",
+              "metric": "Margin %",
+              "measure": "Margin %",
+              "tableau": 0.015953202126186495,
+              "powerbi": 0.015953202126186495,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "KPI register",
+        "name": "KPI scenario: region (Targets) = East",
+        "status": "PASS",
+        "detail": "6/6 KPIs within tolerance",
+        "data": {
+          "register": [
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "SUM(sales)",
+              "measure": "Sum of sales",
+              "tableau": 910389.88,
+              "powerbi": 910389.88,
+              "delta": 0.0,
+              "tolerance": 0.91038988,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "SUM(sales_target)",
+              "measure": "Sum of sales_target",
+              "tableau": 296780000.0,
+              "powerbi": 296780000.0,
+              "delta": 0.0,
+              "tolerance": 296.78,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "Target Attainment",
+              "measure": "Target Attainment",
+              "tableau": 0.003067558056472808,
+              "powerbi": 0.003067558056472808,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "Projected Sales",
+              "measure": "Projected Sales",
+              "tableau": 983221.0704000001,
+              "powerbi": 983221.0704000001,
+              "delta": 0.0,
+              "tolerance": 0.9832210704000001,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "CNT(order_id)",
+              "measure": "Count of order_id",
+              "tableau": 781.0,
+              "powerbi": 781.0,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            },
+            {
+              "scenario": "region (Targets) = East",
+              "metric": "Margin %",
+              "measure": "Margin %",
+              "tableau": 4.1696421317864184e-05,
+              "powerbi": 4.1696421317864184e-05,
+              "delta": 0.0,
+              "tolerance": 0.01,
+              "status": "PASS",
+              "note": ""
+            }
+          ]
+        },
+        "gate": 2
+      },
+      {
+        "layer": "Interactions",
+        "name": "Report field references (PBIR)",
+        "status": "PASS",
+        "detail": "18/18 visual and filter field references resolve to model objects",
+        "data": {
+          "missing": []
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Quick filters and parameter controls -> slicers",
+        "status": "PASS",
+        "detail": "0 slicers for 0 dashboard controls",
+        "data": {
+          "columns": [
+            {
+              "dashboard": "Finance Summary",
+              "quick_filters_and_parameter_controls": 0,
+              "slicers": 0,
+              "status": "PASS"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Filter propagation design",
+        "status": "PASS",
+        "detail": "All relationships many-to-one, single direction (no ambiguous paths)",
+        "data": {},
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "Click paths, slicer defaults, tooltips, drillthrough",
+        "status": "PENDING",
+        "detail": "Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.",
+        "data": {},
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Attainment by Region' sliced by segment = Consumer",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 12/12 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:region:nk"
+          ],
+          "labels": {
+            "none:region:nk": "region",
+            "sum:sales:qk": "SUM(sales)",
+            "sum:sales_target:qk": "SUM(sales_target)",
+            "usr:Calculation_F01:qk": "Target Attainment"
+          },
+          "measures": [
+            "sum:sales:qk",
+            "sum:sales_target:qk",
+            "usr:Calculation_F01:qk"
+          ],
+          "measure_map": {
+            "sum:sales:qk": "Sum of sales",
+            "sum:sales_target:qk": "Sum of sales_target",
+            "usr:Calculation_F01:qk": "Target Attainment"
+          },
+          "dimension_map": {
+            "none:region:nk": [
+              "Finance Orders",
+              "region"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[region],\n    \"Sum of sales\", [Sum of sales],\n    \"Sum of sales_target\", [Sum of sales_target],\n    \"Target Attainment\", [Target Attainment]\n)\nORDER BY 'Finance Orders'[region]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 12,
+            "total_cells": 12,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:sales:qk": {
+                "tableau": 978410.71,
+                "powerbi": 978410.71,
+                "diff": 0.0
+              },
+              "sum:sales_target:qk": {
+                "tableau": 324180000.0,
+                "powerbi": 324180000.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F01:qk": {
+                "tableau": 0.012717,
+                "powerbi": 0.012717,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:region:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Central"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 275291.06,
+                  "powerbi": 275291.06,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 100440000.0,
+                  "powerbi": 100440000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.0027408508562325766,
+                  "powerbi": 0.0027408508562325766,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "East"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 238791.68,
+                  "powerbi": 238791.68,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 75240000.0,
+                  "powerbi": 75240000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.003173733120680489,
+                  "powerbi": 0.003173733120680489,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "South"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 198849.14,
+                  "powerbi": 198849.14,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 47700000.0,
+                  "powerbi": 47700000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.004168745073375262,
+                  "powerbi": 0.004168745073375262,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "West"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 265478.83,
+                  "powerbi": 265478.83,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "sum:sales_target:qk",
+                  "tableau": 100800000.0,
+                  "powerbi": 100800000.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F01:qk",
+                  "tableau": 0.0026337185515873016,
+                  "powerbi": 0.0026337185515873016,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Fiscal Year Sales' sliced by region = Central",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_F04:ok"
+          ],
+          "labels": {
+            "none:Calculation_F04:ok": "Fiscal Year",
+            "sum:sales:qk": "SUM(sales)",
+            "usr:Calculation_F02:qk": "Projected Sales",
+            "usr:Calculation_F05:qk": "Sales YoY Prior",
+            "usr:Calculation_F09:qk": "Avg Monthly Sales"
+          },
+          "measures": [
+            "sum:sales:qk",
+            "usr:Calculation_F02:qk",
+            "usr:Calculation_F05:qk",
+            "usr:Calculation_F09:qk"
+          ],
+          "measure_map": {
+            "sum:sales:qk": "Sum of sales",
+            "usr:Calculation_F02:qk": "Projected Sales",
+            "usr:Calculation_F05:qk": "Sales YoY Prior",
+            "usr:Calculation_F09:qk": "Avg Monthly Sales"
+          },
+          "dimension_map": {
+            "none:Calculation_F04:ok": [
+              "Finance Orders",
+              "Fiscal Year"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Fiscal Year],\n    \"Sum of sales\", [Sum of sales],\n    \"Projected Sales\", [Projected Sales],\n    \"Sales YoY Prior\", [Sales YoY Prior],\n    \"Avg Monthly Sales\", [Avg Monthly Sales]\n)\nORDER BY 'Finance Orders'[Fiscal Year]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 16,
+            "total_cells": 16,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:sales:qk": {
+                "tableau": 674661.42,
+                "powerbi": 674661.42,
+                "diff": 0.0
+              },
+              "usr:Calculation_F02:qk": {
+                "tableau": 728634.3336,
+                "powerbi": 728634.3336,
+                "diff": 0.0
+              },
+              "usr:Calculation_F05:qk": {
+                "tableau": 573659.26,
+                "powerbi": 573659.26,
+                "diff": 0.0
+              },
+              "usr:Calculation_F09:qk": {
+                "tableau": 674661.42,
+                "powerbi": 674661.42,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F04:ok"
+          ],
+          "rows": [
+            {
+              "key": [
+                "2023"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 131007.46,
+                  "powerbi": 131007.46,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 141488.05680000002,
+                  "powerbi": 141488.05680000002,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": null,
+                  "powerbi": null,
+                  "diff": null,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 168665.355,
+                  "powerbi": 168665.355,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2024"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 225270.01,
+                  "powerbi": 225270.01,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 243291.61080000002,
+                  "powerbi": 243291.61080000002,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 131007.46,
+                  "powerbi": 131007.46,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 168665.355,
+                  "powerbi": 168665.355,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2025"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 217381.79,
+                  "powerbi": 217381.79,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 234772.33320000002,
+                  "powerbi": 234772.33320000002,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 225270.01,
+                  "powerbi": 225270.01,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 168665.355,
+                  "powerbi": 168665.355,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "2026"
+              ],
+              "values": [
+                {
+                  "measure": "sum:sales:qk",
+                  "tableau": 101002.16,
+                  "powerbi": 101002.16,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F02:qk",
+                  "tableau": 109082.3328,
+                  "powerbi": 109082.3328,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F05:qk",
+                  "tableau": 217381.79,
+                  "powerbi": 217381.79,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F09:qk",
+                  "tableau": 168665.355,
+                  "powerbi": 168665.355,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Order Size Mix' sliced by region = Central",
+        "status": "PASS",
+        "detail": "tableEx | 4 vs 4 rows | 16/16 cells match",
+        "data": {
+          "visual_type": "tableEx",
+          "dimensions": [
+            "none:Calculation_F06:nk",
+            "none:segment:nk"
+          ],
+          "labels": {
+            "none:Calculation_F06:nk": "Order Size",
+            "none:segment:nk": "segment",
+            "cnt:order_id:qk": "CNT(order_id)",
+            "usr:Calculation_F03:qk": "Margin %",
+            "usr:Calculation_F07:qk": "Loss Orders",
+            "usr:Calculation_F10:qk": "Max Order Value"
+          },
+          "measures": [
+            "cnt:order_id:qk",
+            "usr:Calculation_F03:qk",
+            "usr:Calculation_F07:qk",
+            "usr:Calculation_F10:qk"
+          ],
+          "measure_map": {
+            "cnt:order_id:qk": "Count of order_id",
+            "usr:Calculation_F03:qk": "Margin %",
+            "usr:Calculation_F07:qk": "Loss Orders",
+            "usr:Calculation_F10:qk": "Max Order Value"
+          },
+          "dimension_map": {
+            "none:Calculation_F06:nk": [
+              "Finance Orders",
+              "Order Size"
+            ],
+            "none:segment:nk": [
+              "Finance Orders",
+              "segment"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Order Size],\n    'Finance Orders'[segment],\n    KEEPFILTERS(TREATAS({\"Consumer\", \"Corporate\"}, 'Finance Orders'[segment])),\n    \"Count of order_id\", [Count of order_id],\n    \"Margin %\", [Margin %],\n    \"Loss Orders\", [Loss Orders],\n    \"Max Order Value\", [Max Order Value]\n)\nORDER BY 'Finance Orders'[Order Size], 'Finance Orders'[segment]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 4,
+            "powerbi_rows": 4,
+            "matched_rows": 4,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 16,
+            "total_cells": 16,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "cnt:order_id:qk": {
+                "tableau": 477.0,
+                "powerbi": 477.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F03:qk": {
+                "tableau": 0.046327,
+                "powerbi": 0.046327,
+                "diff": 0.0
+              },
+              "usr:Calculation_F07:qk": {
+                "tableau": 259.0,
+                "powerbi": 259.0,
+                "diff": 0.0
+              },
+              "usr:Calculation_F10:qk": {
+                "tableau": 12766.28,
+                "powerbi": 12766.28,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F06:nk",
+            "none:segment:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "Bulk",
+                "Consumer"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 246.0,
+                  "powerbi": 246.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.02509890914340936,
+                  "powerbi": 0.02509890914340936,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 143.0,
+                  "powerbi": 143.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 4593.52,
+                  "powerbi": 4593.52,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Bulk",
+                "Corporate"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 169.0,
+                  "powerbi": 169.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.009757496184868084,
+                  "powerbi": 0.009757496184868084,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 86.0,
+                  "powerbi": 86.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 5919.3,
+                  "powerbi": 5919.3,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Pair",
+                "Consumer"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 33.0,
+                  "powerbi": 33.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.005419967016258208,
+                  "powerbi": 0.005419967016258208,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 16.0,
+                  "powerbi": 16.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 920.78,
+                  "powerbi": 920.78,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            },
+            {
+              "key": [
+                "Pair",
+                "Corporate"
+              ],
+              "values": [
+                {
+                  "measure": "cnt:order_id:qk",
+                  "tableau": 29.0,
+                  "powerbi": 29.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F03:qk",
+                  "tableau": 0.006050221958150155,
+                  "powerbi": 0.006050221958150155,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F07:qk",
+                  "tableau": 14.0,
+                  "powerbi": 14.0,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                },
+                {
+                  "measure": "usr:Calculation_F10:qk",
+                  "tableau": 1332.68,
+                  "powerbi": 1332.68,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Interactions",
+        "name": "'Region Codes' sliced by region = Central",
+        "status": "PASS",
+        "detail": "clusteredBarChart | 1 vs 1 rows | 1/1 cells match",
+        "data": {
+          "visual_type": "clusteredBarChart",
+          "dimensions": [
+            "none:Calculation_F08:nk"
+          ],
+          "labels": {
+            "none:Calculation_F08:nk": "Region Code",
+            "sum:profit:qk": "SUM(profit)"
+          },
+          "measures": [
+            "sum:profit:qk"
+          ],
+          "measure_map": {
+            "sum:profit:qk": "Sum of profit"
+          },
+          "dimension_map": {
+            "none:Calculation_F08:nk": [
+              "Finance Orders",
+              "Region Code"
+            ]
+          },
+          "dax_query": "EVALUATE\nSUMMARIZECOLUMNS(\n    'Finance Orders'[Region Code],\n    \"Sum of profit\", [Sum of profit]\n)\nORDER BY 'Finance Orders'[Region Code]",
+          "status": "PASS",
+          "summary": {
+            "tableau_rows": 1,
+            "powerbi_rows": 1,
+            "matched_rows": 1,
+            "mismatched_rows": 0,
+            "missing_in_powerbi": 0,
+            "missing_in_tableau": 0,
+            "matched_cells": 1,
+            "total_cells": 1,
+            "null_vs_zero": 0,
+            "match_rate": 100.0,
+            "totals": {
+              "sum:profit:qk": {
+                "tableau": 10763.01,
+                "powerbi": 10763.01,
+                "diff": 0.0
+              }
+            }
+          },
+          "keys": [
+            "none:Calculation_F08:nk"
+          ],
+          "rows": [
+            {
+              "key": [
+                "C7"
+              ],
+              "values": [
+                {
+                  "measure": "sum:profit:qk",
+                  "tableau": 10763.01,
+                  "powerbi": 10763.01,
+                  "diff": 0.0,
+                  "status": "MATCH"
+                }
+              ],
+              "status": "MATCH"
+            }
+          ]
+        },
+        "gate": 3
+      },
+      {
+        "layer": "Security",
+        "name": "User filters / USERNAME()",
+        "status": "N/A",
+        "detail": "No Tableau user filters or user functions found in the workbook.",
+        "data": {},
+        "gate": 4
+      },
+      {
+        "layer": "Security",
+        "name": "Confirm no row-level security requirement",
+        "status": "PENDING",
+        "detail": "Business owner confirms the published Tableau content had no server-side permissions or user filters that must be reproduced.",
+        "data": {},
+        "gate": 4
+      },
+      {
+        "layer": "Business UAT",
+        "name": "Business owner sign-off",
+        "status": "PENDING",
+        "detail": "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.",
+        "data": {},
+        "gate": 5
+      }
+    ],
+    "engine_errors": [],
+    "kpi_register": [
+      {
+        "scenario": "All data",
+        "metric": "SUM(sales)",
+        "measure": "Sum of sales",
+        "tableau": 3069043.03,
+        "powerbi": 3069043.03,
+        "delta": 0.0,
+        "tolerance": 3.0690430299999996,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "SUM(sales_target)",
+        "measure": "Sum of sales_target",
+        "tableau": 978800000.0,
+        "powerbi": 978800000.0,
+        "delta": 0.0,
+        "tolerance": 978.8,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Target Attainment",
+        "measure": "Target Attainment",
+        "tableau": 0.0031355159685328973,
+        "powerbi": 0.0031355159685328973,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Projected Sales",
+        "measure": "Projected Sales",
+        "tableau": 3314566.4724,
+        "powerbi": 3314566.4724,
+        "delta": 0.0,
+        "tolerance": 3.3145664723999997,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "CNT(order_id)",
+        "measure": "Count of order_id",
+        "tableau": 2672.0,
+        "powerbi": 2672.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "All data",
+        "metric": "Margin %",
+        "measure": "Margin %",
+        "tableau": 0.01136020565993824,
+        "powerbi": 0.01136020565993824,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "SUM(sales)",
+        "measure": "Sum of sales",
+        "tableau": 674661.42,
+        "powerbi": 674661.42,
+        "delta": 0.0,
+        "tolerance": 0.67466142,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "SUM(sales_target)",
+        "measure": "Sum of sales_target",
+        "tableau": 232560000.0,
+        "powerbi": 232560000.0,
+        "delta": 0.0,
+        "tolerance": 232.56,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "Target Attainment",
+        "measure": "Target Attainment",
+        "tableau": 0.0029010208978328175,
+        "powerbi": 0.0029010208978328175,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "Projected Sales",
+        "measure": "Projected Sales",
+        "tableau": 728634.3336000001,
+        "powerbi": 728634.3336000001,
+        "delta": 0.0,
+        "tolerance": 0.7286343336000001,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "CNT(order_id)",
+        "measure": "Count of order_id",
+        "tableau": 646.0,
+        "powerbi": 646.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = Central",
+        "metric": "Margin %",
+        "measure": "Margin %",
+        "tableau": 0.015953202126186495,
+        "powerbi": 0.015953202126186495,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "SUM(sales)",
+        "measure": "Sum of sales",
+        "tableau": 910389.88,
+        "powerbi": 910389.88,
+        "delta": 0.0,
+        "tolerance": 0.91038988,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "SUM(sales_target)",
+        "measure": "Sum of sales_target",
+        "tableau": 296780000.0,
+        "powerbi": 296780000.0,
+        "delta": 0.0,
+        "tolerance": 296.78,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "Target Attainment",
+        "measure": "Target Attainment",
+        "tableau": 0.003067558056472808,
+        "powerbi": 0.003067558056472808,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "Projected Sales",
+        "measure": "Projected Sales",
+        "tableau": 983221.0704000001,
+        "powerbi": 983221.0704000001,
+        "delta": 0.0,
+        "tolerance": 0.9832210704000001,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "CNT(order_id)",
+        "measure": "Count of order_id",
+        "tableau": 781.0,
+        "powerbi": 781.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region = East",
+        "metric": "Margin %",
+        "measure": "Margin %",
+        "tableau": 4.1696421317864184e-05,
+        "powerbi": 4.1696421317864184e-05,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "SUM(sales)",
+        "measure": "Sum of sales",
+        "tableau": 674661.42,
+        "powerbi": 674661.42,
+        "delta": 0.0,
+        "tolerance": 0.67466142,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "SUM(sales_target)",
+        "measure": "Sum of sales_target",
+        "tableau": 232560000.0,
+        "powerbi": 232560000.0,
+        "delta": 0.0,
+        "tolerance": 232.56,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "Target Attainment",
+        "measure": "Target Attainment",
+        "tableau": 0.0029010208978328175,
+        "powerbi": 0.0029010208978328175,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "Projected Sales",
+        "measure": "Projected Sales",
+        "tableau": 728634.3336000001,
+        "powerbi": 728634.3336000001,
+        "delta": 0.0,
+        "tolerance": 0.7286343336000001,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "CNT(order_id)",
+        "measure": "Count of order_id",
+        "tableau": 646.0,
+        "powerbi": 646.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = Central",
+        "metric": "Margin %",
+        "measure": "Margin %",
+        "tableau": 0.015953202126186495,
+        "powerbi": 0.015953202126186495,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "SUM(sales)",
+        "measure": "Sum of sales",
+        "tableau": 910389.88,
+        "powerbi": 910389.88,
+        "delta": 0.0,
+        "tolerance": 0.91038988,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "SUM(sales_target)",
+        "measure": "Sum of sales_target",
+        "tableau": 296780000.0,
+        "powerbi": 296780000.0,
+        "delta": 0.0,
+        "tolerance": 296.78,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "Target Attainment",
+        "measure": "Target Attainment",
+        "tableau": 0.003067558056472808,
+        "powerbi": 0.003067558056472808,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "Projected Sales",
+        "measure": "Projected Sales",
+        "tableau": 983221.0704000001,
+        "powerbi": 983221.0704000001,
+        "delta": 0.0,
+        "tolerance": 0.9832210704000001,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "CNT(order_id)",
+        "measure": "Count of order_id",
+        "tableau": 781.0,
+        "powerbi": 781.0,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      },
+      {
+        "scenario": "region (Targets) = East",
+        "metric": "Margin %",
+        "measure": "Margin %",
+        "tableau": 4.1696421317864184e-05,
+        "powerbi": 4.1696421317864184e-05,
+        "delta": 0.0,
+        "tolerance": 0.01,
+        "status": "PASS",
+        "note": ""
+      }
+    ],
+    "identity_matrix": [],
+    "gates": [
+      {
+        "gate": 1,
+        "name": "Data contract",
+        "status": "PASS",
+        "automated_checks": 9,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 2,
+        "name": "Numeric / KPI parity",
+        "status": "PASS",
+        "automated_checks": 10,
+        "passed": 9,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": []
+      },
+      {
+        "gate": 3,
+        "name": "Interactions",
+        "status": "PENDING",
+        "automated_checks": 7,
+        "passed": 7,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Click paths, slicer defaults, tooltips, drillthrough"
+        ]
+      },
+      {
+        "gate": 4,
+        "name": "Security (RLS)",
+        "status": "PENDING",
+        "automated_checks": 1,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Confirm no row-level security requirement"
+        ]
+      },
+      {
+        "gate": 5,
+        "name": "Business UAT",
+        "status": "PENDING",
+        "automated_checks": 0,
+        "passed": 0,
+        "failed": 0,
+        "warnings": 0,
+        "pending_human_checks": [
+          "Business owner sign-off"
+        ]
+      }
+    ],
+    "readiness": {
+      "metrics": [
+        {
+          "metric": "Parse completeness",
+          "value": 100.0,
+          "detail": "206 known / 0 unknown XML elements (unknown preserved for review)"
+        },
+        {
+          "metric": "Calculation pass rate",
+          "value": 91.7,
+          "detail": "11 of 12 calculations numerically verified in a passing check (12 PASS, 0 REVIEW, 0 UNSUPPORTED by rule)"
+        },
+        {
+          "metric": "Visual openability",
+          "value": null,
+          "detail": "NOT RUN: requires Power BI Desktop on Windows. 4/4 worksheets map to native visuals."
+        },
+        {
+          "metric": "Numeric parity",
+          "value": 100.0,
+          "detail": "9 of 9 visual, scenario and KPI checks pass"
+        },
+        {
+          "metric": "Security acceptance",
+          "value": null,
+          "detail": "No row-level security in the workbook"
+        },
+        {
+          "metric": "Manual effort (estimate)",
+          "value": 0,
+          "unit": "minutes",
+          "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
+        }
+      ],
+      "index": 97.2,
+      "verified_objects": [
+        "Avg Monthly Sales",
+        "Count of order_id",
+        "Fiscal Year",
+        "Growth Rate",
+        "Growth Rate Value",
+        "Loss Orders",
+        "Margin %",
+        "Max Order Value",
+        "Order Size",
+        "Projected Sales",
+        "Region Code",
+        "Sales YoY Prior",
+        "Sum of profit",
+        "Sum of sales",
+        "Sum of sales_target",
+        "Target Attainment",
+        "order_date",
+        "order_id",
+        "profit",
+        "quantity",
+        "region",
+        "sales",
+        "sales_target",
+        "segment"
+      ]
+    },
+    "verdict": "Automated gates passed; human checks pending"
+  }
+}

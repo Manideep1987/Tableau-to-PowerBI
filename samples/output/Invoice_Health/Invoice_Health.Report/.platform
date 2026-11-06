@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Invoice_Health"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "80b51dfe-8fb6-56d9-8237-877ae8303773"
+  }
+}

@@ -1,19 +1,21 @@
 {
   "workbook": "HR_Analytics",
   "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
-  "started": "2026-11-06T16:56:04",
-  "duration_s": 0.33,
+  "started": "2026-11-06T17:26:56",
+  "duration_s": 0.38,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 19,
+    "PASS": 27,
     "WARN": 0,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
-    "total": 19,
+    "PENDING": 3,
+    "N/A": 1,
+    "total": 31,
     "pass_rate": 100.0,
     "overall": "PASS"
   },
@@ -27,14 +29,16 @@
         "expected": 11,
         "actual": 11,
         "manual": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Parameters converted",
       "status": "PASS",
       "detail": "0/0 parameters -> parameter tables + value measures",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -43,7 +47,8 @@
       "detail": "5/5 worksheets have a visual",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -52,28 +57,32 @@
       "detail": "1/1 dashboards -> report pages",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Worksheet filters converted",
       "status": "PASS",
       "detail": "2/2 worksheet filters -> visual-level filters",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Columns mapped",
       "status": "PASS",
       "detail": "10/10 source columns in the semantic model",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Relationships converted",
       "status": "PASS",
       "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 0)",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -83,7 +92,8 @@
       "data": {
         "tableau": 400,
         "powerbi": 400
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -177,7 +187,8 @@
             "status": "PASS"
           }
         ]
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L3 Visual",
@@ -421,7 +432,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -628,7 +640,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1605,7 +1618,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1887,7 +1901,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1986,10 +2001,439 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "KPI register",
+      "name": "KPI scenario: All data",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "All data",
+            "metric": "Headcount",
+            "measure": "Headcount",
+            "tableau": 400.0,
+            "powerbi": 400.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Attrition Rate",
+            "measure": "Attrition Rate",
+            "tableau": 0.17,
+            "powerbi": 0.17,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Median Salary",
+            "measure": "Median Salary",
+            "tableau": 90047.5,
+            "powerbi": 90047.5,
+            "delta": 0.0,
+            "tolerance": 0.0900475,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "AVG(Tenure Years)",
+            "measure": "Average of Tenure Years",
+            "tableau": 5.49501711156742,
+            "powerbi": 5.49501711156742,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "AVG(Salary)",
+            "measure": "Average of Salary",
+            "tableau": 98596.55,
+            "powerbi": 98596.55,
+            "delta": 0.0,
+            "tolerance": 0.09859655,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Salary vs Dept",
+            "measure": "Salary vs Dept",
+            "tableau": 0.0,
+            "powerbi": 0.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Department = Engineering",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Department = Engineering",
+            "metric": "Headcount",
+            "measure": "Headcount",
+            "tableau": 66.0,
+            "powerbi": 66.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Engineering",
+            "metric": "Attrition Rate",
+            "measure": "Attrition Rate",
+            "tableau": 0.13636363636363635,
+            "powerbi": 0.13636363636363635,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Engineering",
+            "metric": "Median Salary",
+            "measure": "Median Salary",
+            "tableau": 97661.5,
+            "powerbi": 97661.5,
+            "delta": 0.0,
+            "tolerance": 0.0976615,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Engineering",
+            "metric": "AVG(Tenure Years)",
+            "measure": "Average of Tenure Years",
+            "tableau": 5.671291975193412,
+            "powerbi": 5.671291975193412,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Engineering",
+            "metric": "AVG(Salary)",
+            "measure": "Average of Salary",
+            "tableau": 109685.80303030302,
+            "powerbi": 109685.80303030302,
+            "delta": 0.0,
+            "tolerance": 0.10968580303030302,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Engineering",
+            "metric": "Salary vs Dept",
+            "measure": "Salary vs Dept",
+            "tableau": 0.0,
+            "powerbi": 0.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Department = Finance",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Department = Finance",
+            "metric": "Headcount",
+            "measure": "Headcount",
+            "tableau": 60.0,
+            "powerbi": 60.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Finance",
+            "metric": "Attrition Rate",
+            "measure": "Attrition Rate",
+            "tableau": 0.15,
+            "powerbi": 0.15,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Finance",
+            "metric": "Median Salary",
+            "measure": "Median Salary",
+            "tableau": 90200.0,
+            "powerbi": 90200.0,
+            "delta": 0.0,
+            "tolerance": 0.0902,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Finance",
+            "metric": "AVG(Tenure Years)",
+            "measure": "Average of Tenure Years",
+            "tableau": 5.537075062742414,
+            "powerbi": 5.537075062742414,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Finance",
+            "metric": "AVG(Salary)",
+            "measure": "Average of Salary",
+            "tableau": 98740.56666666667,
+            "powerbi": 98740.56666666667,
+            "delta": 0.0,
+            "tolerance": 0.09874056666666667,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Department = Finance",
+            "metric": "Salary vs Dept",
+            "measure": "Salary vs Dept",
+            "tableau": 0.0,
+            "powerbi": 0.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Job Level = L1",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Job Level = L1",
+            "metric": "Headcount",
+            "measure": "Headcount",
+            "tableau": 97.0,
+            "powerbi": 97.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L1",
+            "metric": "Attrition Rate",
+            "measure": "Attrition Rate",
+            "tableau": 0.15463917525773196,
+            "powerbi": 0.15463917525773196,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L1",
+            "metric": "Median Salary",
+            "measure": "Median Salary",
+            "tableau": 53420.0,
+            "powerbi": 53420.0,
+            "delta": 0.0,
+            "tolerance": 0.053419999999999995,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L1",
+            "metric": "AVG(Tenure Years)",
+            "measure": "Average of Tenure Years",
+            "tableau": 5.634948524171412,
+            "powerbi": 5.634948524171412,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L1",
+            "metric": "AVG(Salary)",
+            "measure": "Average of Salary",
+            "tableau": 54715.536082474224,
+            "powerbi": 54715.536082474224,
+            "delta": 0.0,
+            "tolerance": 0.054715536082474224,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L1",
+            "metric": "Salary vs Dept",
+            "measure": "Salary vs Dept",
+            "tableau": -43673.436033359816,
+            "powerbi": -43673.436033359816,
+            "delta": 0.0,
+            "tolerance": 0.04367343603335981,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Job Level = L2",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Job Level = L2",
+            "metric": "Headcount",
+            "measure": "Headcount",
+            "tableau": 79.0,
+            "powerbi": 79.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L2",
+            "metric": "Attrition Rate",
+            "measure": "Attrition Rate",
+            "tableau": 0.189873417721519,
+            "powerbi": 0.189873417721519,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L2",
+            "metric": "Median Salary",
+            "measure": "Median Salary",
+            "tableau": 70958.0,
+            "powerbi": 70958.0,
+            "delta": 0.0,
+            "tolerance": 0.070958,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L2",
+            "metric": "AVG(Tenure Years)",
+            "measure": "Average of Tenure Years",
+            "tableau": 5.206837695700015,
+            "powerbi": 5.206837695700015,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L2",
+            "metric": "AVG(Salary)",
+            "measure": "Average of Salary",
+            "tableau": 72262.69620253165,
+            "powerbi": 72262.69620253165,
+            "delta": 0.0,
+            "tolerance": 0.07226269620253165,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Job Level = L2",
+            "metric": "Salary vs Dept",
+            "measure": "Salary vs Dept",
+            "tableau": -26258.35739189561,
+            "powerbi": -26258.35739189561,
+            "delta": 0.0,
+            "tolerance": 0.02625835739189561,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "Interactions",
+      "name": "Report field references (PBIR)",
+      "status": "PASS",
+      "detail": "21/21 visual and filter field references resolve to model objects",
+      "data": {
+        "missing": []
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Quick filters and parameter controls -> slicers",
+      "status": "PASS",
+      "detail": "1 slicers for 1 dashboard controls",
+      "data": {
+        "columns": [
+          {
+            "dashboard": "HR Overview",
+            "quick_filters_and_parameter_controls": 1,
+            "slicers": 1,
+            "status": "PASS"
+          }
+        ]
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Filter propagation design",
+      "status": "PASS",
+      "detail": "All relationships many-to-one, single direction (no ambiguous paths)",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Click paths, slicer defaults, tooltips, drillthrough",
+      "status": "PENDING",
+      "detail": "Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
       "name": "'Headcount by Department' sliced by Job Level = L1",
       "status": "PASS",
       "detail": "tableEx | 6 vs 6 rows | 18/18 cells match",
@@ -2230,10 +2674,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Tenure Distribution' sliced by Department = Engineering",
       "status": "PASS",
       "detail": "tableEx | 6 vs 6 rows | 12/12 cells match",
@@ -2437,10 +2882,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Salary Benchmark' sliced by Gender = F",
       "status": "PASS",
       "detail": "tableEx | 29 vs 29 rows | 87/87 cells match",
@@ -3384,10 +3830,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Hiring Trend' sliced by Department = Engineering",
       "status": "PASS",
       "detail": "lineChart | 10 vs 10 rows | 20/20 cells match",
@@ -3666,10 +4113,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Performance Mix' sliced by Job Level = L1",
       "status": "PASS",
       "detail": "clusteredBarChart | 3 vs 3 rows | 3/3 cells match",
@@ -3765,8 +4213,485 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Security",
+      "name": "User filters / USERNAME()",
+      "status": "N/A",
+      "detail": "No Tableau user filters or user functions found in the workbook.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Security",
+      "name": "Confirm no row-level security requirement",
+      "status": "PENDING",
+      "detail": "Business owner confirms the published Tableau content had no server-side permissions or user filters that must be reproduced.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Business UAT",
+      "name": "Business owner sign-off",
+      "status": "PENDING",
+      "detail": "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.",
+      "data": {},
+      "gate": 5
     }
   ],
-  "engine_errors": []
+  "engine_errors": [],
+  "kpi_register": [
+    {
+      "scenario": "All data",
+      "metric": "Headcount",
+      "measure": "Headcount",
+      "tableau": 400.0,
+      "powerbi": 400.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Attrition Rate",
+      "measure": "Attrition Rate",
+      "tableau": 0.17,
+      "powerbi": 0.17,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Median Salary",
+      "measure": "Median Salary",
+      "tableau": 90047.5,
+      "powerbi": 90047.5,
+      "delta": 0.0,
+      "tolerance": 0.0900475,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "AVG(Tenure Years)",
+      "measure": "Average of Tenure Years",
+      "tableau": 5.49501711156742,
+      "powerbi": 5.49501711156742,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "AVG(Salary)",
+      "measure": "Average of Salary",
+      "tableau": 98596.55,
+      "powerbi": 98596.55,
+      "delta": 0.0,
+      "tolerance": 0.09859655,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Salary vs Dept",
+      "measure": "Salary vs Dept",
+      "tableau": 0.0,
+      "powerbi": 0.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "Headcount",
+      "measure": "Headcount",
+      "tableau": 66.0,
+      "powerbi": 66.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "Attrition Rate",
+      "measure": "Attrition Rate",
+      "tableau": 0.13636363636363635,
+      "powerbi": 0.13636363636363635,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "Median Salary",
+      "measure": "Median Salary",
+      "tableau": 97661.5,
+      "powerbi": 97661.5,
+      "delta": 0.0,
+      "tolerance": 0.0976615,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "AVG(Tenure Years)",
+      "measure": "Average of Tenure Years",
+      "tableau": 5.671291975193412,
+      "powerbi": 5.671291975193412,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "AVG(Salary)",
+      "measure": "Average of Salary",
+      "tableau": 109685.80303030302,
+      "powerbi": 109685.80303030302,
+      "delta": 0.0,
+      "tolerance": 0.10968580303030302,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Engineering",
+      "metric": "Salary vs Dept",
+      "measure": "Salary vs Dept",
+      "tableau": 0.0,
+      "powerbi": 0.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "Headcount",
+      "measure": "Headcount",
+      "tableau": 60.0,
+      "powerbi": 60.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "Attrition Rate",
+      "measure": "Attrition Rate",
+      "tableau": 0.15,
+      "powerbi": 0.15,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "Median Salary",
+      "measure": "Median Salary",
+      "tableau": 90200.0,
+      "powerbi": 90200.0,
+      "delta": 0.0,
+      "tolerance": 0.0902,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "AVG(Tenure Years)",
+      "measure": "Average of Tenure Years",
+      "tableau": 5.537075062742414,
+      "powerbi": 5.537075062742414,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "AVG(Salary)",
+      "measure": "Average of Salary",
+      "tableau": 98740.56666666667,
+      "powerbi": 98740.56666666667,
+      "delta": 0.0,
+      "tolerance": 0.09874056666666667,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Department = Finance",
+      "metric": "Salary vs Dept",
+      "measure": "Salary vs Dept",
+      "tableau": 0.0,
+      "powerbi": 0.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "Headcount",
+      "measure": "Headcount",
+      "tableau": 97.0,
+      "powerbi": 97.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "Attrition Rate",
+      "measure": "Attrition Rate",
+      "tableau": 0.15463917525773196,
+      "powerbi": 0.15463917525773196,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "Median Salary",
+      "measure": "Median Salary",
+      "tableau": 53420.0,
+      "powerbi": 53420.0,
+      "delta": 0.0,
+      "tolerance": 0.053419999999999995,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "AVG(Tenure Years)",
+      "measure": "Average of Tenure Years",
+      "tableau": 5.634948524171412,
+      "powerbi": 5.634948524171412,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "AVG(Salary)",
+      "measure": "Average of Salary",
+      "tableau": 54715.536082474224,
+      "powerbi": 54715.536082474224,
+      "delta": 0.0,
+      "tolerance": 0.054715536082474224,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L1",
+      "metric": "Salary vs Dept",
+      "measure": "Salary vs Dept",
+      "tableau": -43673.436033359816,
+      "powerbi": -43673.436033359816,
+      "delta": 0.0,
+      "tolerance": 0.04367343603335981,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "Headcount",
+      "measure": "Headcount",
+      "tableau": 79.0,
+      "powerbi": 79.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "Attrition Rate",
+      "measure": "Attrition Rate",
+      "tableau": 0.189873417721519,
+      "powerbi": 0.189873417721519,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "Median Salary",
+      "measure": "Median Salary",
+      "tableau": 70958.0,
+      "powerbi": 70958.0,
+      "delta": 0.0,
+      "tolerance": 0.070958,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "AVG(Tenure Years)",
+      "measure": "Average of Tenure Years",
+      "tableau": 5.206837695700015,
+      "powerbi": 5.206837695700015,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "AVG(Salary)",
+      "measure": "Average of Salary",
+      "tableau": 72262.69620253165,
+      "powerbi": 72262.69620253165,
+      "delta": 0.0,
+      "tolerance": 0.07226269620253165,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Job Level = L2",
+      "metric": "Salary vs Dept",
+      "measure": "Salary vs Dept",
+      "tableau": -26258.35739189561,
+      "powerbi": -26258.35739189561,
+      "delta": 0.0,
+      "tolerance": 0.02625835739189561,
+      "status": "PASS",
+      "note": ""
+    }
+  ],
+  "identity_matrix": [],
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Data contract",
+      "status": "PASS",
+      "automated_checks": 9,
+      "passed": 9,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 2,
+      "name": "Numeric / KPI parity",
+      "status": "PASS",
+      "automated_checks": 10,
+      "passed": 10,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 3,
+      "name": "Interactions",
+      "status": "PENDING",
+      "automated_checks": 8,
+      "passed": 8,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Click paths, slicer defaults, tooltips, drillthrough"
+      ]
+    },
+    {
+      "gate": 4,
+      "name": "Security (RLS)",
+      "status": "PENDING",
+      "automated_checks": 1,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Confirm no row-level security requirement"
+      ]
+    },
+    {
+      "gate": 5,
+      "name": "Business UAT",
+      "status": "PENDING",
+      "automated_checks": 0,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Business owner sign-off"
+      ]
+    }
+  ],
+  "readiness": {
+    "metrics": [
+      {
+        "metric": "Parse completeness",
+        "value": 100.0,
+        "detail": "228 known / 0 unknown XML elements (unknown preserved for review)"
+      },
+      {
+        "metric": "Calculation pass rate",
+        "value": 100.0,
+        "detail": "11 of 11 calculations numerically verified in a passing check (11 PASS, 0 REVIEW, 0 UNSUPPORTED by rule)"
+      },
+      {
+        "metric": "Visual openability",
+        "value": null,
+        "detail": "NOT RUN: requires Power BI Desktop on Windows. 5/5 worksheets map to native visuals."
+      },
+      {
+        "metric": "Numeric parity",
+        "value": 100.0,
+        "detail": "10 of 10 visual, scenario and KPI checks pass"
+      },
+      {
+        "metric": "Security acceptance",
+        "value": null,
+        "detail": "No row-level security in the workbook"
+      },
+      {
+        "metric": "Manual effort (estimate)",
+        "value": 0,
+        "unit": "minutes",
+        "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
+      }
+    ],
+    "index": 100.0,
+    "verified_objects": [
+      "Attrition Rate",
+      "Average of Performance Score",
+      "Average of Salary",
+      "Average of Tenure Years",
+      "Count of Employee ID",
+      "Department",
+      "Dept Avg Salary",
+      "Employee ID",
+      "Headcount",
+      "High Performer",
+      "Hire Date",
+      "Hire Year",
+      "Hires Running Total",
+      "Is Active",
+      "Job Level",
+      "Median Salary",
+      "Performance Score",
+      "Salary",
+      "Salary vs Dept",
+      "Tenure Band",
+      "Tenure Years",
+      "Termination Date"
+    ]
+  },
+  "verdict": "Automated gates passed; human checks pending"
 }

@@ -263,9 +263,14 @@ def build_dax_engine(res: ConversionResult, binding: DataBinding, today: date) -
 class Check:
     layer: str
     name: str
-    status: str            # PASS | WARN | FAIL | ERROR | SKIP
+    status: str            # PASS | WARN | FAIL | ERROR | SKIP | PENDING (human check) | N/A
     detail: str = ""
     data: dict = field(default_factory=dict)
+    gate: int = 0          # 1 data contract, 2 numeric, 3 interactions, 4 security, 5 business UAT
+
+
+GATE_OF_LAYER = {"L1 Metadata": 1, "L2 Data": 1, "L3 Visual": 2, "L4 Scenario": 2, "KPI register": 2,
+                 "Interactions": 3, "Security": 4, "Business UAT": 5}
 
 
 @dataclass
@@ -277,14 +282,18 @@ class ValidationReport:
     tolerance: dict = field(default_factory=dict)
     checks: list = field(default_factory=list)
     engine_errors: list = field(default_factory=list)
+    kpi_register: list = field(default_factory=list)
+    identity_matrix: list = field(default_factory=list)
+    gates: list = field(default_factory=list)
+    readiness: dict = field(default_factory=dict)
 
     @property
     def summary(self):
-        out = {"PASS": 0, "WARN": 0, "FAIL": 0, "ERROR": 0, "SKIP": 0}
+        out = {"PASS": 0, "WARN": 0, "FAIL": 0, "ERROR": 0, "SKIP": 0, "PENDING": 0, "N/A": 0}
         for c in self.checks:
             out[c.status] = out.get(c.status, 0) + 1
         out["total"] = len(self.checks)
-        executed = out["total"] - out["SKIP"]
+        executed = out["total"] - out["SKIP"] - out["PENDING"] - out["N/A"]
         out["pass_rate"] = round(100.0 * out["PASS"] / executed, 1) if executed else 0.0
         out["overall"] = "FAIL" if out["FAIL"] or out["ERROR"] else ("WARN" if out["WARN"] else "PASS")
         return out
@@ -292,11 +301,16 @@ class ValidationReport:
     def to_dict(self):
         return {"workbook": self.workbook, "binding": self.binding, "started": self.started,
                 "duration_s": self.duration_s, "tolerance": self.tolerance, "summary": self.summary,
-                "checks": [asdict(c) for c in self.checks], "engine_errors": self.engine_errors}
+                "checks": [asdict(c) for c in self.checks], "engine_errors": self.engine_errors,
+                "kpi_register": self.kpi_register, "identity_matrix": self.identity_matrix,
+                "gates": self.gates, "readiness": self.readiness}
 
 
 # ========================================================== validator ==
-class Validator:
+from .gate_checks import GateChecks  # noqa: E402
+
+
+class Validator(GateChecks):
     def __init__(self, res: ConversionResult, binding: DataBinding, today: Optional[date] = None,
                  abs_tol: float = 0.01, rel_tol: float = 1e-6, scenarios: bool = True):
         self.res = res
@@ -312,7 +326,11 @@ class Validator:
         self.tab_records = {}
 
     def add(self, *a, **kw):
-        self.report.checks.append(Check(*a, **kw))
+        c = Check(*a, **kw)
+        if not c.gate:
+            c.gate = GATE_OF_LAYER.get(c.layer, 2)
+        self.report.checks.append(c)
+        return c
 
     # ---------------------------------------------------------------- run --
     def run(self) -> ValidationReport:
@@ -336,9 +354,18 @@ class Validator:
             self.visual_check(ws)
         if self.scenarios:
             self.parameter_scenarios()
+        self.kpi_checks()
+        self.interaction_checks()
+        if self.scenarios:
             self.slice_scenarios()
+        self.security_checks()
+        self.add("Business UAT", "Business owner sign-off", "PENDING",
+                 "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.")
         self.report.engine_errors = list(dict.fromkeys(self.dax.errors))[:50]
         self.report.duration_s = round(time.time() - t0, 2)
+        from .gates import compute_gates, readiness
+        self.report.gates = compute_gates(self.report.to_dict(), None)
+        self.report.readiness = readiness(self.res, self.report.to_dict())
         return self.report
 
     # ------------------------------------------------------------ layer 1 --
@@ -677,7 +704,7 @@ class Validator:
             tws.filters.append(Filter("categorical", ds.name, FieldRef(ds.name, cname, "none", "nk"),
                                       members=[val]))
             st = self.visual_check(ws, label=f"'{ws.name}' sliced by {cname} = {val}", tab_ws=tws,
-                                   extra_pbi=[ColF(f"{tgt[0]}[{tgt[1]}]", frozenset([val]))], layer="L4 Scenario")
+                                   extra_pbi=[ColF(f"{tgt[0]}[{tgt[1]}]", frozenset([val]))], layer="Interactions")
             if st:
                 done += 1
 

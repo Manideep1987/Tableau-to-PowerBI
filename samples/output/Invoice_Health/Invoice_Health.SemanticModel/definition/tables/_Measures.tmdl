@@ -1,0 +1,89 @@
+table _Measures
+	lineageTag: be4325f5-f32a-5868-8446-c527a8a5607a
+
+	measure 'Total Invoice Amount' = SUM('FactInvoices'[Invoice Amount])
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 356b1772-a3f8-5217-a5db-54ccca902354
+
+		annotation TableauSource = Calculation_I01
+
+	measure 'On Time Paid Amount' = SUMX('FactInvoices', IF((('FactInvoices'[Paid Flag] = TRUE()) && IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), 'FactInvoices'[Invoice Amount], 0))
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 78e1ccd2-889b-582b-88ba-455027139844
+
+		annotation TableauSource = Calculation_I02
+
+	measure 'Paid Amount' = SUMX('FactInvoices', IF('FactInvoices'[Paid Flag], 'FactInvoices'[Invoice Amount]))
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 873a2356-50fe-5ff4-8fab-646ef0b7458f
+
+		annotation TableauSource = Calculation_I03
+
+	measure 'On-time %' = DIVIDE([On Time Paid Amount], [Paid Amount])
+		formatString: 0.0%
+		lineageTag: a9a8da03-ca94-5919-b4ea-d71d6c1f4679
+
+		annotation TableauSource = Calculation_I04
+
+	measure 'Overdue Invoices' = SUMX('FactInvoices', IF((ISBLANK('FactInvoices'[Payment Date]) && ('FactInvoices'[Due Date] < DATE(2025, 12, 31))), 1, 0))
+		lineageTag: f1d01d10-0b2c-5989-9688-3c217e989a5d
+
+		annotation TableauSource = Calculation_I09
+
+	measure 'Invoice Count' = DISTINCTCOUNTNOBLANK('FactInvoices'[Invoice ID])
+		lineageTag: d5772eb0-1866-59dd-bb47-302185e23c31
+
+		annotation TableauSource = Calculation_I10
+
+	measure 'Avg Days to Pay' = AVERAGEX('FactInvoices', DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY))
+		lineageTag: 36255249-d7a7-5db7-a570-f1229f8fa21c
+
+		annotation TableauSource = Calculation_I11
+
+	measure 'Selected Metric Amount' = SWITCH([Status Selector Value], "Late invoices", SUMX('FactInvoices', IF(('FactInvoices'[Payment Status] = "Late"), 'FactInvoices'[Invoice Amount])), "On time", [On Time Paid Amount], SUM('FactInvoices'[Invoice Amount]))
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: a9112a5b-2acb-5d0d-bcb9-86d378397b1c
+
+		annotation TableauSource = Calculation_I12
+
+	measure 'Vendor Share of Region' = DIVIDE(SUM('FactInvoices'[Invoice Amount]), CALCULATE(SUM('FactInvoices'[Invoice Amount]), ALLSELECTED('DimVendor'[Vendor Name])))
+		formatString: 0%
+		lineageTag: 180a6ad1-809b-51c6-a3ba-5f12c77b61d7
+
+		annotation TableauSource = Calculation_I14
+
+	/// Tableau SUM([Invoice Amount])
+	measure 'Sum of Invoice Amount' = SUM('FactInvoices'[Invoice Amount])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0
+		displayFolder: Base measures
+		lineageTag: 185848e0-8001-5101-811b-95e3e7eb4401
+
+		annotation TableauSource = sum:Invoice Amount
+
+	/// Tableau AVG([Calculation_I05])
+	measure 'Average of Days Late' = AVERAGE('FactInvoices'[Days Late])
+		displayFolder: Base measures
+		lineageTag: 53ac6de9-be56-5d0d-82b3-aaf302fb4e6a
+
+		annotation TableauSource = avg:Calculation_I05
+
+	/// Tableau MAX([Calculation_I08])
+	measure 'Max of Vendor Fixed Amount' = MAX('FactInvoices'[Vendor Fixed Amount])
+		displayFolder: Base measures
+		lineageTag: b7557db5-faa6-5366-8580-74e202762cce
+
+		annotation TableauSource = max:Calculation_I08
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: d009e2ef-fff4-5c97-aa5e-78855ea86a52
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Measures
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Measures", BLANK())
+
+	annotation PBI_ResultType = Table

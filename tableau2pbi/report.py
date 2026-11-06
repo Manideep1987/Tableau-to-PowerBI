@@ -59,7 +59,11 @@ def conversion_json(res: ConversionResult) -> dict:
         "model": {"tables": tables,
                   "relationships": [r.__dict__ for r in res.model.relationships],
                   "expressions": [{"name": n, "expression": e} for n, e, _ in res.model.expressions]},
-        "calculations": [m.__dict__ for m in res.calc_mappings],
+        "calculations": [{**m.__dict__, "classification": m.classification} for m in res.calc_mappings],
+        "roles": [{"name": r.name, "table_permissions": r.table_permissions, "tableau": r.tableau_ref}
+                  for r in res.model.roles],
+        "security_findings": wb.security_findings, "unknown_nodes": wb.unknown_nodes, "parse_stats": wb.parse_stats,
+        "inventory": __import__("tableau2pbi.ir", fromlist=["feature_inventory"]).feature_inventory(res),
         "parameters": params, "worksheets": worksheets, "pages": pages,
         "dashboards": [{"name": d.name, "width": d.width, "height": d.height,
                         "zones": [z.__dict__ for z in d.zones]} for d in wb.dashboards],
@@ -87,10 +91,10 @@ def dax_mapping_csv(res: ConversionResult) -> str:
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(["Data source", "Tableau field", "Tableau formula", "Kind", "Power BI table", "Power BI object",
-                "DAX", "Status", "Notes"])
+                "DAX", "Status", "Classification", "Strategy", "Confidence", "Notes"])
     for m in res.calc_mappings:
         w.writerow([m.datasource, m.tableau_name, m.tableau_formula, m.kind, m.pbi_table, m.pbi_object, m.dax,
-                    m.status, " | ".join(m.warnings)])
+                    m.status, m.classification, m.strategy, m.confidence, " | ".join(m.warnings)])
     return buf.getvalue()
 
 

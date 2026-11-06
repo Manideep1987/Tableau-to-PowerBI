@@ -2,6 +2,22 @@
 
 Convert Tableau workbooks (`.twb` / `.twbx`) into Power BI projects (`.pbip`), then **prove the numbers match**.
 
+The design follows the supplied research and build guide (*Build a Tableau to Power BI Conversion Tool*). It is an
+auditable converter, not a screenshot redrawer. Tableau parsing is deterministic and feeds a typed intermediate
+representation. Rule-based mappings translate it, AI assists only where rules can't, and Microsoft-native
+PBIP/TMDL/PBIR files are generated. Independent validation then runs through five quality gates. Processing is
+local. Nothing is published.
+
+| Engine (guide section 5) | Implementation |
+|---|---|
+| Web UI | Upload → Inventory → Mapping → Convert → Validate → Export (`tableau2pbi/web/static`) |
+| Application API | FastAPI jobs, overrides, sign-off, artifacts, audit trail (`web/app.py`) |
+| Conversion engine | Secure TWB/TWBX reader → canonical IR v0.1.0 with JSON Schema (`parser.py`, `ir.py`) |
+| Rules | Tableau AST → DAX / Power Query rules with PASS / REVIEW / UNSUPPORTED (`formula/`, `converter.py`, `mcode.py`) |
+| AI assistant | Opt-in Claude suggestions for unsupported expressions: redacted, parsed, reference-checked, review only (`ai_assist.py`) |
+| Power BI builders | TMDL semantic model incl. RLS roles, PBIR pages and visuals (`pbip/writer.py`) |
+| Quality gates | 1 Data → 2 KPI/numeric → 3 Interactions → 4 Security → 5 Business UAT (`validation/`) |
+
 * **Reads all the workbook metadata:** connections, custom SQL, physical joins, relationships (logical layer), columns
   (types, roles, default aggregation, NULL flags, formats, descriptions, folders, hidden), calculated fields, groups,
   bins, sets, parameters, hierarchies, worksheets (shelves, marks, encodings, filters, sorts), dashboards (zones, quick
@@ -18,13 +34,13 @@ Convert Tableau workbooks (`.twb` / `.twbx`) into Power BI projects (`.pbip`), t
   Power BI service.
 * **Tableau → DAX reference** and an interactive **formula translator**.
 
-![Conversion](docs/screenshots/02_conversion_summary.png)
+![Validation center](docs/screenshots/11_validation_gates.png)
 
 ## Quick start
 
 ```bash
 pip install -r requirements.txt
-python samples/generate_samples.py          # sample data + 3 sample workbooks (already committed)
+python samples/generate_samples.py          # sample data + 4 sample workbooks (already committed)
 python -m tableau2pbi serve --port 8000     # open http://127.0.0.1:8000
 ```
 
@@ -34,9 +50,16 @@ in Options > Preview features). Then set the data source credentials and refresh
 
 ### Command line
 
+Samples: **Invoice_Health.twb** is the guide's finance showcase (procure-to-pay, on-time %, vendor FIXED LOD,
+USERNAME() row-level security). There are also Superstore_Sales.twb, Finance_CustomSQL.twb and HR_Analytics.twbx.
+
+Optional AI suggestions: set `ANTHROPIC_API_KEY` on the server. The UI then shows *Suggest with AI* for each
+calculation. Only the formula and the model's table and column names are sent, with e-mails and hosts redacted. The
+suggestion must parse and reference existing objects, and a reviewer has to apply it as an override.
+
 ```bash
 # convert + validate against a copy of the source tables
-python -m tableau2pbi convert samples/workbooks/Superstore_Sales.twb -o out/superstore \
+python -m tableau2pbi convert samples/workbooks/Invoice_Health.twb -o out/invoice \
        --sqlite samples/data/superstore.db --as-of 2025-12-31
 
 # validation only (exit code 2 when numbers differ)
@@ -51,12 +74,26 @@ report, the validation report and the DAX mapping.
 
 ## How validation works
 
-| Layer | Checks | Source of truth |
+A failed gate **blocks** every later gate. Human checks stay **PENDING** until a person performs them; they are never
+simulated as passed.
+
+| Gate | Automated checks | Human / live checks |
 |---|---|---|
-| L1 Metadata parity | Every calculation, parameter, worksheet, dashboard, filter, column and relationship has a counterpart | Workbook inventory |
-| L2 Data reconciliation | Row counts, column sums, NULL counts, distinct counts | Source SQL = Tableau data source = Power BI tables |
-| L3 Visual reconciliation | Every worksheet vs its visual, cell by cell (abs 0.01 / rel 1e-6 tolerance) | Tableau-semantics engine vs DAX engine |
-| L4 Scenarios | Parameter changes, slicers on dimensions outside the view | Same engines with changed inputs |
+| 1 Data contract | Metadata parity; row counts, column sums, NULL / distinct counts; source SQL = Tableau = Power BI | Same warehouse view and business date |
+| 2 Numeric / KPI | Every worksheet vs its visual cell by cell; parameter scenarios; **KPI regression register** (critical KPIs x canonical filter scenarios) | Approve ambiguous definitions |
+| 3 Interactions | PBIR field references resolve; quick filters → slicers; actions → interactions; sort; slicer propagation scenarios | Click paths, tooltips, drillthrough |
+| 4 Security | `USERNAME()` user filter → RLS role lint; **simulated identity matrix** (each manager + a forbidden user) | Real users, groups, SSO |
+| 5 Business UAT | Decision log, `uat_signoff.json` | Business owner sign-off |
+
+Outputs: `validation_results.csv` (gate, scenario, metric, Tableau value, Power BI value, delta, tolerance,
+root-cause category, status, owner, approval notes), `lineage.csv` (every Power BI object traced back to its Tableau
+XPath, rule, confidence and evidence), `ir.json`, `migration_report.json`, and a readiness score:
+- Parse completeness.
+- Calculation pass rate.
+- Visual openability.
+- Numeric parity.
+- Security acceptance.
+- Manual effort estimate.
 
 The **Tableau engine** (`validation/tableau_engine.py`) applies Tableau semantics:
 - Record-level FIXED LODs.
@@ -104,8 +141,8 @@ docs/                  test report (Markdown + Word), screenshots, test evidence
 ## Testing
 
 ```bash
-python -m pytest -q                  # 131 tests: parser, translator, engines, PBIP integrity, validation, API, live clients
-python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 25 UAT cases + defect injection
+python -m pytest -q                  # 155 tests: parser, security, IR, translator, engines, PBIP, gates, RLS, API, AI, live clients
+python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 36 UAT cases + defect injection
 ```
 
 Results are in [docs/TEST_REPORT.md](docs/TEST_REPORT.md) and [docs/Test_Report.docx](docs/Test_Report.docx).
@@ -127,5 +164,6 @@ Results are in [docs/TEST_REPORT.md](docs/TEST_REPORT.md) and [docs/Test_Report.
 | Parameter | Disconnected table (`GENERATESERIES` / list) + slicer + `SELECTEDVALUE` measure |
 | Filters | Basic / Advanced / TopN / RelativeDate visual filters; measure filters on aggregated values |
 | Dashboard | Report page (zones scaled to 1280×720), quick filters and parameter controls become slicers |
+| `USERNAME()` user filter | TMDL role with `USERPRINCIPALNAME()` table permission (tested per identity) |
 
 Known limitations are listed in the [test report](docs/TEST_REPORT.md#10-known-limitations-and-recommendations).

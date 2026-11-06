@@ -1,20 +1,22 @@
 {
   "workbook": "Superstore_Sales",
   "binding": "SQLite: superstore.db",
-  "started": "2026-11-06T16:55:54",
-  "duration_s": 8.53,
+  "started": "2026-11-06T17:27:10",
+  "duration_s": 9.0,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 34,
-    "WARN": 1,
+    "PASS": 47,
+    "WARN": 2,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
-    "total": 35,
-    "pass_rate": 97.1,
+    "PENDING": 3,
+    "N/A": 1,
+    "total": 53,
+    "pass_rate": 95.9,
     "overall": "WARN"
   },
   "checks": [
@@ -27,14 +29,16 @@
         "expected": 26,
         "actual": 26,
         "manual": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Parameters converted",
       "status": "PASS",
       "detail": "4/4 parameters -> parameter tables + value measures",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -43,7 +47,8 @@
       "detail": "16/16 worksheets have a visual",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
@@ -52,28 +57,32 @@
       "detail": "2/2 dashboards -> report pages",
       "data": {
         "missing": []
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Worksheet filters converted",
       "status": "PASS",
       "detail": "7/7 worksheet filters -> visual-level filters",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Columns mapped",
       "status": "PASS",
       "detail": "21/21 source columns in the semantic model",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L1 Metadata",
       "name": "Relationships converted",
       "status": "PASS",
       "detail": "2/2 Tableau relationships -> model relationships (joins flattened: 0)",
-      "data": {}
+      "data": {},
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -83,7 +92,8 @@
       "data": {
         "tableau": 3000,
         "powerbi": 3000
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -191,7 +201,8 @@
             "status": "PASS"
           }
         ]
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L2 Data",
@@ -236,7 +247,8 @@
             "status": "PASS"
           }
         ]
-      }
+      },
+      "gate": 1
     },
     {
       "layer": "L3 Visual",
@@ -489,7 +501,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1079,7 +1092,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1236,7 +1250,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1627,7 +1642,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1848,7 +1864,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -1947,7 +1964,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -2273,7 +2291,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -2375,7 +2394,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -2701,7 +2721,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -2995,7 +3016,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -3413,7 +3435,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -3670,7 +3693,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -3927,7 +3951,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -4364,7 +4389,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -4523,7 +4549,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L3 Visual",
@@ -5512,7 +5539,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L4 Scenario",
@@ -5614,7 +5642,8 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L4 Scenario",
@@ -5871,7 +5900,8 @@
             "status": "MISMATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
       "layer": "L4 Scenario",
@@ -6860,10 +6890,795 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 2
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "KPI register",
+      "name": "KPI scenario: All data",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "All data",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 3136577.55,
+            "powerbi": 3136577.55,
+            "delta": 0.0,
+            "tolerance": 3.1365775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.011456066182709241,
+            "powerbi": 0.011456066182709241,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 1501.0,
+            "powerbi": 1501.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 2886577.55,
+            "powerbi": 2886577.55,
+            "delta": 0.0,
+            "tolerance": 2.8865775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 35932.840000000004,
+            "powerbi": 35932.840000000004,
+            "delta": 0.0,
+            "tolerance": 0.03593284,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "All data",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 200.0,
+            "powerbi": 200.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Category = Furniture",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Category = Furniture",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 1106603.59,
+            "powerbi": 1106603.59,
+            "delta": 0.0,
+            "tolerance": 1.10660359,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Furniture",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.008540492806461977,
+            "powerbi": 0.008540492806461977,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Furniture",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 824.0,
+            "powerbi": 824.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Furniture",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 856603.5900000001,
+            "powerbi": 856603.5900000001,
+            "delta": 0.0,
+            "tolerance": 0.8566035900000001,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Furniture",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 9450.94,
+            "powerbi": 9450.94,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Furniture",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 199.0,
+            "powerbi": 199.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Category = Office Supplies",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 127527.04,
+            "powerbi": 127527.04,
+            "delta": 0.0,
+            "tolerance": 0.12752703999999998,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": -0.005052732346018539,
+            "powerbi": -0.005052732346018539,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 834.0,
+            "powerbi": 834.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": -122472.96,
+            "powerbi": -122472.96,
+            "delta": 0.0,
+            "tolerance": 0.12247296,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": -644.36,
+            "powerbi": -644.36,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Category = Office Supplies",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 199.0,
+            "powerbi": 199.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Region = Central",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Region = Central",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 686717.25,
+            "powerbi": 686717.25,
+            "delta": 0.0,
+            "tolerance": 0.68671725,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = Central",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.0161386363892854,
+            "powerbi": 0.0161386363892854,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = Central",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 623.0,
+            "powerbi": 623.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = Central",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 436717.25,
+            "powerbi": 436717.25,
+            "delta": 0.0,
+            "tolerance": 0.43671725,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = Central",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 11082.68,
+            "powerbi": 11082.68,
+            "delta": 0.0,
+            "tolerance": 0.01108268,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = Central",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 48.0,
+            "powerbi": 48.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Region = East",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Region = East",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 930470.86,
+            "powerbi": 930470.86,
+            "delta": 0.0,
+            "tolerance": 0.9304708599999999,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = East",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.0004600036587927104,
+            "powerbi": 0.0004600036587927104,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = East",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 743.0,
+            "powerbi": 743.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = East",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 680470.86,
+            "powerbi": 680470.86,
+            "delta": 0.0,
+            "tolerance": 0.68047086,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = East",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 428.0199999999998,
+            "powerbi": 428.0199999999998,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Region = East",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 56.0,
+            "powerbi": 56.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Parameter Sales Target = 300000.0",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 3136577.55,
+            "powerbi": 3136577.55,
+            "delta": 0.0,
+            "tolerance": 3.1365775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.011456066182709241,
+            "powerbi": 0.011456066182709241,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 1501.0,
+            "powerbi": 1501.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 2836577.55,
+            "powerbi": 2836577.55,
+            "delta": 0.0,
+            "tolerance": 2.83657755,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 35932.840000000004,
+            "powerbi": 35932.840000000004,
+            "delta": 0.0,
+            "tolerance": 0.03593284,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Sales Target = 300000.0",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 200.0,
+            "powerbi": 200.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Parameter Top N Customers = 5",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 3136577.55,
+            "powerbi": 3136577.55,
+            "delta": 0.0,
+            "tolerance": 3.1365775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.011456066182709241,
+            "powerbi": 0.011456066182709241,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 1501.0,
+            "powerbi": 1501.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 2886577.55,
+            "powerbi": 2886577.55,
+            "delta": 0.0,
+            "tolerance": 2.8865775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 35932.840000000004,
+            "powerbi": 35932.840000000004,
+            "delta": 0.0,
+            "tolerance": 0.03593284,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Top N Customers = 5",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 200.0,
+            "powerbi": 200.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Parameter Discount Threshold = 0.25",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 3136577.55,
+            "powerbi": 3136577.55,
+            "delta": 0.0,
+            "tolerance": 3.1365775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.011456066182709241,
+            "powerbi": 0.011456066182709241,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 1501.0,
+            "powerbi": 1501.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 2886577.55,
+            "powerbi": 2886577.55,
+            "delta": 0.0,
+            "tolerance": 2.8865775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 35932.840000000004,
+            "powerbi": 35932.840000000004,
+            "delta": 0.0,
+            "tolerance": 0.03593284,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Discount Threshold = 0.25",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 200.0,
+            "powerbi": 200.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "KPI register",
+      "name": "KPI scenario: Parameter Metric Selector = Profit",
+      "status": "PASS",
+      "detail": "6/6 KPIs within tolerance",
+      "data": {
+        "register": [
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "SUM(Sales)",
+            "measure": "Sum of Sales",
+            "tableau": 3136577.55,
+            "powerbi": 3136577.55,
+            "delta": 0.0,
+            "tolerance": 3.1365775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "Profit Ratio",
+            "measure": "Profit Ratio",
+            "tableau": 0.011456066182709241,
+            "powerbi": 0.011456066182709241,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "Order Count",
+            "measure": "Order Count",
+            "tableau": 1501.0,
+            "powerbi": 1501.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "Sales vs Target",
+            "measure": "Sales vs Target",
+            "tableau": 2886577.55,
+            "powerbi": 2886577.55,
+            "delta": 0.0,
+            "tolerance": 2.8865775499999997,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "SUM(Profit)",
+            "measure": "Sum of Profit",
+            "tableau": 35932.840000000004,
+            "powerbi": 35932.840000000004,
+            "delta": 0.0,
+            "tolerance": 0.03593284,
+            "status": "PASS",
+            "note": ""
+          },
+          {
+            "scenario": "Parameter Metric Selector = Profit",
+            "metric": "CNTD(Customer Name)",
+            "measure": "Distinct Count of Customer Name",
+            "tableau": 200.0,
+            "powerbi": 200.0,
+            "delta": 0.0,
+            "tolerance": 0.01,
+            "status": "PASS",
+            "note": ""
+          }
+        ]
+      },
+      "gate": 2
+    },
+    {
+      "layer": "Interactions",
+      "name": "Report field references (PBIR)",
+      "status": "PASS",
+      "detail": "66/66 visual and filter field references resolve to model objects",
+      "data": {
+        "missing": []
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Quick filters and parameter controls -> slicers",
+      "status": "PASS",
+      "detail": "2 slicers for 2 dashboard controls",
+      "data": {
+        "columns": [
+          {
+            "dashboard": "Executive Overview",
+            "quick_filters_and_parameter_controls": 2,
+            "slicers": 2,
+            "status": "PASS"
+          },
+          {
+            "dashboard": "Customer Insights",
+            "quick_filters_and_parameter_controls": 0,
+            "slicers": 0,
+            "status": "PASS"
+          }
+        ]
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Dashboard actions -> interactions",
+      "status": "WARN",
+      "detail": "2/3 actions map to native interactions; 1 need a manual step",
+      "data": {
+        "columns": [
+          {
+            "action": "Filter by Region",
+            "type": "filter",
+            "source": "Sales by Region",
+            "power_bi": "default cross-filter",
+            "status": "PASS"
+          },
+          {
+            "action": "Highlight Category",
+            "type": "highlight",
+            "source": "Category Profitability",
+            "power_bi": "default cross-highlight",
+            "status": "PASS"
+          },
+          {
+            "action": "Open CRM",
+            "type": "url",
+            "source": "Top Customers",
+            "power_bi": "manual: button / drillthrough / bookmark",
+            "status": "WARN"
+          }
+        ]
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Sort order",
+      "status": "PASS",
+      "detail": "1/1 sorted worksheets keep their sort",
+      "data": {
+        "missing": []
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Filter propagation design",
+      "status": "PASS",
+      "detail": "All relationships many-to-one, single direction (no ambiguous paths)",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
+      "name": "Click paths, slicer defaults, tooltips, drillthrough",
+      "status": "PENDING",
+      "detail": "Human check in Power BI Desktop: click each visual and slicer and compare with the Tableau dashboard.",
+      "data": {},
+      "gate": 3
+    },
+    {
+      "layer": "Interactions",
       "name": "'Sales by Region' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "stackedBarChart | 12 vs 12 rows | 12/12 cells match",
@@ -7113,10 +7928,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Monthly Trend' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "lineChart | 24 vs 24 rows | 48/48 cells match",
@@ -7703,10 +8519,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Category Profitability' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "clusteredBarChart | 3 vs 3 rows | 9/9 cells match",
@@ -7860,10 +8677,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Segment Matrix' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "pivotTable | 18 vs 18 rows | 18/18 cells match",
@@ -8234,10 +9052,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Top Customers' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "stackedBarChart | 10 vs 10 rows | 10/10 cells match",
@@ -8455,10 +9274,11 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
     },
     {
-      "layer": "L4 Scenario",
+      "layer": "Interactions",
       "name": "'Sales Share' sliced by Ship Mode = First Class",
       "status": "PASS",
       "detail": "pieChart | 3 vs 3 rows | 3/3 cells match",
@@ -8554,8 +9374,782 @@
             "status": "MATCH"
           }
         ]
-      }
+      },
+      "gate": 3
+    },
+    {
+      "layer": "Security",
+      "name": "User filters / USERNAME()",
+      "status": "N/A",
+      "detail": "No Tableau user filters or user functions found in the workbook.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Security",
+      "name": "Confirm no row-level security requirement",
+      "status": "PENDING",
+      "detail": "Business owner confirms the published Tableau content had no server-side permissions or user filters that must be reproduced.",
+      "data": {},
+      "gate": 4
+    },
+    {
+      "layer": "Business UAT",
+      "name": "Business owner sign-off",
+      "status": "PENDING",
+      "detail": "Record the decision (approve / approve with redesign / reject) after reviewing gates 1-4.",
+      "data": {},
+      "gate": 5
     }
   ],
-  "engine_errors": []
+  "engine_errors": [],
+  "kpi_register": [
+    {
+      "scenario": "All data",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 3136577.55,
+      "powerbi": 3136577.55,
+      "delta": 0.0,
+      "tolerance": 3.1365775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.011456066182709241,
+      "powerbi": 0.011456066182709241,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 1501.0,
+      "powerbi": 1501.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 2886577.55,
+      "powerbi": 2886577.55,
+      "delta": 0.0,
+      "tolerance": 2.8865775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 35932.840000000004,
+      "powerbi": 35932.840000000004,
+      "delta": 0.0,
+      "tolerance": 0.03593284,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "All data",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 200.0,
+      "powerbi": 200.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 1106603.59,
+      "powerbi": 1106603.59,
+      "delta": 0.0,
+      "tolerance": 1.10660359,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.008540492806461977,
+      "powerbi": 0.008540492806461977,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 824.0,
+      "powerbi": 824.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 856603.5900000001,
+      "powerbi": 856603.5900000001,
+      "delta": 0.0,
+      "tolerance": 0.8566035900000001,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 9450.94,
+      "powerbi": 9450.94,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Furniture",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 199.0,
+      "powerbi": 199.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 127527.04,
+      "powerbi": 127527.04,
+      "delta": 0.0,
+      "tolerance": 0.12752703999999998,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": -0.005052732346018539,
+      "powerbi": -0.005052732346018539,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 834.0,
+      "powerbi": 834.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": -122472.96,
+      "powerbi": -122472.96,
+      "delta": 0.0,
+      "tolerance": 0.12247296,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": -644.36,
+      "powerbi": -644.36,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Category = Office Supplies",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 199.0,
+      "powerbi": 199.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 686717.25,
+      "powerbi": 686717.25,
+      "delta": 0.0,
+      "tolerance": 0.68671725,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.0161386363892854,
+      "powerbi": 0.0161386363892854,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 623.0,
+      "powerbi": 623.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 436717.25,
+      "powerbi": 436717.25,
+      "delta": 0.0,
+      "tolerance": 0.43671725,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 11082.68,
+      "powerbi": 11082.68,
+      "delta": 0.0,
+      "tolerance": 0.01108268,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = Central",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 48.0,
+      "powerbi": 48.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 930470.86,
+      "powerbi": 930470.86,
+      "delta": 0.0,
+      "tolerance": 0.9304708599999999,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.0004600036587927104,
+      "powerbi": 0.0004600036587927104,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 743.0,
+      "powerbi": 743.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 680470.86,
+      "powerbi": 680470.86,
+      "delta": 0.0,
+      "tolerance": 0.68047086,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 428.0199999999998,
+      "powerbi": 428.0199999999998,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Region = East",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 56.0,
+      "powerbi": 56.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 3136577.55,
+      "powerbi": 3136577.55,
+      "delta": 0.0,
+      "tolerance": 3.1365775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.011456066182709241,
+      "powerbi": 0.011456066182709241,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 1501.0,
+      "powerbi": 1501.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 2836577.55,
+      "powerbi": 2836577.55,
+      "delta": 0.0,
+      "tolerance": 2.83657755,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 35932.840000000004,
+      "powerbi": 35932.840000000004,
+      "delta": 0.0,
+      "tolerance": 0.03593284,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Sales Target = 300000.0",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 200.0,
+      "powerbi": 200.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 3136577.55,
+      "powerbi": 3136577.55,
+      "delta": 0.0,
+      "tolerance": 3.1365775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.011456066182709241,
+      "powerbi": 0.011456066182709241,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 1501.0,
+      "powerbi": 1501.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 2886577.55,
+      "powerbi": 2886577.55,
+      "delta": 0.0,
+      "tolerance": 2.8865775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 35932.840000000004,
+      "powerbi": 35932.840000000004,
+      "delta": 0.0,
+      "tolerance": 0.03593284,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Top N Customers = 5",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 200.0,
+      "powerbi": 200.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 3136577.55,
+      "powerbi": 3136577.55,
+      "delta": 0.0,
+      "tolerance": 3.1365775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.011456066182709241,
+      "powerbi": 0.011456066182709241,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 1501.0,
+      "powerbi": 1501.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 2886577.55,
+      "powerbi": 2886577.55,
+      "delta": 0.0,
+      "tolerance": 2.8865775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 35932.840000000004,
+      "powerbi": 35932.840000000004,
+      "delta": 0.0,
+      "tolerance": 0.03593284,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Discount Threshold = 0.25",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 200.0,
+      "powerbi": 200.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "SUM(Sales)",
+      "measure": "Sum of Sales",
+      "tableau": 3136577.55,
+      "powerbi": 3136577.55,
+      "delta": 0.0,
+      "tolerance": 3.1365775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "Profit Ratio",
+      "measure": "Profit Ratio",
+      "tableau": 0.011456066182709241,
+      "powerbi": 0.011456066182709241,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "Order Count",
+      "measure": "Order Count",
+      "tableau": 1501.0,
+      "powerbi": 1501.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "Sales vs Target",
+      "measure": "Sales vs Target",
+      "tableau": 2886577.55,
+      "powerbi": 2886577.55,
+      "delta": 0.0,
+      "tolerance": 2.8865775499999997,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "SUM(Profit)",
+      "measure": "Sum of Profit",
+      "tableau": 35932.840000000004,
+      "powerbi": 35932.840000000004,
+      "delta": 0.0,
+      "tolerance": 0.03593284,
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "scenario": "Parameter Metric Selector = Profit",
+      "metric": "CNTD(Customer Name)",
+      "measure": "Distinct Count of Customer Name",
+      "tableau": 200.0,
+      "powerbi": 200.0,
+      "delta": 0.0,
+      "tolerance": 0.01,
+      "status": "PASS",
+      "note": ""
+    }
+  ],
+  "identity_matrix": [],
+  "gates": [
+    {
+      "gate": 1,
+      "name": "Data contract",
+      "status": "PASS",
+      "automated_checks": 10,
+      "passed": 10,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 2,
+      "name": "Numeric / KPI parity",
+      "status": "WARN",
+      "automated_checks": 28,
+      "passed": 27,
+      "failed": 0,
+      "warnings": 1,
+      "pending_human_checks": []
+    },
+    {
+      "gate": 3,
+      "name": "Interactions",
+      "status": "WARN",
+      "automated_checks": 11,
+      "passed": 10,
+      "failed": 0,
+      "warnings": 1,
+      "pending_human_checks": [
+        "Click paths, slicer defaults, tooltips, drillthrough"
+      ]
+    },
+    {
+      "gate": 4,
+      "name": "Security (RLS)",
+      "status": "PENDING",
+      "automated_checks": 1,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Confirm no row-level security requirement"
+      ]
+    },
+    {
+      "gate": 5,
+      "name": "Business UAT",
+      "status": "PENDING",
+      "automated_checks": 0,
+      "passed": 0,
+      "failed": 0,
+      "warnings": 0,
+      "pending_human_checks": [
+        "Business owner sign-off"
+      ]
+    }
+  ],
+  "readiness": {
+    "metrics": [
+      {
+        "metric": "Parse completeness",
+        "value": 100.0,
+        "detail": "674 known / 0 unknown XML elements (unknown preserved for review)"
+      },
+      {
+        "metric": "Calculation pass rate",
+        "value": 80.0,
+        "detail": "24 of 30 calculations numerically verified in a passing check (25 PASS, 5 REVIEW, 0 UNSUPPORTED by rule)"
+      },
+      {
+        "metric": "Visual openability",
+        "value": null,
+        "detail": "NOT RUN: requires Power BI Desktop on Windows. 16/16 worksheets map to native visuals."
+      },
+      {
+        "metric": "Numeric parity",
+        "value": 96.4,
+        "detail": "27 of 28 visual, scenario and KPI checks pass"
+      },
+      {
+        "metric": "Security acceptance",
+        "value": null,
+        "detail": "No row-level security in the workbook"
+      },
+      {
+        "metric": "Manual effort (estimate)",
+        "value": 130,
+        "unit": "minutes",
+        "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
+      }
+    ],
+    "index": 92.1,
+    "verified_objects": [
+      "Average of Avg Customer Sales (INCLUDE)",
+      "Average of Customer Lifetime Sales",
+      "Average of Days to Ship",
+      "Average of Discount",
+      "Avg Sales per Customer",
+      "Category",
+      "Count of Order ID",
+      "Customer Lifetime Sales",
+      "Customer Name",
+      "Customer Tier",
+      "Days to Ship",
+      "Discount",
+      "Discount Band",
+      "Discount Threshold",
+      "Discount Threshold Value",
+      "Distinct Count of Customer Name",
+      "Key States",
+      "Metric Selector",
+      "Metric Selector Value",
+      "Net Sales",
+      "Order Count",
+      "Order Date",
+      "Order Date Month Start",
+      "Order Date Quarter Start",
+      "Order Date Year",
+      "Order ID",
+      "Percent of Total Sales",
+      "Product Code",
+      "Product ID",
+      "Profit",
+      "Profit Ratio",
+      "Profit Status",
+      "Profit per Unit",
+      "Quantity",
+      "Region",
+      "Region Group",
+      "Region Sales",
+      "Running Sales",
+      "Sales",
+      "Sales (bin)",
+      "Sales Rank",
+      "Sales Target",
+      "Sales Target Value",
+      "Sales vs Target",
+      "Segment",
+      "Selected Metric",
+      "Share of Region",
+      "Ship Date",
+      "Ship Mode",
+      "State",
+      "Sub-Category",
+      "Sum of Net Sales",
+      "Sum of Profit",
+      "Sum of Region Sales",
+      "Sum of Sales"
+    ]
+  },
+  "verdict": "Automated gates passed with warnings; human checks pending"
 }

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tableau2pbi.local/schemas/ir-0.1.0.schema.json",
+  "title": "Tableau to Power BI canonical IR",
+  "type": "object",
+  "required": ["ir_version", "workbook", "sources", "fields", "calculations", "parameters", "worksheets",
+               "dashboards", "security", "unknown_nodes", "warnings"],
+  "properties": {
+    "ir_version": {"const": "0.1.0"},
+    "workbook": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {"id": {"type": "string", "pattern": "^wb_"}, "name": {"type": "string"},
+                     "version": {"type": ["string", "null"]}, "parse_stats": {"type": "object"}}
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "connections", "tables"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^src_"},
+          "kind": {"enum": ["sql", "custom_sql", "file", "extract"]},
+          "connections": {"type": "array", "items": {"type": "object", "required": ["class", "supported"]}},
+          "tables": {"type": "array", "items": {"type": "object", "required": ["id", "name", "type"]}}
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "source_id", "type", "role"],
+        "properties": {"id": {"type": "string", "pattern": "^f_"},
+                       "type": {"enum": ["string", "integer", "real", "date", "datetime", "boolean"]},
+                       "role": {"enum": ["dimension", "measure"]}}
+      }
+    },
+    "calculations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "tableau", "deps", "pbi_dax", "confidence", "classification"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^c_"},
+          "deps": {"type": "array", "items": {"type": "string", "pattern": "^(f|c|p)_"}},
+          "expression_ast": {"type": ["object", "null"]},
+          "pbi_dax": {"type": ["string", "null"]},
+          "confidence": {"enum": ["high", "medium", "low", "unresolved"]},
+          "classification": {"enum": ["PASS", "REVIEW", "UNSUPPORTED"]}
+        }
+      }
+    },
+    "parameters": {"type": "array", "items": {"type": "object", "required": ["id", "name", "type"],
+                                              "properties": {"id": {"type": "string", "pattern": "^p_"}}}},
+    "worksheets": {"type": "array", "items": {"type": "object", "required": ["id", "name", "mark", "rows", "columns"],
+                                              "properties": {"id": {"type": "string", "pattern": "^ws_"}}}},
+    "dashboards": {"type": "array", "items": {"type": "object", "required": ["id", "name", "zones"],
+                                              "properties": {"id": {"type": "string", "pattern": "^db_"}}}},
+    "security": {"type": "object", "required": ["rules", "requires_identity_review"],
+                 "properties": {"requires_identity_review": {"type": "boolean"}}},
+    "unknown_nodes": {"type": "array", "items": {"type": "object", "required": ["path", "tag"]}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

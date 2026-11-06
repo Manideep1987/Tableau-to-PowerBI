@@ -1,0 +1,7 @@
+/// Converted from Tableau user filter '[Manager UPN] = USERNAME()'
+role 'Manager Security'
+	modelPermission: read
+
+	tablePermission DimEmployeeSecurity = 'DimEmployeeSecurity'[Manager UPN] = USERPRINCIPALNAME()
+
+	annotation TableauSource = Calculation_I13

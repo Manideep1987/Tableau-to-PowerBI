@@ -1,21 +1,21 @@
-Data source,Tableau field,Tableau formula,Kind,Power BI table,Power BI object,DAX,Status,Notes
+Data source,Tableau field,Tableau formula,Kind,Power BI table,Power BI object,DAX,Status,Classification,Strategy,Confidence,Notes
 Parameters,Min Quantity,2,parameter,Min Quantity,Min Quantity Value,"Min Quantity = SELECTCOLUMNS(GENERATESERIES(1, 9, 1), ""Min Quantity"", [Value])
 
-[Min Quantity Value] = SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",Converted,What-if (range) parameter -> disconnected table + slicer + value measure
+[Min Quantity Value] = SELECTEDVALUE('Min Quantity'[Min Quantity], 2)",Converted,PASS,rule:parameter-table+selectedvalue,high,What-if (range) parameter -> disconnected table + slicer + value measure
 Parameters,Growth Rate,0.08,parameter,Growth Rate,Growth Rate Value,"Growth Rate = SELECTCOLUMNS({0.08}, ""Growth Rate"", [Value])
 
-[Growth Rate Value] = SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",Converted,Any value parameter -> disconnected table + slicer + value measure
-Finance Orders,Target Attainment,SUM([sales]) / SUM([sales_target]),measure,_Measures,Target Attainment,"DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",Converted,
-Finance Orders,Projected Sales,SUM([sales]) * (1 + [Parameters].[Growth Rate]),measure,_Measures,Projected Sales,(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value])),Converted,
-Finance Orders,Margin %,IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END,measure,_Measures,Margin %,"IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",Converted,
-Finance Orders,Fiscal Year,"IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END",column,Finance Orders,Fiscal Year,"IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",Converted,
-Finance Orders,Sales YoY Prior,"LOOKUP(SUM([sales]), -1)",measure,_Measures,Sales YoY Prior,"CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",Converted,
-Finance Orders,Order Size,CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END,column,Finance Orders,Order Size,"SWITCH('Finance Orders'[quantity], 1, ""Single"", 2, ""Pair"", ""Bulk"")",Converted,
-Finance Orders,Loss Orders,SUM(IF [profit] < 0 THEN 1 ELSE 0 END),measure,_Measures,Loss Orders,"SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",Converted,
-Finance Orders,Region Code,"UPPER(LEFT([region], 1)) + STR(LEN([region]))",column,Finance Orders,Region Code,"UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",Converted,
-Finance Orders,Avg Monthly Sales,WINDOW_AVG(SUM([sales])),measure,_Measures,Avg Monthly Sales,"AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",Converted,
-Finance Orders,Max Order Value,MAX([sales]),measure,_Measures,Max Order Value,MAX('Finance Orders'[sales]),Converted,
-Finance Orders,Sum of sales,SUM([sales]),base-measure,_Measures,Sum of sales,SUM('Finance Orders'[sales]),Converted,
-Finance Orders,Sum of sales_target,SUM([sales_target]),base-measure,_Measures,Sum of sales_target,SUM('Finance Orders'[sales_target]),Converted,
-Finance Orders,Count of order_id,COUNT([order_id]),base-measure,_Measures,Count of order_id,COUNTA('Finance Orders'[order_id]),Converted,
-Finance Orders,Sum of profit,SUM([profit]),base-measure,_Measures,Sum of profit,SUM('Finance Orders'[profit]),Converted,
+[Growth Rate Value] = SELECTEDVALUE('Growth Rate'[Growth Rate], 0.08)",Converted,PASS,rule:parameter-table+selectedvalue,high,Any value parameter -> disconnected table + slicer + value measure
+Finance Orders,Target Attainment,SUM([sales]) / SUM([sales_target]),measure,_Measures,Target Attainment,"DIVIDE(SUM('Finance Orders'[sales]), SUM('Finance Orders'[sales_target]))",Converted,PASS,rule:aggregate-measure,high,
+Finance Orders,Projected Sales,SUM([sales]) * (1 + [Parameters].[Growth Rate]),measure,_Measures,Projected Sales,(SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value])),Converted,PASS,rule:aggregate-measure,high,
+Finance Orders,Margin %,IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END,measure,_Measures,Margin %,"IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales])))",Converted,PASS,rule:aggregate-measure,high,
+Finance Orders,Fiscal Year,"IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END",column,Finance Orders,Fiscal Year,"IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date]))",Converted,PASS,rule:row-level-calculated-column,high,
+Finance Orders,Sales YoY Prior,"LOOKUP(SUM([sales]), -1)",measure,_Measures,Sales YoY Prior,"CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",Converted,PASS,rule:table-calc-window,high,
+Finance Orders,Order Size,CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END,column,Finance Orders,Order Size,"SWITCH('Finance Orders'[quantity], 1, ""Single"", 2, ""Pair"", ""Bulk"")",Converted,PASS,rule:row-level-calculated-column,high,
+Finance Orders,Loss Orders,SUM(IF [profit] < 0 THEN 1 ELSE 0 END),measure,_Measures,Loss Orders,"SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0))",Converted,PASS,rule:aggregate-measure,high,
+Finance Orders,Region Code,"UPPER(LEFT([region], 1)) + STR(LEN([region]))",column,Finance Orders,Region Code,"UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING)",Converted,PASS,rule:row-level-calculated-column,high,
+Finance Orders,Avg Monthly Sales,WINDOW_AVG(SUM([sales])),measure,_Measures,Avg Monthly Sales,"AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",Converted,PASS,rule:table-calc-window,high,
+Finance Orders,Max Order Value,MAX([sales]),measure,_Measures,Max Order Value,MAX('Finance Orders'[sales]),Converted,PASS,rule:aggregate-measure,high,
+Finance Orders,Sum of sales,SUM([sales]),base-measure,_Measures,Sum of sales,SUM('Finance Orders'[sales]),Converted,PASS,rule:explicit-base-measure,high,
+Finance Orders,Sum of sales_target,SUM([sales_target]),base-measure,_Measures,Sum of sales_target,SUM('Finance Orders'[sales_target]),Converted,PASS,rule:explicit-base-measure,high,
+Finance Orders,Count of order_id,COUNT([order_id]),base-measure,_Measures,Count of order_id,COUNTA('Finance Orders'[order_id]),Converted,PASS,rule:explicit-base-measure,high,
+Finance Orders,Sum of profit,SUM([profit]),base-measure,_Measures,Sum of profit,SUM('Finance Orders'[profit]),Converted,PASS,rule:explicit-base-measure,high,

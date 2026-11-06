@@ -11,8 +11,9 @@
   <div class="topbar-inner">
     <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>Tableau → Power BI Migrator</span></div>
     <nav aria-label="Main">
-      <button data-view="convert" aria-current="page">Convert</button>
-      <button data-view="validate">Validate</button>
+      <button data-view="convert" aria-current="page">Workbench</button>
+      <button data-view="validate">Validation center</button>
+      <button data-view="export">Export</button>
       <button data-view="translate">Formula translator</button>
       <button data-view="reference">DAX reference</button>
       <button data-view="compare">Compare exports</button>
@@ -23,25 +24,27 @@
 <main>
   <ol class="steps" id="steps" aria-label="Progress">
     <li data-step="1" class="active"><span class="n">1</span>Upload</li>
-    <li data-step="2"><span class="n">2</span>Review conversion</li>
-    <li data-step="3"><span class="n">3</span>Validate numbers</li>
-    <li data-step="4"><span class="n">4</span>Download PBIP</li>
+    <li data-step="2"><span class="n">2</span>Inventory</li>
+    <li data-step="3"><span class="n">3</span>Mapping</li>
+    <li data-step="4"><span class="n">4</span>Convert</li>
+    <li data-step="5"><span class="n">5</span>Validate</li>
+    <li data-step="6"><span class="n">6</span>Export</li>
   </ol>
 
-  <!-- ================================================================ CONVERT -->
+  <!-- ================================================================ WORKBENCH -->
   <section class="view" id="view-convert">
     <div id="convert-start">
-      <h1>Convert a Tableau workbook</h1>
-      <p class="lead">Upload a .twb or .twbx file. The tool reads the full metadata: data sources, custom SQL, joins and relationships,
-        calculations, LODs, table calculations, parameters, filters, worksheets and dashboards. It produces a Power BI project (PBIP)
-        with a star-schema semantic model, DAX measures and report pages.</p>
+      <h1>Migrate a Tableau workbook</h1>
+      <p class="lead">Upload a .twb or .twbx file. Everything runs locally: parsing is deterministic and nothing is sent to
+        a cloud service. The tool produces an inventory, a Tableau → DAX mapping with lineage, a Power BI project (PBIP),
+        and an independent validation across 5 gates.</p>
       <div class="grid-2">
         <div class="panel">
           <h2>Your workbook</h2>
           <label class="drop" id="drop" tabindex="0">
             <input type="file" id="file" accept=".twb,.twbx">
             <strong>Drop a .twb / .twbx file here</strong>
-            <span class="muted">or click to browse · up to 200 MB</span>
+            <span class="muted">or click to browse · up to 200 MB · packages are checked for path traversal, zip bombs and XML entities</span>
             <div id="file-chip"></div>
           </label>
           <fieldset>
@@ -51,11 +54,11 @@
             <label class="radio"><input type="radio" name="join" value="star">
               <span>Star schema<small>Joined tables become related tables. Numbers can differ when joins duplicate rows.</small></span></label>
           </fieldset>
-          <div class="actions" style="margin-top:16px"><button class="btn primary" id="btn-convert" disabled>Convert workbook</button></div>
+          <div class="actions" style="margin-top:16px"><button class="btn primary" id="btn-convert" disabled>Analyze and convert</button></div>
         </div>
         <div class="panel">
-          <h2>Or try a sample</h2>
-          <p class="muted" style="margin-top:-6px">Sample workbooks cover every conversion feature and include source data for validation.</p>
+          <h2>Sample workbooks</h2>
+          <p class="muted" style="margin-top:-6px">Each sample includes its source data, so the numbers can be validated end to end.</p>
           <div class="samples" id="samples"><div class="muted">Loading…</div></div>
         </div>
       </div>
@@ -68,20 +71,20 @@
           <div class="muted" id="job-sub"></div>
         </div>
         <div class="actions">
-          <button class="btn" id="btn-new">New conversion</button>
-          <a class="btn" id="dl-report" target="_blank" rel="noopener">Migration report</a>
-          <a class="btn" id="dl-csv">DAX mapping (CSV)</a>
-          <a class="btn" id="dl-pbip">Download PBIP</a>
+          <button class="btn" id="btn-new">New workbook</button>
+          <button class="btn" data-goto="export">Export</button>
           <button class="btn primary" id="btn-to-validate">Validate numbers →</button>
         </div>
       </div>
       <div class="stats" id="stats"></div>
       <div class="tabs" role="tablist" id="result-tabs">
-        <button role="tab" data-tab="calcs" aria-selected="true">Calculations<span class="count" id="c-calcs"></span></button>
+        <button role="tab" data-tab="inventory" aria-selected="true">Inventory<span class="count" id="c-inventory"></span></button>
+        <button role="tab" data-tab="calcs">Mapping<span class="count" id="c-calcs"></span></button>
         <button role="tab" data-tab="data">Data &amp; SQL<span class="count" id="c-data"></span></button>
         <button role="tab" data-tab="model">Model<span class="count" id="c-model"></span></button>
-        <button role="tab" data-tab="layout">Report layout<span class="count" id="c-layout"></span></button>
+        <button role="tab" data-tab="layout">Report pages<span class="count" id="c-layout"></span></button>
         <button role="tab" data-tab="filters">Filters &amp; parameters<span class="count" id="c-filters"></span></button>
+        <button role="tab" data-tab="security">Security<span class="count" id="c-security"></span></button>
         <button role="tab" data-tab="issues">Issues<span class="count" id="c-issues"></span></button>
       </div>
       <div id="tab-body"></div>
@@ -90,15 +93,15 @@
 
   <!-- ================================================================ VALIDATE -->
   <section class="view" id="view-validate" hidden>
-    <h1>Validate numbers</h1>
-    <p class="lead">Every Tableau worksheet is executed with Tableau semantics and its converted Power BI visual is executed with DAX
-      semantics, over the same source data. Results are compared cell by cell. Checks run in four layers: metadata parity,
-      data reconciliation, visual reconciliation, and scenarios (parameter changes and slicers).</p>
-    <div id="validate-empty" class="panel empty">Convert a workbook first. <button class="btn small" data-goto="convert">Go to Convert</button></div>
+    <h1>Validation center</h1>
+    <p class="lead">Each Tableau worksheet and KPI is run with Tableau semantics, and its converted Power BI visual is run by
+      executing the generated DAX, over the same data. Results pass through 5 gates. A failed gate blocks the later
+      ones, and human checks stay <b>PENDING</b> until a person performs them. They are never simulated as passed.</p>
+    <div id="validate-empty" class="panel empty">Convert a workbook first. <button class="btn small" data-goto="convert">Go to the workbench</button></div>
     <div id="validate-form" hidden>
       <div class="grid-2">
         <div class="panel">
-          <h2>Source data</h2>
+          <h2>Source data (same source, same refresh)</h2>
           <fieldset style="margin-top:0">
             <legend class="visually-hidden">Data source</legend>
             <label class="radio" id="opt-sample"><input type="radio" name="src" value="sample" checked>
@@ -117,7 +120,7 @@
             <div><label class="field" for="tol-abs">Absolute tolerance</label><input type="number" id="tol-abs" value="0.01" step="0.001" min="0"></div>
             <div><label class="field" for="tol-rel">Relative tolerance</label><input type="number" id="tol-rel" value="0.000001" step="0.000001" min="0"></div>
           </div>
-          <label class="field" for="as-of">"Today" for relative dates</label><input type="date" id="as-of">
+          <label class="field" for="as-of">Business date ("today" for relative dates)</label><input type="date" id="as-of">
           <label class="radio" style="margin-top:12px"><input type="checkbox" id="scen" checked>
             <span>Scenario tests<small>Re-run with changed parameters and slicers to test filter propagation.</small></span></label>
           <div class="actions" style="margin-top:12px"><button class="btn primary" id="btn-validate">Run validation</button></div>
@@ -127,11 +130,21 @@
     </div>
   </section>
 
+  <!-- ================================================================ EXPORT -->
+  <section class="view" id="view-export" hidden>
+    <h1>Export</h1>
+    <p class="lead">Every artifact is editable and open: the PBIP project, a JSON mapping manifest, lineage, and the
+      validation CSV. There is no proprietary output. This tool never publishes to Power BI. Publishing is a separate step
+      that needs explicit approval.</p>
+    <div id="export-body"><div class="panel empty">Convert a workbook first. <button class="btn small" data-goto="convert">Go to the workbench</button></div></div>
+  </section>
+
   <!-- ================================================================ TRANSLATE -->
   <section class="view" id="view-translate" hidden>
     <h1>Formula translator</h1>
-    <p class="lead">Paste a Tableau calculation to get its Power BI DAX equivalent. After a conversion, formulas are resolved against
-      that workbook's model. Otherwise a demo schema is used (Orders, Customers, Products).</p>
+    <p class="lead">Paste a Tableau calculation to get its Power BI DAX equivalent, with notes on grain and filter context.
+      After a conversion, formulas are resolved against that workbook's model. Otherwise a demo schema is used
+      (Orders, Customers, Products).</p>
     <div class="grid-2">
       <div class="panel">
         <label class="field" for="formula" style="margin-top:0">Tableau formula</label>

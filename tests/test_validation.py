@@ -16,8 +16,8 @@ def _by_name(rep):
     return {c.name: c for c in rep.checks}
 
 
-@pytest.mark.parametrize("name,expected_pass", [("Superstore_Sales.twb", 34), ("Finance_CustomSQL.twb", 17),
-                                                ("HR_Analytics.twbx", 19)])
+@pytest.mark.parametrize("name,expected_pass", [("Superstore_Sales.twb", 47), ("Finance_CustomSQL.twb", 25),
+                                                ("HR_Analytics.twbx", 27), ("Invoice_Health.twb", 42)])
 def test_samples_validate(validations, name, expected_pass):
     s = validations[name].summary
     assert s["FAIL"] == 0 and s["ERROR"] == 0, [(c.name, c.detail) for c in validations[name].checks if c.status in ("FAIL", "ERROR")]
@@ -33,7 +33,9 @@ def test_every_worksheet_is_validated(validations, workbooks):
 
 def test_known_limitation_reported_as_warning(validations):
     warn = [c for c in validations["Superstore_Sales.twb"].checks if c.status == "WARN"]
-    assert len(warn) == 1 and "KNOWN LIMITATION" in warn[0].detail and "Discount Band" in warn[0].detail
+    assert {c.name for c in warn} == {"'Discount Analysis' with Discount Threshold = 0.25", "Dashboard actions -> interactions"}
+    lim = next(c for c in warn if "KNOWN LIMITATION" in c.detail)
+    assert "Discount Band" in lim.detail
 
 
 def test_sql_ground_truth_and_profiles(validations):

@@ -65,7 +65,12 @@ def _as_dt(v):
 
 
 class TableauEngine:
-    def __init__(self, wb: Workbook, ds: Datasource, records: pd.DataFrame, today: Optional[date] = None):
+    def __init__(self, wb: Workbook, ds: Datasource, records: pd.DataFrame, today: Optional[date] = None,
+                 user: Optional[str] = None):
+        """``user`` is the identity returned by USERNAME(). With ``user=None`` user filters
+        (data source filters built on USERNAME()) are not applied - the unsecured view the
+        model owner sees in Power BI - so numeric parity and security are tested separately."""
+        self.user = user
         self.wb, self.ds = wb, ds
         self.today = today or date.today()
         self.n = len(records)
@@ -407,6 +412,10 @@ class TableauEngine:
                                "WEEK": "week"}[name], d)
         if name == "MAKEDATE":
             return datetime(int(vals[0]), int(vals[1]), int(vals[2]))
+        if name in ("USERNAME", "FULLNAME", "USERDOMAIN"):
+            return self.user
+        if name in ("ISMEMBEROF", "ISUSERNAME", "ISFULLNAME"):
+            return name != "ISMEMBEROF" and self.user is not None and str(vals[0]).lower() == str(self.user).lower()
         if name == "TODAY" or name == "NOW":
             return datetime(self.today.year, self.today.month, self.today.day)
         if name == "DATE":
@@ -526,8 +535,8 @@ class TableauEngine:
             (meas if self.is_measure(r) else dims).append(r)
         dims = _uniq(dims)
         meas = _uniq(meas)
-        # 1. context filters
-        self.context = np.ones(self.n, dtype=bool)
+        # 0. data source filters (incl. user filters when an identity is set), 1. context filters
+        self.context = self.datasource_mask()
         for f in ws.filters:
             if f.is_context:
                 self.context &= self._dim_filter_mask(f)
@@ -581,6 +590,18 @@ class TableauEngine:
                 row.append(_nz(self.measure_value(m, cells[k], view)))
             rows.append(row)
         return pd.DataFrame(rows, columns=[d.key for d in dims] + [m.key for m in meas])
+
+    def datasource_mask(self):
+        m = np.ones(self.n, dtype=bool)
+        for f in self.ds.datasource_filters:
+            cf = self.ds.calculations.get(f.field.field)
+            if cf is not None and cf.extra.get("security") and self.user is None:
+                continue
+            m &= self._dim_filter_mask(f)
+        return m
+
+    def visible_records(self) -> int:
+        return int(self.datasource_mask().sum())
 
     def measure_value(self, ref: FieldRef, idx, view):
         if ref.derivation in ("usr", "none") or (ref.derivation not in AGG_OF and self.is_agg_calc(ref.field)):

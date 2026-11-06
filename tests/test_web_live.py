@@ -25,7 +25,7 @@ def job():
 def test_health_and_samples():
     assert client.get("/api/health").json()["status"] == "ok"
     names = [s["name"] for s in client.get("/api/samples").json()]
-    assert names == ["Finance_CustomSQL.twb", "HR_Analytics.twbx", "Superstore_Sales.twb"]
+    assert names == ["Invoice_Health.twb", "Finance_CustomSQL.twb", "HR_Analytics.twbx", "Superstore_Sales.twb"]
     assert "Tableau" in client.get("/").text
 
 
@@ -50,6 +50,7 @@ def test_downloads(job):
     assert z.status_code == 200 and z.headers["content-type"] == "application/zip"
     names = zipfile.ZipFile(io.BytesIO(z.content)).namelist()
     assert "Superstore_Sales.pbip" in names and "MIGRATION_REPORT.html" in names and "DAX_MAPPING.csv" in names
+    assert {"migration_report.json", "lineage.csv", "ir.json", ".gitignore"} <= set(names)
     assert any(n.endswith("visual.json") for n in names)
     assert "Calculations" in client.get(f"/api/jobs/{job['job_id']}/report").text
     assert client.get(f"/api/jobs/{job['job_id']}/mapping.csv").text.startswith("Data source,Tableau field")
@@ -63,7 +64,7 @@ def test_validate_endpoint(job):
     assert s["FAIL"] == 0 and s["PASS"] >= 30
     assert "Validation report" in client.get(f"/api/jobs/{job['job_id']}/validation/report").text
     names = zipfile.ZipFile(io.BytesIO(client.get(f"/api/jobs/{job['job_id']}/pbip").content)).namelist()
-    assert "VALIDATION_REPORT.html" in names
+    assert "VALIDATION_REPORT.html" in names and "validation_results.csv" in names
     assert client.post(f"/api/jobs/{job['job_id']}/validate", data={"use_sample_data": "true", "as_of": "bad"}).status_code == 400
 
 

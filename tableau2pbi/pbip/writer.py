@@ -125,7 +125,19 @@ def model_tmdl(res: ConversionResult) -> str:
              f"annotation ConvertedFrom = Tableau workbook {res.workbook.name}", ""]
     for t in res.model.tables:
         lines.append(f"ref table {tmdl_name(t.name)}")
+    for r in res.model.roles:
+        lines.append(f"ref role {tmdl_name(r.name)}")
     return "\n".join(lines) + "\n"
+
+
+def role_tmdl(role) -> str:
+    out = [_desc(role.description, "") + f"role {tmdl_name(role.name)}", "\tmodelPermission: read", ""]
+    for table, expr in role.table_permissions.items():
+        out.append(f"\ttablePermission {tmdl_name(table)} = {expr}")
+        out.append("")
+    if role.tableau_ref:
+        out.append(f"\tannotation TableauSource = {role.tableau_ref}")
+    return "\n".join(out) + "\n"
 
 
 def relationships_tmdl(res: ConversionResult) -> str:
@@ -297,6 +309,8 @@ def build_files(res: ConversionResult) -> dict:
         fname = re.sub(r"[^\w\- ()]", "_", t.name)
         files[f"{sm}/definition/tables/{fname}.tmdl"] = table_tmdl(t, name)
     files[f"{sm}/definition/cultures/en-US.tmdl"] = "cultureInfo en-US\n"
+    for role in res.model.roles:
+        files[f"{sm}/definition/roles/{re.sub(r'[^\w\- ()]', '_', role.name)}.tmdl"] = role_tmdl(role)
 
     files[f"{rp}/definition.pbir"] = json.dumps({
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",

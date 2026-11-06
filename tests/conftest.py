@@ -14,7 +14,7 @@ from tableau2pbi.validation.runner import DataBinding, validate  # noqa: E402
 SAMPLES = os.path.join(ROOT, "samples", "workbooks")
 DB = os.path.join(ROOT, "samples", "data", "superstore.db")
 AS_OF = date(2025, 12, 31)
-NAMES = ["Superstore_Sales.twb", "Finance_CustomSQL.twb", "HR_Analytics.twbx"]
+NAMES = ["Superstore_Sales.twb", "Finance_CustomSQL.twb", "HR_Analytics.twbx", "Invoice_Health.twb"]
 
 
 def _ensure_samples():

@@ -32,6 +32,7 @@ from tableau2pbi.converter import convert  # noqa: E402
 from tableau2pbi.parser import read_workbook  # noqa: E402
 from tableau2pbi.pbip.writer import build_files  # noqa: E402
 from tableau2pbi.validation.runner import DataBinding, validate  # noqa: E402
+from tableau2pbi.validation.gates import verdict  # noqa: E402
 
 DOCS = os.path.join(ROOT, "docs")
 SHOTS = os.path.join(DOCS, "screenshots")
@@ -39,7 +40,7 @@ OUT = os.path.join(DOCS, "test-results")
 SAMPLES = os.path.join(ROOT, "samples", "workbooks")
 DB = os.path.join(ROOT, "samples", "data", "superstore.db")
 AS_OF = date(2025, 12, 31)
-NAMES = ["Superstore_Sales.twb", "Finance_CustomSQL.twb", "HR_Analytics.twbx"]
+NAMES = ["Superstore_Sales.twb", "Finance_CustomSQL.twb", "HR_Analytics.twbx", "Invoice_Health.twb"]
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -119,6 +120,12 @@ def mutation_campaign(samples):
     """Inject realistic conversion defects; the validator must flag each one."""
     s = samples["Superstore_Sales.twb"]
     f = samples["Finance_CustomSQL.twb"]
+    i = samples["Invoice_Health.twb"]
+
+    def rls_wrong(res):
+        r = copy.deepcopy(res)
+        r.model.roles[0].table_permissions["DimEmployeeSecurity"] = "'DimEmployeeSecurity'[Email UPN] = USERPRINCIPALNAME()"
+        return r
     muts = []
 
     def mut_measure(res, name, expr):
@@ -171,20 +178,26 @@ def mutation_campaign(samples):
          s, "Worksheet 'Running Sales by Quarter'"),
         ("M9", "Join converted to star schema", "Finance physical inner join modelled as a relationship",
          lambda: convert(f["wb"], "star"), f, "Worksheet 'Attainment by Region'"),
+        ("M10", "RLS role on the wrong column", "Manager Security role filters Email UPN instead of Manager UPN",
+         lambda: rls_wrong(i["res"]), i, "Identity anna.lee@contoso.com (permitted user)"),
+        ("M11", "On-time % definition changed", "Denominator = all invoices instead of paid invoices (guide challenge B)",
+         lambda: mut_measure(i["res"], "On-time %", "DIVIDE([On Time Paid Amount], [Total Invoice Amount])"),
+         i, "KPI scenario: All data"),
     ]
     for mid, title, change, make, sample, check in cases:
         res = make()
         rep = validate(res, binding(sample["wb"]), today=AS_OF, scenarios=False)
         c = by_name(rep).get(check)
         detected = c is not None and c.status in ("FAIL", "ERROR")
+        g = {x["gate"]: x["status"] for x in rep.gates}
         muts.append({"id": mid, "title": title, "change": change, "check": check,
                      "status": c.status if c else "MISSING", "detail": c.detail if c else "",
-                     "detected": detected})
+                     "detected": detected, "gates": " ".join(f"G{k}:{v}" for k, v in g.items())})
     return muts
 
 
 def uat_cases(samples, ui, muts, pyres):
-    S, F, H = (samples[n] for n in NAMES)
+    S, F, H, I = (samples[n] for n in NAMES)
     cases = []
 
     def case(cid, title, requirement, steps, expected, actual, ok, evidence=""):
@@ -283,12 +296,12 @@ def uat_cases(samples, ui, muts, pyres):
          f"{len(cat['functions'])} functions ({cats}); {len(cat['structural'])} structural mappings", len(cat["functions"]) >= 70)
     ui_ok = {s["id"]: s["status"] == "PASS" for s in ui["steps"]}
     case("UAT-17", "Formula translator", "Users can translate any formula", "Translate an LOD and an invalid formula in the UI",
-         "DAX returned; syntax error explained", "UI-11, UI-12 " + ("PASS" if ui_ok.get("UI-11") and ui_ok.get("UI-12") else "FAIL"),
-         ui_ok.get("UI-11", False) and ui_ok.get("UI-12", False), "screenshots/12_translator.png")
+         "DAX returned; syntax error explained", "UI-16, UI-17 " + ("PASS" if ui_ok.get("UI-16") and ui_ok.get("UI-17") else "FAIL"),
+         ui_ok.get("UI-16", False) and ui_ok.get("UI-17", False), "screenshots/18_translator.png")
     case("UAT-18", "Compare exported reports", "Validate numbers of both reports from exports",
          "Upload a Tableau crosstab CSV and a Power BI export with one seeded difference",
-         "Formatted numbers parsed; the single different row is reported", "UI-14 " + ("PASS" if ui_ok.get("UI-14") else "FAIL"),
-         ui_ok.get("UI-14", False), "screenshots/14_compare_exports.png")
+         "Formatted numbers parsed; the single different row is reported", "UI-19 " + ("PASS" if ui_ok.get("UI-19") else "FAIL"),
+         ui_ok.get("UI-19", False), "screenshots/20_compare_exports.png")
     case("UAT-19", "Simple UI following design principles", "UI must be very simple",
          "Playwright walkthrough: 4-step flow, responsive, dark mode, no JS errors",
          "All UI checks pass", f"{sum(ui_ok.values())}/{len(ui_ok)} UI checks passed", ui["ok"], "screenshots/")
@@ -314,8 +327,78 @@ def uat_cases(samples, ui, muts, pyres):
          "; ".join(c.detail[:120] for c in sk), bool(sk))
     allpass = all(samples[n]["rep"].summary["FAIL"] == 0 and samples[n]["rep"].summary["ERROR"] == 0 for n in NAMES)
     case("UAT-24", "Overall number parity", "Numbers of both reports must match",
-         "Run full validation (4 layers) on the 3 samples", "No FAIL / ERROR",
+         "Run full validation on the 4 samples", "No FAIL / ERROR",
          "; ".join(f"{n}: {samples[n]['rep'].summary}" for n in NAMES), allpass)
+    # ---- build guide requirements
+    from tableau2pbi.ir import build_ir, lineage_csv, validate_ir
+    from tableau2pbi.validation.gates import CSV_COLUMNS, results_csv, verdict
+    errs = {n: validate_ir(build_ir(samples[n]["res"])) for n in NAMES}
+    case("UAT-25", "Canonical IR v0.1.0", "Guide 6: versioned JSON IR with stable IDs, deps, confidence",
+         "Build ir.json for the 4 samples; validate against schemas/ir-0.1.0.schema.json; build twice",
+         "Schema-valid and deterministic", "; ".join(f"{n}: {len(e)} schema errors" for n, e in errs.items()),
+         all(not e for e in errs.values()) and json.dumps(build_ir(I["res"]), sort_keys=True) == json.dumps(build_ir(I["res"]), sort_keys=True))
+    sec_tests = {n: st for n, st in pyres["by_file"].get("test_guide_features", {}).get("tests", [])}
+    sec_ok = all(sec_tests.get(t) == "passed" for t in ("test_rejects_path_traversal", "test_rejects_zip_bomb", "test_rejects_xml_entities"))
+    case("UAT-26", "Secure ingestion", "Guide 15: XML entity / ZIP path attacks",
+         "Upload a .twbx with ../ paths, a 30 MB zero-filled member, and a TWB with an external entity",
+         "All three rejected with a clear error; no file written to disk", f"path traversal / zip bomb / XXE tests: {'passed' if sec_ok else 'failed'}", sec_ok)
+    unk_ok = sec_tests.get("test_unknown_nodes_preserved_with_xpath") == "passed"
+    case("UAT-27", "Unknown nodes preserved", "Guide 6: preserve unknown node + review flag",
+         "Parse a workbook with an unrecognised element", "Listed with XPath; parse completeness < 100%",
+         f"test_unknown_nodes_preserved_with_xpath: {'passed' if unk_ok else 'failed'}; Superstore completeness "
+         f"{S['wb'].parse_stats['completeness']}%", unk_ok)
+    role = I["res"].model.roles[0] if I["res"].model.roles else None
+    ident = [c for c in I["rep"].checks if c.name.startswith("Identity")]
+    case("UAT-28", "Row-level security", "Guide 8 RLS example: USERNAME() -> USERPRINCIPALNAME() role, identity matrix",
+         "Convert Invoice_Health.twb; validate each manager and a forbidden user",
+         "Role on DimEmployeeSecurity; each identity sees the same rows/KPIs in both tools; forbidden user sees 0; live test PENDING",
+         (f"role {role.name}: {role.table_permissions}; " if role else "no role; ") + "; ".join(f"{c.name}: {c.status}" for c in ident),
+         bool(role) and len(ident) == 4 and all(c.status == "PASS" for c in ident)
+         and any(c.status == "PENDING" and c.name.startswith("Live identity") for c in I["rep"].checks), "screenshots/13_identity_matrix.png")
+    gates_i = {g["gate"]: g["status"] for g in I["rep"].gates}
+    m11 = next((m for m in muts if m["id"] == "M11"), {})
+    case("UAT-29", "Five quality gates", "Guide 10: data, KPI, interactions, RLS, business UAT; earlier failure blocks later gates",
+         "Validate Invoice Health; inject M11 (KPI definition change)",
+         "Clean run: G1/G2 PASS, G3/G4/G5 PENDING human checks. Injected defect: G2 FAIL, G3-G5 BLOCKED",
+         f"clean {gates_i}; injected {m11.get('gates')}",
+         gates_i.get(1) == "PASS" and gates_i.get(2) == "PASS" and gates_i.get(5) == "PENDING"
+         and "G2:FAIL G3:BLOCKED G4:BLOCKED G5:BLOCKED" in (m11.get("gates") or ""), "screenshots/11_validation_gates.png")
+    reg = I["rep"].kpi_register
+    case("UAT-30", "KPI regression register", "Guide 10: 5-15 critical KPIs x canonical filter scenarios with Tableau value, Power BI value, delta",
+         "Validate Invoice Health", "All scenario rows within tolerance",
+         f"{len(reg)} rows, {len({r['scenario'] for r in reg})} scenarios, {len({r['metric'] for r in reg})} KPIs, "
+         f"{sum(r['status'] == 'PASS' for r in reg)} PASS", bool(reg) and all(r["status"] == "PASS" for r in reg),
+         "screenshots/12_kpi_register.png")
+    csv_text = results_csv(I["rep"].to_dict())
+    lin = lineage_csv(I["res"], I["rep"].to_dict())
+    case("UAT-31", "validation_results.csv and lineage", "Guide 12 prompt D + 15: scenario, metric, values, delta, tolerance, root cause, status, owner, approval notes; trace every field back to Tableau",
+         "Download both CSVs", "All required columns; every PBI object traced to Tableau XPath and rule",
+         f"validation_results.csv columns = {CSV_COLUMNS}; lineage rows = {len(lin.splitlines()) - 1}",
+         csv_text.splitlines()[0].split(",") == CSV_COLUMNS and "rule:fixed-lod-column" in lin and "/workbook/" in lin)
+    rd = {m["metric"]: m for m in I["rep"].readiness["metrics"]}
+    case("UAT-32", "Readiness score", "Guide 13: parse completeness, calc pass rate, visual openability, numeric parity, security acceptance, manual effort",
+         "Validate Invoice Health", "Measured metrics; openability reported as NOT RUN (no Windows)",
+         "; ".join(f"{k}: {v['value']}" for k, v in rd.items()), rd["Parse completeness"]["value"] == 100.0
+         and rd["Visual openability"]["value"] is None)
+    ov_ok = sec_tests.get("test_api_override_signoff_history_artifacts") == "passed" and ui_ok.get("UI-05", False)
+    case("UAT-33", "Mapping override with provenance", "Guide 15 checklist: reviewer can trace and override each field",
+         "Override On-time % with an invalid then a valid DAX; re-validate", "Invalid rejected; valid applied, original kept, audit trail, re-validation detects the change",
+         f"API test + UI-05: {'passed' if ov_ok else 'failed'}", ov_ok, "screenshots/04_override.png")
+    ai_ok = all(sec_tests.get(t) == "passed" for t in ("test_ai_suggestion_is_validated_and_review_only", "test_ai_is_opt_in",
+                                                     "test_redaction_and_dax_check"))
+    case("UAT-34", "Opt-in AI assistance", "Guide 5/11/15: AI only for ambiguous expressions, redacted, reviewed",
+         "Request a suggestion without credentials; with a stubbed Claude response; with a refusal",
+         "Opt-in error without credentials; suggestion parsed + reference-checked + REVIEW only; identifiers redacted",
+         f"AI tests: {'passed' if ai_ok else 'failed'} (model claude-opus-5-5, structured JSON output, server-side fallback)", ai_ok)
+    ch = by_name(I["rep"])
+    reg_all = {r["metric"]: r for r in reg if r["scenario"] == "All data"}
+    case("UAT-35", "Finance showcase: the guide's three translation challenges", "Guide 8 A/B/C: total, on-time paid amount with NULLs, vendor FIXED LOD",
+         "Validate Invoice Health KPI register and 'Vendor Concentration'",
+         "A, B and C reconcile exactly (C as a record-level FIXED column, not ALLEXCEPT)",
+         f"A Total {reg_all.get('Total Invoice Amount', {}).get('tableau')} = {reg_all.get('Total Invoice Amount', {}).get('powerbi')}; "
+         f"B On-time % {reg_all.get('On-time %', {}).get('status')}; C {ch.get(chr(87) + 'orksheet ' + chr(39) + 'Vendor Concentration' + chr(39)).status}",
+         reg_all.get("Total Invoice Amount", {}).get("status") == "PASS" and reg_all.get("On-time %", {}).get("status") == "PASS"
+         and ch["Worksheet 'Vendor Concentration'"].status == "PASS")
     return cases
 
 
@@ -394,14 +477,16 @@ def write_markdown(pyres, ui, samples, muts, cases):
     L.append("**In scope:** metadata extraction, conversion of data sources, custom SQL, joins, relationships, calculations, "
              "LODs, table calculations, groups, bins, sets, parameters, filters, worksheets and dashboards. Also in scope: "
              "the PBIP output, number validation, the Tableau→DAX reference, the formula translator, export comparison and the web UI.\n")
-    L.append("**Validation method.** The requested bichart.ai article could not be retrieved from the build environment "
-             "(the domain is outside the network allow-list). The framework therefore follows published Tableau→Power BI "
-             "migration validation practice:\n")
-    L.append(md_table(["Layer", "What is checked", "How"], [
-        ["L1 Metadata parity", "Every calculation, parameter, worksheet, dashboard, filter, column and relationship has a Power BI counterpart", "Inventory comparison"],
-        ["L2 Data reconciliation", "Row counts, column sums, NULL counts and distinct counts", "Source SQL = Tableau data source = Power BI model tables"],
-        ["L3 Visual reconciliation", "Every worksheet vs its converted visual, cell by cell", "Tableau-semantics engine vs DAX engine running the generated DAX, abs tolerance 0.01 / rel 1e-6"],
-        ["L4 Scenarios", "Parameter changes and slicers on dimensions outside the view", "Re-run L3 with changed inputs (filter propagation)"],
+    L.append("**Validation method.** It follows the supplied research and build guide (\"Build a Tableau to Power BI "
+             "Conversion Tool\", section 10). That guide summarises the BIChart validation article, which itself could not be "
+             "fetched from the build environment. Validation is a feature, not a final checkbox. It has five gates, and a "
+             "failed gate blocks every later gate. Human checks stay PENDING until a person performs them:\n")
+    L.append(md_table(["Gate", "Automated checks", "Human / live-system checks"], [
+        ["1 Data contract", "Metadata parity (every object has a counterpart); row counts, column sums, NULL and distinct counts; source SQL = Tableau = Power BI", "Same warehouse view, extract filters and business date"],
+        ["2 Numeric / KPI", "Every worksheet vs its visual cell by cell; parameter scenarios; KPI regression register (critical KPIs x canonical filter scenarios); tolerance abs 0.01 / rel 1e-6", "Approve ambiguous definitions and unusual LOD cases"],
+        ["3 Interactions", "PBIR field references resolve; quick filters and parameter controls become slicers; actions become interactions; sort order; single-direction relationships; slicer propagation scenarios", "Click paths, slicer defaults, tooltips, drillthrough (PENDING)"],
+        ["4 Security", "USERNAME() user filter becomes an RLS role (lint); simulated identity matrix per manager plus a forbidden user", "Real users, groups and SSO (PENDING)"],
+        ["5 Business UAT", "Decision log and signed output artifact (uat_signoff.json)", "Business owner signs off or records an approved redesign"],
     ]))
     L.append("\nThe two engines are independent implementations. The Tableau engine models record-level FIXED LODs, the Tableau "
              "filter order (context → Top N/FIXED → dimension → measure → table calc) and NULL propagation. The DAX engine "
@@ -415,9 +500,12 @@ def write_markdown(pyres, ui, samples, muts, cases):
         ["Finance_CustomSQL.twb", "PostgreSQL · custom SQL with <Parameters.Min Quantity> · physical INNER join · extract",
          "Fiscal year logic, LOOKUP, WINDOW_AVG, IF..NULL, CASE on numbers, SUM(IF..), STR/LEN; join duplication semantics"],
         ["HR_Analytics.twbx", "Packaged CSV (textscan)", "NULLs in dates and scores, ISNULL/IFNULL, date literal, FIXED AVG, MEDIAN, RUNNING_SUM(COUNTD), boolean dimensions"],
+        ["Invoice_Health.twb (finance showcase)", "SQL Server FinanceDW · FactInvoices -> DimVendor, DimEmployeeSecurity, DimDate",
+         "The guide's procure-to-pay demo: total invoice amount, on-time paid amount with NULL payment dates, on-time %, vendor FIXED LOD, aging buckets, overdue count, Top 10 vendors, 'Late invoices' parameter metric, TOTAL() share by field addressing, fiscal periods, and a USERNAME() data source filter converted to RLS"],
     ]))
     L.append(f"\nData: deterministic generator (`samples/generate_samples.py`, seed 42): 3,000 orders, 200 customers, 60 products, "
-             f"400 employees, deliberate NULLs (3% discounts, 5% performance scores, terminations).\n")
+             f"400 employees, 1,500 invoices / 40 vendors / 12 AP clerks under 3 managers, deliberate NULLs (3% discounts, 5% performance "
+             f"scores, terminations, unpaid invoices).\n")
     L.append("## 4. Automated test results\n")
     L.append(md_table(["Test module", "Passed", "Failed", "Skipped"],
                       [[f, d["passed"], d["failed"], d["skipped"]] for f, d in sorted(pyres["by_file"].items())]
@@ -435,9 +523,23 @@ def write_markdown(pyres, ui, samples, muts, cases):
         L.append(f"Conversion: {st['tables']} tables, {st['relationships']} relationships, {st['measures']} measures, "
                  f"{st['calc_columns']} calculated columns, {st['pages']} pages, {st['visuals']} visuals in "
                  f"{smp['t_convert']:.2f} s; validation {smp['t_validate']:.1f} s.\n")
-        L.append(md_table(["Layer", "Check", "Status", "Result"],
-                          [[c.layer, c.name, f"**{c.status}**", c.detail[:300]] for c in smp["rep"].checks]))
+        L.append(md_table(["Gate", "Status", "Automated (pass / fail / warn)", "Pending human checks"],
+                          [[f"{g['gate']} {g['name']}", f"**{g['status']}**", f"{g['automated_checks']} ({g['passed']} / {g['failed']} / {g['warnings']})",
+                            "; ".join(g["pending_human_checks"])] for g in smp["rep"].gates]))
+        L.append(f"\nVerdict: **{verdict(smp['rep'].gates)}**. Readiness: " + "; ".join(
+            f"{m['metric']} {m['value'] if m['value'] is not None else 'n/a'}" for m in smp["rep"].readiness["metrics"]) + "\n")
+        L.append(md_table(["Gate", "Layer", "Check", "Status", "Result"],
+                          [[c.gate, c.layer, c.name, f"**{c.status}**", c.detail[:300]] for c in smp["rep"].checks]))
         L.append("")
+    inv = samples["Invoice_Health.twb"]["rep"]
+    L.append("**KPI regression register: Invoice Health** (the guide's example register, measured)\n")
+    L.append(md_table(["Scenario", "KPI", "Tableau", "Power BI", "Delta", "Tolerance", "Acceptance"],
+                      [[r["scenario"], r["metric"], _f(r["tableau"]), _f(r["powerbi"]), _f(r["delta"]), _f(r["tolerance"]),
+                        r["status"]] for r in inv.kpi_register]))
+    L.append("\n**Security identity matrix: Invoice Health** (simulated identities; the live user test stays PENDING)\n")
+    L.append(md_table(["User", "Metric", "Tableau USERNAME() filter", "Power BI role", "Status"],
+                      [[r["user"], r["metric"], _f(r["tableau"]), _f(r["powerbi"]), r["status"]] for r in inv.identity_matrix]))
+    L.append("")
     sup = by_name(samples["Superstore_Sales.twb"]["rep"])
     for title in ("Worksheet 'Region Share'", "Worksheet 'Running Sales by Quarter'"):
         c = sup[title]
@@ -451,14 +553,15 @@ def write_markdown(pyres, ui, samples, muts, cases):
         L.append(md_table(["Key"] + [d["labels"].get(m, m) + " (T / PBI)" for m in d["measures"]] + ["Status"], rows))
         L.append(f"\nDAX query for live validation:\n\n```\n{d['dax_query']}\n```\n")
     L.append("## 7. Defect injection (does the validator catch wrong conversions?)\n")
-    L.append(md_table(["ID", "Injected defect", "Change", "Check", "Result", "Detected"],
-                      [[m["id"], m["title"], m["change"], m["check"], f"{m['status']}: {m['detail'][:150]}", "Yes" if m["detected"] else "**No**"] for m in muts]))
+    L.append(md_table(["ID", "Injected defect", "Change", "Check", "Result", "Gates", "Detected"],
+                      [[m["id"], m["title"], m["change"], m["check"], f"{m['status']}: {m['detail'][:150]}", m.get("gates", ""),
+                        "Yes" if m["detected"] else "**No**"] for m in muts]))
     L.append("\n## 8. Tableau → DAX mapping of the sample calculations\n")
     for n in NAMES:
         L.append(f"### {n}\n")
-        L.append(md_table(["Tableau field", "Tableau formula", "Power BI object", "DAX", "Status"],
-                          [[m.tableau_name, m.tableau_formula, f"{m.pbi_table}[{m.pbi_object}] ({m.kind})", m.dax, m.status]
-                           for m in samples[n]["res"].calc_mappings]))
+        L.append(md_table(["Tableau field", "Tableau formula", "Power BI object", "DAX", "Rule", "Class"],
+                          [[m.tableau_name, m.tableau_formula, f"{m.pbi_table}[{m.pbi_object}] ({m.kind})", m.dax, m.strategy,
+                            m.classification] for m in samples[n]["res"].calc_mappings]))
         L.append("")
     L.append("## 9. Defects found and fixed during testing\n")
     L.append(md_table(["ID", "Severity", "Component", "Defect", "How it was found", "Fix"], DEFECTS))
@@ -469,10 +572,13 @@ def write_markdown(pyres, ui, samples, muts, cases):
     for shot, cap in SHOT_CAPTIONS:
         if os.path.exists(os.path.join(SHOTS, shot)):
             L.append(f"\n**{cap}**\n\n![{cap}](screenshots/{shot})")
-    L.append("\n## 12. Sign-off\n")
+    L.append("\n## 12. Build guide traceability\n")
+    L.append(md_table(["Guide section", "Requirement", "Implementation", "Evidence"], GUIDE_TRACE))
+    L.append("\n## 13. Sign-off\n")
     L.append(md_table(["Criterion", "Result"], [
         ["All automated tests pass", "Yes" if tot["failed"] == 0 else "No"],
         ["All UAT cases pass", "Yes" if n_pass == len(cases) else "No"],
+        ["Business UAT (gate 5)", "PENDING: recorded by the business owner in the Validation center (the UI walkthrough records a sample decision)"],
         ["Numbers match for all sample worksheets (L3)", "Yes" if all(c.status == "PASS" for n in NAMES for c in samples[n]["rep"].checks if c.layer == "L3 Visual") else "No"],
         ["Validator detects all injected defects", "Yes" if all(m["detected"] for m in muts) else "No"],
         ["Open items", "Open the generated PBIP in Power BI Desktop and run live validation against the published Tableau and Power BI content"],
@@ -483,13 +589,35 @@ def write_markdown(pyres, ui, samples, muts, cases):
     return text
 
 
-SHOT_CAPTIONS = [("01_convert_start.png", "Upload and samples"), ("02_conversion_summary.png", "Conversion summary and Tableau → DAX mapping"),
-                 ("04_data_sql.png", "Data sources and custom SQL → Power Query"), ("05_model.png", "Semantic model"),
-                 ("06_layout.png", "Dashboard converted to a report page"), ("07_filters_params.png", "Filters and parameters"),
-                 ("08_issues.png", "Issues and manual steps"), ("10_validation_results.png", "Validation results"),
-                 ("11_validation_detail.png", "Cell-level comparison"), ("12_translator.png", "Formula translator"),
-                 ("13_reference.png", "Tableau → DAX reference"), ("14_compare_exports.png", "Compare exports"),
-                 ("15_mobile.png", "Phone layout"), ("16_dark_mode.png", "Dark mode")]
+GUIDE_TRACE = [
+    ["Exec decision", "Deterministic parsing -> typed IR -> rules -> selective AI -> PBIP/TMDL/PBIR -> independent validation", "parser.py, ir.py, formula/, converter.py, ai_assist.py, pbip/writer.py, validation/", "UAT-01, 05, 14, 25, 34"],
+    ["MVP finish line", "PBIP, JSON inventory, original-vs-DAX pairs, supported/unsupported inventory, test report, provenance", "Export view: PBIP zip, migration_report.json, DAX_MAPPING.csv, inventory, lineage.csv, this report", "UAT-14, 31; UI-14/15"],
+    ["2 BIChart workflow", "Connect/upload, inventory/assess, configure target, convert, validate/publish", "Upload -> Inventory -> Mapping -> Convert -> Validate -> Export; publishing deliberately not automated", "UI-01..15"],
+    ["5 Five engines", "UI, API, conversion engine, AI assistants, Power BI builders, quality gates", "web/static, web/app.py (FastAPI), parser+converter, ai_assist.py, pbip/writer.py, validation/gates.py", "tests/*"],
+    ["6 Canonical JSON", "Versioned IR, stable IDs, deps, confidence, unknown node preservation, lineage", "ir.py + schemas/ir-0.1.0.schema.json; XPath on every object", "UAT-25, 27, 31"],
+    ["6 Minimum extraction", "TWB/TWBX, safe unzip (path traversal, zip bombs), data sources, fields, calcs, filters, shelves, zones", "parser.py LIMITS, entity rejection", "UAT-01, 26"],
+    ["7 Translation coverage", "Classify, typed tree, deterministic rules, AI candidate, validate, PASS/REVIEW/UNSUPPORTED", "formula/dax.py rules; CalcMapping.classification/strategy/confidence", "UAT-05, 06, 07, 34"],
+    ["8 Finance example", "Invoice Health: total, on-time paid amount, vendor FIXED LOD, RLS", "samples/invoice_health.py", "UAT-28, 35"],
+    ["9 Real Power BI project", "PBIP folders, fields exist, TMDL parses, relationships reference known columns", "pbip/writer.py; Gate 3 PBIR reference check; DAX parser over all expressions", "UAT-14; test_report_references_exist_in_model"],
+    ["10 Validation gates", "Data, KPI/DAX, interactions, RLS, business UAT; KPI register; blocked later gates", "validation/gates.py, gate_checks.py", "UAT-28..30; M10/M11"],
+    ["12 Prompt D", "Read-only validation; CSV + HTML with scenario, metric, values, delta, tolerance, root cause, status, owner, approval", "validation_results.csv, VALIDATION_REPORT.html; never marks complete without running", "UAT-31"],
+    ["12 Prompt E", "Upload -> Inventory -> Mapping -> Convert -> Validate -> Export; readiness, lineage, side-by-side DAX, rerun history, QA pack, finance showcase, accessible contrast", "web/static/*", "UI-01..22"],
+    ["13 Readiness score", "Parse completeness, calc pass rate, visual openability, numeric parity, security acceptance, manual effort", "gates.readiness()", "UAT-32"],
+    ["14 UX screens", "Upload & inspect, model explorer, DAX translator, page designer (layout), validation center, download", "Workbench tabs, Validation center, Export", "UI-01..22"],
+    ["15 Security & risks", "Local processing, opt-in redacted AI, entity/ZIP guards, no credentials exported, RLS as hard gate, measured denominators", "parser LIMITS, ai_assist.redact, gate 4, readiness metrics", "UAT-26, 28, 34"],
+    ["15 Go/no-go", "Openable PBIP with 2 pages; SUM/COUNTD/IF/CASE/FIXED reconcile; unsupported shown; RLS; trace + override", "All automated except Desktop open (Windows) and real users", "UAT-24, 28, 33; open items in sign-off"],
+]
+
+SHOT_CAPTIONS = [("01_convert_start.png", "Upload and samples (finance showcase first)"), ("02_inventory.png", "Inventory: parse completeness and feature support"),
+                 ("03_mapping.png", "Mapping: Tableau → DAX with rule, confidence and classification"), ("04_override.png", "Reviewed DAX override with original kept"),
+                 ("05_data_sql.png", "Data sources and SQL → Power Query"), ("06_model.png", "Semantic model"),
+                 ("07_layout.png", "Dashboard converted to a report page"), ("09_security.png", "Row-level security role"),
+                 ("11_validation_gates.png", "Validation center: five gates"), ("12_kpi_register.png", "KPI regression register"),
+                 ("13_identity_matrix.png", "Security identity matrix"), ("15_signoff.png", "Business UAT sign-off"),
+                 ("16_export.png", "Export center"),
+                 ("14_validation_detail.png", "Cell-level comparison"), ("18_translator.png", "Formula translator"),
+                 ("19_reference.png", "Tableau → DAX reference"), ("20_compare_exports.png", "Compare exports"),
+                 ("21_mobile.png", "Phone layout"), ("22_dark_mode.png", "Dark mode")]
 
 
 def _f(v):

@@ -53,20 +53,24 @@ def index():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": __version__, "jobs": len(JOBS)}
+    from ..ai_assist import available
+    return {"status": "ok", "version": __version__, "jobs": len(JOBS), "ai_available": available()}
 
 
 @app.get("/api/samples")
 def samples():
     out = []
     desc = {
+        "Invoice_Health.twb": "Finance showcase (procure-to-pay) · star schema · on-time %, vendor FIXED LOD, aging · Top N · parameter · USERNAME() row-level security",
         "Superstore_Sales.twb": "Relationships model · 26 calcs (LOD, table calcs, groups, sets, bins) · 4 parameters · 16 sheets · 2 dashboards",
         "Finance_CustomSQL.twb": "Custom SQL with a parameter · physical inner join · extract · LOOKUP / WINDOW_AVG",
         "HR_Analytics.twbx": "Packaged workbook with CSV data · NULL handling · FIXED LOD · RUNNING_SUM",
     }
     for f in sorted(os.listdir(SAMPLES)) if os.path.isdir(SAMPLES) else []:
         if f.lower().endswith((".twb", ".twbx")):
-            out.append({"name": f, "description": desc.get(f, ""), "size": os.path.getsize(os.path.join(SAMPLES, f))})
+            out.append({"name": f, "description": desc.get(f, ""), "size": os.path.getsize(os.path.join(SAMPLES, f)),
+                        "showcase": f == "Invoice_Health.twb"})
+    out.sort(key=lambda x: (not x["showcase"], x["name"]))
     return out
 
 
@@ -86,7 +90,8 @@ def _do_convert(data: bytes, filename: str, join_strategy: str, sample: Optional
     payload["sample"] = sample
     payload["duration_s"] = round(time.time() - t0, 3)
     JOBS[job_id] = {"res": res, "conv": conv, "json": payload, "filename": filename, "sample": sample, "validation": None,
-                    "join_strategy": join_strategy}
+                    "join_strategy": join_strategy, "history": [], "signoff": None, "audit": [
+                        {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "converted", "detail": filename}]}
     return payload
 
 
@@ -116,20 +121,41 @@ def api_job(job_id: str):
     j = _job(job_id)
     out = dict(j["json"])
     out["validation"] = j["validation"]
+    out["history"] = j["history"]
+    out["signoff"] = j["signoff"]
+    out["audit"] = j["audit"]
     return out
+
+
+def _refresh(j):
+    """Re-serialise after an override (the conversion payload changed)."""
+    keep = {k: j["json"][k] for k in ("job_id", "filename", "sample", "duration_s")}
+    j["json"] = {**conversion_json(j["res"]), **keep}
+
+
+def _artifacts(j) -> dict:
+    from ..ir import build_ir, lineage_csv
+    from ..validation.gates import results_csv
+    res, v = j["res"], j["validation"]
+    files = {"MIGRATION_REPORT.html": migration_report_html(res, v), "DAX_MAPPING.csv": dax_mapping_csv(res),
+             "lineage.csv": lineage_csv(res, v), "ir.json": json.dumps(build_ir(res, v), indent=2, default=str),
+             "migration_report.json": json.dumps({**j["json"], "validation": v, "signoff": j["signoff"],
+                                                  "history": j["history"], "audit": j["audit"]}, indent=2, default=str),
+             ".gitignore": "*.pbix\n.pbi/localSettings.json\n.pbi/cache.abf\n"}
+    if v:
+        files["VALIDATION_REPORT.html"] = validation_report_html(v)
+        files["validation_results.csv"] = results_csv(v)
+        files["validation.json"] = json.dumps(v, indent=2, default=str)
+    if j["signoff"]:
+        files["uat_signoff.json"] = json.dumps(j["signoff"], indent=2)
+    return files
 
 
 @app.get("/api/jobs/{job_id}/pbip")
 def api_pbip(job_id: str):
     j = _job(job_id)
     res = j["res"]
-    extra = {"MIGRATION_REPORT.html": migration_report_html(res, j["validation"]),
-             "DAX_MAPPING.csv": dax_mapping_csv(res),
-             "conversion.json": json.dumps(j["json"], indent=2, default=str)}
-    if j["validation"]:
-        extra["VALIDATION_REPORT.html"] = validation_report_html(j["validation"])
-        extra["validation.json"] = json.dumps(j["validation"], indent=2, default=str)
-    data = pbip_zip(res, extra)
+    data = pbip_zip(res, _artifacts(j))
     name = os.path.splitext(j["filename"])[0]
     return Response(data, media_type="application/zip",
                     headers={"Content-Disposition": f'attachment; filename="{name}_PowerBI.zip"'})
@@ -176,8 +202,88 @@ async def api_validate(job_id: str, use_sample_data: bool = Form(False), sqlite:
     except ValueError:
         raise HTTPException(400, "as_of must be YYYY-MM-DD")
     rep = validate(res, binding, today=today, abs_tol=abs_tol, rel_tol=rel_tol, scenarios=scenarios).to_dict()
+    from ..validation.gates import compute_gates, verdict
+    rep["gates"] = compute_gates(rep, j["signoff"])
+    rep["verdict"] = verdict(rep["gates"])
     j["validation"] = json.loads(json.dumps(rep, default=str))
-    return j["validation"]
+    j["history"].append({"run": len(j["history"]) + 1, "at": rep["started"], "overall": rep["summary"]["overall"],
+                         "pass_rate": rep["summary"]["pass_rate"], "verdict": rep["verdict"],
+                         "overrides": sum(m.overridden for m in res.calc_mappings), "duration_s": rep["duration_s"]})
+    j["audit"].append({"at": rep["started"], "event": "validated", "detail": rep["verdict"]})
+    return {**j["validation"], "history": j["history"]}
+
+
+@app.get("/api/jobs/{job_id}/artifact/{name}")
+def api_artifact(job_id: str, name: str):
+    j = _job(job_id)
+    files = _artifacts(j)
+    if name not in files:
+        raise HTTPException(404, "Artifact not available yet (run the validation for validation artifacts)")
+    ctype = {"csv": "text/csv", "json": "application/json", "html": "text/html"}.get(name.rsplit(".", 1)[-1], "text/plain")
+    disp = "inline" if name.endswith(".html") else f'attachment; filename="{name}"'
+    return Response(files[name], media_type=ctype, headers={"Content-Disposition": disp})
+
+
+@app.post("/api/jobs/{job_id}/override")
+async def api_override(job_id: str, payload: dict):
+    from ..converter import apply_override
+    j = _job(job_id)
+    obj, dax = (payload or {}).get("object", ""), (payload or {}).get("dax", "").strip()
+    if not obj or not dax:
+        raise HTTPException(400, "object and dax are required")
+    try:
+        m = apply_override(j["res"], obj, dax, (payload or {}).get("note", ""), (payload or {}).get("source", "manual"))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+    except ValueError as e:
+        raise HTTPException(400, f"Override rejected: {e}")
+    _refresh(j)
+    if j["validation"]:
+        j["validation"]["stale"] = True
+    j["audit"].append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "override",
+                       "detail": f"{obj}: {m.original_dax} -> {dax}"})
+    return {"ok": True, "mapping": {**m.__dict__, "classification": m.classification},
+            "message": "Override applied. Re-run validation to verify the numbers."}
+
+
+@app.post("/api/jobs/{job_id}/ai-suggest")
+async def api_ai_suggest(job_id: str, payload: dict):
+    from ..ai_assist import AIUnavailable, suggest
+    j = _job(job_id)
+    obj = (payload or {}).get("object", "")
+    m = next((x for x in j["res"].calc_mappings if x.pbi_object == obj or x.tableau_name == obj), None)
+    if m is None:
+        raise HTTPException(404, f"No calculation '{obj}'")
+    try:
+        out = suggest(j["res"], m, client=app.state.ai_client if hasattr(app.state, "ai_client") else None)
+    except AIUnavailable as e:
+        raise HTTPException(400, str(e))
+    j["audit"].append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "ai-suggestion", "detail": obj})
+    return out
+
+
+@app.post("/api/jobs/{job_id}/signoff")
+async def api_signoff(job_id: str, payload: dict):
+    from ..validation.gates import compute_gates, make_signoff, verdict
+    j = _job(job_id)
+    if not j["validation"]:
+        raise HTTPException(400, "Run the validation before recording the business sign-off")
+    try:
+        so = make_signoff((payload or {}).get("approver", ""), (payload or {}).get("decision", ""),
+                          (payload or {}).get("notes", ""))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    so["validation_run"] = len(j["history"])
+    so["validation_verdict_before"] = j["validation"].get("verdict")
+    j["signoff"] = so
+    for c in j["validation"]["checks"]:
+        if c["gate"] == 5:
+            c["status"] = {"approved": "PASS", "approved-with-redesign": "WARN", "rejected": "FAIL"}[so["decision"]]
+            c["detail"] = f"{so['decision']} by {so['approver']} on {so['recorded_at']}. {so['notes']}".strip()
+    j["validation"]["gates"] = compute_gates(j["validation"], so)
+    j["validation"]["verdict"] = verdict(j["validation"]["gates"])
+    j["audit"].append({"at": so["recorded_at"], "event": "signoff", "detail": f"{so['decision']} by {so['approver']}"})
+    return {"signoff": so, "gates": j["validation"]["gates"], "verdict": j["validation"]["verdict"]}
 
 
 @app.get("/api/jobs/{job_id}/validation/report", response_class=HTMLResponse)

@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook original-version='18.1' source-build='2024.2.0 (20242.24.0716.1944)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <datasources>
+    <datasource hasconnection='false' inline='true' name='Parameters' version='18.1'>
+      <column caption='Status Selector' datatype='string' name='[Status Selector]' param-domain-type='list' role='dimension' type='nominal' value='&quot;All&quot;'>
+        <calculation class='tableau' formula='&quot;All&quot;' />
+        <members><member value='&quot;All&quot;' /><member value='&quot;Late invoices&quot;' /><member value='&quot;On time&quot;' /></members>
+      </column>
+    </datasource>
+    <datasource caption='Invoice Health' inline='true' name='federated.0inv4health9p2p' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='FinanceDW' name='sqlserver.0financedw'>
+            <connection authentication='sspi' class='sqlserver' dbname='FinanceDW' schema='dbo' server='findw-sql.contoso.local' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation type='collection'>
+          <relation connection='sqlserver.0financedw' name='FactInvoices' table='[dbo].[FactInvoices]' type='table' /><relation connection='sqlserver.0financedw' name='DimVendor' table='[dbo].[DimVendor]' type='table' /><relation connection='sqlserver.0financedw' name='DimEmployeeSecurity' table='[dbo].[DimEmployeeSecurity]' type='table' /><relation connection='sqlserver.0financedw' name='DimDate' table='[dbo].[DimDate]' type='table' />
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <metadata-records><metadata-record class='column'><remote-name>invoice_id</remote-name><remote-type>129</remote-type><local-name>[Invoice ID]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>invoice_id</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>vendor_key</remote-name><remote-type>129</remote-type><local-name>[Vendor Key]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>vendor_key</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>employee_key</remote-name><remote-type>129</remote-type><local-name>[Employee Key]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>employee_key</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>date_key</remote-name><remote-type>20</remote-type><local-name>[Date Key]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>date_key</remote-alias><local-type>integer</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>invoice_date</remote-name><remote-type>7</remote-type><local-name>[Invoice Date]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>invoice_date</remote-alias><local-type>date</local-type><aggregation>Year</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>due_date</remote-name><remote-type>7</remote-type><local-name>[Due Date]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>due_date</remote-alias><local-type>date</local-type><aggregation>Year</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>payment_date</remote-name><remote-type>7</remote-type><local-name>[Payment Date]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>payment_date</remote-alias><local-type>date</local-type><aggregation>Year</aggregation><contains-null>true</contains-null></metadata-record><metadata-record class='column'><remote-name>invoice_amount</remote-name><remote-type>5</remote-type><local-name>[Invoice Amount]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>invoice_amount</remote-alias><local-type>real</local-type><aggregation>Sum</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>status</remote-name><remote-type>129</remote-type><local-name>[Status]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>status</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>paid_flag</remote-name><remote-type>11</remote-type><local-name>[Paid Flag]</local-name><parent-name>[FactInvoices]</parent-name><remote-alias>paid_flag</remote-alias><local-type>boolean</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>vendor_key</remote-name><remote-type>129</remote-type><local-name>[Vendor Key (DimVendor)]</local-name><parent-name>[DimVendor]</parent-name><remote-alias>vendor_key</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>vendor_name</remote-name><remote-type>129</remote-type><local-name>[Vendor Name]</local-name><parent-name>[DimVendor]</parent-name><remote-alias>vendor_name</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>category</remote-name><remote-type>129</remote-type><local-name>[Vendor Category]</local-name><parent-name>[DimVendor]</parent-name><remote-alias>category</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>region</remote-name><remote-type>129</remote-type><local-name>[Region]</local-name><parent-name>[DimVendor]</parent-name><remote-alias>region</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>employee_key</remote-name><remote-type>129</remote-type><local-name>[Employee Key (DimEmployeeSecurity)]</local-name><parent-name>[DimEmployeeSecurity]</parent-name><remote-alias>employee_key</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>employee_name</remote-name><remote-type>129</remote-type><local-name>[Employee Name]</local-name><parent-name>[DimEmployeeSecurity]</parent-name><remote-alias>employee_name</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>email_upn</remote-name><remote-type>129</remote-type><local-name>[Email UPN]</local-name><parent-name>[DimEmployeeSecurity]</parent-name><remote-alias>email_upn</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>manager_upn</remote-name><remote-type>129</remote-type><local-name>[Manager UPN]</local-name><parent-name>[DimEmployeeSecurity]</parent-name><remote-alias>manager_upn</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>role</remote-name><remote-type>129</remote-type><local-name>[Role]</local-name><parent-name>[DimEmployeeSecurity]</parent-name><remote-alias>role</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>date_key</remote-name><remote-type>20</remote-type><local-name>[Date Key (DimDate)]</local-name><parent-name>[DimDate]</parent-name><remote-alias>date_key</remote-alias><local-type>integer</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>date</remote-name><remote-type>7</remote-type><local-name>[Calendar Date]</local-name><parent-name>[DimDate]</parent-name><remote-alias>date</remote-alias><local-type>date</local-type><aggregation>Year</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>month</remote-name><remote-type>129</remote-type><local-name>[Month]</local-name><parent-name>[DimDate]</parent-name><remote-alias>month</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record><metadata-record class='column'><remote-name>fiscal_period</remote-name><remote-type>129</remote-type><local-name>[Fiscal Period]</local-name><parent-name>[DimDate]</parent-name><remote-alias>fiscal_period</remote-alias><local-type>string</local-type><aggregation>Count</aggregation><contains-null>false</contains-null></metadata-record></metadata-records>
+      </connection>
+      <column datatype='real' name='[Invoice Amount]' role='measure' type='quantitative' default-format='c&quot;$&quot;#,##0.00'>
+        <desc><formatted-text><run>Invoice value in reporting currency</run></formatted-text></desc>
+      </column>
+      <column datatype='string' name='[Email UPN]' role='dimension' type='nominal' hidden='true' />
+      <column caption='Total Invoice Amount' datatype='real' name='[Calculation_I01]' role='measure' type='quantitative' default-format='c&quot;$&quot;#,##0'><calculation class='tableau' formula='SUM([Invoice Amount])' /></column><column caption='On Time Paid Amount' datatype='real' name='[Calculation_I02]' role='measure' type='quantitative' default-format='c&quot;$&quot;#,##0'><calculation class='tableau' formula='SUM(IF [Paid Flag] = TRUE AND [Payment Date] &lt;= [Due Date]
+THEN [Invoice Amount] ELSE 0 END)' /></column><column caption='Paid Amount' datatype='real' name='[Calculation_I03]' role='measure' type='quantitative' default-format='c&quot;$&quot;#,##0'><calculation class='tableau' formula='SUM(IF [Paid Flag] THEN [Invoice Amount] END)' /></column><column caption='On-time %' datatype='real' name='[Calculation_I04]' role='measure' type='quantitative' default-format='p0.0%'><calculation class='tableau' formula='[On Time Paid Amount] / [Paid Amount]' /></column><column caption='Days Late' datatype='integer' name='[Calculation_I05]' role='measure' type='quantitative'><calculation class='tableau' formula='DATEDIFF(&#x27;day&#x27;, [Due Date], [Payment Date])' /></column><column caption='Payment Status' datatype='string' name='[Calculation_I06]' role='dimension' type='nominal'><calculation class='tableau' formula='IF ISNULL([Payment Date]) THEN &#x27;Unpaid&#x27;
+ELSEIF [Payment Date] &lt;= [Due Date] THEN &#x27;On time&#x27;
+ELSE &#x27;Late&#x27;
+END' /></column><column caption='Aging Bucket' datatype='string' name='[Calculation_I07]' role='dimension' type='nominal'><calculation class='tableau' formula='IF ISNULL([Payment Date]) THEN &#x27;Unpaid&#x27; ELSEIF [Days Late] &lt;= 0 THEN &#x27;Not late&#x27; ELSEIF [Days Late] &lt;= 15 THEN &#x27;1-15 days&#x27; ELSEIF [Days Late] &lt;= 30 THEN &#x27;16-30 days&#x27; ELSE &#x27;30+ days&#x27; END' /></column><column caption='Vendor Fixed Amount' datatype='real' name='[Calculation_I08]' role='measure' type='quantitative'><calculation class='tableau' formula='{ FIXED [Vendor Name] : SUM([Invoice Amount]) }' /></column><column caption='Overdue Invoices' datatype='integer' name='[Calculation_I09]' role='measure' type='quantitative'><calculation class='tableau' formula='SUM(IF ISNULL([Payment Date]) AND [Due Date] &lt; #2025-12-31# THEN 1 ELSE 0 END)' /></column><column caption='Invoice Count' datatype='integer' name='[Calculation_I10]' role='measure' type='quantitative'><calculation class='tableau' formula='COUNTD([Invoice ID])' /></column><column caption='Avg Days to Pay' datatype='real' name='[Calculation_I11]' role='measure' type='quantitative'><calculation class='tableau' formula='AVG(DATEDIFF(&#x27;day&#x27;, [Invoice Date], [Payment Date]))' /></column><column caption='Selected Metric Amount' datatype='real' name='[Calculation_I12]' role='measure' type='quantitative' default-format='c&quot;$&quot;#,##0'><calculation class='tableau' formula='CASE [Parameters].[Status Selector]
+WHEN &#x27;Late invoices&#x27; THEN SUM(IF [Payment Status] = &#x27;Late&#x27; THEN [Invoice Amount] END)
+WHEN &#x27;On time&#x27; THEN [On Time Paid Amount]
+ELSE SUM([Invoice Amount])
+END' /></column><column caption='Manager Security' datatype='boolean' name='[Calculation_I13]' role='dimension' type='nominal'><calculation class='tableau' formula='[Manager UPN] = USERNAME()' /></column><column caption='Vendor Share of Region' datatype='real' name='[Calculation_I14]' role='measure' type='quantitative' default-format='p1'><calculation class='tableau' formula='SUM([Invoice Amount]) / TOTAL(SUM([Invoice Amount]))' /></column>
+      <drill-paths><drill-path name='Vendor Hierarchy'><field>[Region]</field><field>[Vendor Category]</field><field>[Vendor Name]</field></drill-path></drill-paths>
+      <filter class='categorical' column='[federated.0inv4health9p2p].[none:Calculation_I13:nk]'>
+        <groupfilter function='member' level='[none:Calculation_I13:nk]' member='true' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+      </filter>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects><object caption='FactInvoices' id='FI_obj'><properties context=''><relation connection='sqlserver.0financedw' name='FactInvoices' table='[dbo].[FactInvoices]' type='table' /></properties></object><object caption='DimVendor' id='DV_obj'><properties context=''><relation connection='sqlserver.0financedw' name='DimVendor' table='[dbo].[DimVendor]' type='table' /></properties></object><object caption='DimEmployeeSecurity' id='DE_obj'><properties context=''><relation connection='sqlserver.0financedw' name='DimEmployeeSecurity' table='[dbo].[DimEmployeeSecurity]' type='table' /></properties></object><object caption='DimDate' id='DD_obj'><properties context=''><relation connection='sqlserver.0financedw' name='DimDate' table='[dbo].[DimDate]' type='table' /></properties></object></objects>
+        <relationships><relationship><expression op='='><expression op='[Vendor Key]' /><expression op='[Vendor Key (DimVendor)]' /></expression><first-end-point object-id='FI_obj' /><second-end-point object-id='DV_obj' /></relationship><relationship><expression op='='><expression op='[Employee Key]' /><expression op='[Employee Key (DimEmployeeSecurity)]' /></expression><first-end-point object-id='FI_obj' /><second-end-point object-id='DE_obj' /></relationship><relationship><expression op='='><expression op='[Date Key]' /><expression op='[Date Key (DimDate)]' /></expression><first-end-point object-id='FI_obj' /><second-end-point object-id='DD_obj' /></relationship></relationships>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='KPI Overview'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Text' />
+            <encodings><text column='[federated.0inv4health9p2p].[usr:Calculation_I01:qk]' /><text column='[federated.0inv4health9p2p].[usr:Calculation_I04:qk]' /><text column='[federated.0inv4health9p2p].[usr:Calculation_I09:qk]' /><text column='[federated.0inv4health9p2p].[usr:Calculation_I10:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows></rows>
+        <cols></cols>
+      </table>
+    </worksheet>
+    <worksheet name='Invoice Amount by Vendor'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          <filter class='categorical' column='[federated.0inv4health9p2p].[none:Vendor Name:nk]'><groupfilter count='10' end='top' function='end' units='records' user:ui-marker='end' user:ui-top-by-field='true'><groupfilter direction='DESC' expression='SUM([Invoice Amount])' function='order' user:ui-marker='order'><groupfilter function='level-members' level='[none:Vendor Name:nk]' user:ui-enumeration='all' user:ui-marker='enumerate' /></groupfilter></groupfilter></filter>
+          <computed-sort column='[federated.0inv4health9p2p].[none:Vendor Name:nk]' direction='DESC' using='[federated.0inv4health9p2p].[usr:Calculation_I01:qk]' />
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Bar' />
+            <encodings></encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0inv4health9p2p].[none:Vendor Name:nk]</rows>
+        <cols>[federated.0inv4health9p2p].[usr:Calculation_I01:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Monthly Payment Trend'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Line' />
+            <encodings></encodings>
+          </pane>
+        </panes>
+        <rows>([federated.0inv4health9p2p].[usr:Calculation_I01:qk] + [federated.0inv4health9p2p].[usr:Calculation_I02:qk])</rows>
+        <cols>[federated.0inv4health9p2p].[tmn:Invoice Date:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Aging by Region'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Text' />
+            <encodings><text column='[federated.0inv4health9p2p].[sum:Invoice Amount:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0inv4health9p2p].[none:Region:nk]</rows>
+        <cols>[federated.0inv4health9p2p].[none:Calculation_I07:nk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Vendor Category Performance'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Text' />
+            <encodings><text column='[federated.0inv4health9p2p].[usr:Calculation_I01:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0inv4health9p2p].[none:Vendor Category:nk]</rows>
+        <cols>([federated.0inv4health9p2p].[usr:Calculation_I01:qk] + [federated.0inv4health9p2p].[usr:Calculation_I04:qk] + [federated.0inv4health9p2p].[usr:Calculation_I11:qk] + [federated.0inv4health9p2p].[avg:Calculation_I05:qk])</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Payment Status Mix'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Pie' />
+            <encodings><color column='[federated.0inv4health9p2p].[none:Calculation_I06:nk]' /><size column='[federated.0inv4health9p2p].[sum:Invoice Amount:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows></rows>
+        <cols></cols>
+      </table>
+    </worksheet>
+    <worksheet name='Selected Status by Region'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Bar' />
+            <encodings></encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0inv4health9p2p].[none:Region:nk]</rows>
+        <cols>[federated.0inv4health9p2p].[usr:Calculation_I12:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Vendor Concentration'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'><column-instance column='[Calculation_I14]' derivation='User' name='[usr:Calculation_I14:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Field'><order field='[federated.0inv4health9p2p].[none:Vendor Name:nk]' /></table-calc></column-instance></datasource-dependencies>
+          <filter class='categorical' column='[federated.0inv4health9p2p].[none:Vendor Category:nk]'><groupfilter function='member' level='[none:Vendor Category:nk]' member='&quot;IT&quot;' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' /></filter>
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Text' />
+            <encodings><text column='[federated.0inv4health9p2p].[max:Calculation_I08:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows>([federated.0inv4health9p2p].[none:Region:nk] / [federated.0inv4health9p2p].[none:Vendor Name:nk])</rows>
+        <cols>([federated.0inv4health9p2p].[max:Calculation_I08:qk] + [federated.0inv4health9p2p].[usr:Calculation_I14:qk])</cols>
+      </table>
+    </worksheet>
+    <worksheet name='Fiscal Period South'>
+      
+      <table>
+        <view>
+          <datasources><datasource caption='Invoice Health' name='federated.0inv4health9p2p' /></datasources>
+          <datasource-dependencies datasource='federated.0inv4health9p2p'></datasource-dependencies>
+          <filter class='categorical' column='[federated.0inv4health9p2p].[none:Region:nk]'><groupfilter function='member' level='[none:Region:nk]' member='&quot;South&quot;' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' /></filter>
+          
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view><breakdown value='auto' /></view>
+            <mark class='Text' />
+            <encodings><text column='[federated.0inv4health9p2p].[usr:Calculation_I01:qk]' /></encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0inv4health9p2p].[none:Fiscal Period:nk]</rows>
+        <cols>[federated.0inv4health9p2p].[usr:Calculation_I01:qk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+    <dashboards>
+      <dashboard name='Invoice Payment Health'>
+        <size maxheight='800' maxwidth='1400' minheight='800' minwidth='1400' />
+        <zones><zone h='100000' id='1' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone id='2' x='0' y='0' w='80000' h='8000' type-v2='text'><formatted-text><run>Invoice Payment Health</run></formatted-text></zone>
+          <zone id='3' x='0' y='8000' w='80000' h='18000' name='KPI Overview'></zone>
+          <zone id='4' x='0' y='26000' w='40000' h='37000' name='Invoice Amount by Vendor'></zone>
+          <zone id='5' x='40000' y='26000' w='40000' h='37000' name='Monthly Payment Trend'></zone>
+          <zone id='6' x='0' y='63000' w='40000' h='37000' name='Aging by Region'></zone>
+          <zone id='7' x='40000' y='63000' w='40000' h='37000' name='Payment Status Mix'></zone>
+          <zone id='8' x='80000' y='0' w='20000' h='20000' name='Aging by Region' type-v2='filter' param='[federated.0inv4health9p2p].[none:Region:nk]' mode='checkdropdown'></zone>
+          <zone id='9' x='80000' y='20000' w='20000' h='20000' type-v2='paramctrl' param='[Parameters].[Status Selector]' mode='compact'></zone>
+        </zone></zones>
+      </dashboard>
+    </dashboards>
+    <actions>
+      <action caption='Filter by Vendor' name='[ActionI1]'>
+        <activation auto-clear='true' type='on-select' />
+        <source dashboard='Invoice Payment Health' type='sheet' worksheet='Invoice Amount by Vendor' />
+        <command command='tsc:tsl-filter'><param name='target' value='Invoice Payment Health' /></command>
+      </action>
+    </actions>
+</workbook>
