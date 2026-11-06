@@ -570,6 +570,7 @@ class Validator:
             status = "FAIL" if status == "PASS" else status
             detail += f" | unmapped: {', '.join(missing)}"
         data = {"visual_type": visual.visual_type if visual else None, "dimensions": dims_keys,
+                "labels": {k: pill_label(self.wb, ws, k) for k in dims_keys + meas_keys},
                 "measures": meas_keys,
                 "measure_map": {k: self.res.field_map.get((ws.name, k)) for k in meas_keys},
                 "dimension_map": {k: self.res.field_map.get((ws.name, k)) for k in dims_keys},
@@ -691,6 +692,22 @@ def _col_lookup(res: ConversionResult, ds):
             if c.expression is None and c.tableau_ref:
                 out[(ds.name, c.tableau_ref)] = (t.name, c.name)
     return out
+
+
+def pill_label(wb: Workbook, ws, key: str) -> str:
+    """Human readable pill name, e.g. 'SUM(Sales)', 'YEAR(Order Date)', 'Profit Ratio'."""
+    ref = _ref(key)
+    ds = wb.datasource(ws.datasources[0]) if ws.datasources else None
+    name = ref.field
+    if ds is not None:
+        if ref.field in ds.calculations:
+            name = ds.calculations[ref.field].caption
+        elif ref.field in ds.columns and ds.columns[ref.field].caption:
+            name = ds.columns[ref.field].caption
+    fn = {"sum": "SUM", "avg": "AVG", "min": "MIN", "max": "MAX", "cnt": "CNT", "ctd": "CNTD", "med": "MEDIAN",
+          "attr": "ATTR", "yr": "YEAR", "qr": "QUARTER", "mn": "MONTH", "dy": "DAY", "wk": "WEEK",
+          "tyr": "YEAR", "tqr": "QUARTER", "tmn": "MONTH", "twk": "WEEK", "tdy": "DAY", "my": "MY"}.get(ref.derivation)
+    return f"{fn}({name})" if fn else name
 
 
 def _ref(key: str) -> FieldRef:

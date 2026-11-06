@@ -519,7 +519,8 @@ class TableauReader:
                 flt = self._read_filter(f, None)
                 if flt:
                     ws.filters.append(flt)
-            for s in _iter(view, "sort"):
+            sort_tags = ("sort", "computed-sort", "natural-sort", "manual-sort", "shelf-sort-v2")
+            for s in (el for el in view.iter() if _local(el.tag) in sort_tags):
                 ref = parse_field_ref(s.get("column", ""))
                 using = parse_field_ref(s.get("using", "")) if s.get("using") else None
                 if ref:

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tableau to Power BI Migrator</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>Tableau → Power BI Migrator</span></div>
+    <nav aria-label="Main">
+      <button data-view="convert" aria-current="page">Convert</button>
+      <button data-view="validate">Validate</button>
+      <button data-view="translate">Formula translator</button>
+      <button data-view="reference">DAX reference</button>
+      <button data-view="compare">Compare exports</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <ol class="steps" id="steps" aria-label="Progress">
+    <li data-step="1" class="active"><span class="n">1</span>Upload</li>
+    <li data-step="2"><span class="n">2</span>Review conversion</li>
+    <li data-step="3"><span class="n">3</span>Validate numbers</li>
+    <li data-step="4"><span class="n">4</span>Download PBIP</li>
+  </ol>
+
+  <!-- ================================================================ CONVERT -->
+  <section class="view" id="view-convert">
+    <div id="convert-start">
+      <h1>Convert a Tableau workbook</h1>
+      <p class="lead">Upload a .twb or .twbx file. The tool reads the full metadata: data sources, custom SQL, joins and relationships,
+        calculations, LODs, table calculations, parameters, filters, worksheets and dashboards. It produces a Power BI project (PBIP)
+        with a star-schema semantic model, DAX measures and report pages.</p>
+      <div class="grid-2">
+        <div class="panel">
+          <h2>Your workbook</h2>
+          <label class="drop" id="drop" tabindex="0">
+            <input type="file" id="file" accept=".twb,.twbx">
+            <strong>Drop a .twb / .twbx file here</strong>
+            <span class="muted">or click to browse · up to 200 MB</span>
+            <div id="file-chip"></div>
+          </label>
+          <fieldset>
+            <legend>Physical joins</legend>
+            <label class="radio"><input type="radio" name="join" value="flatten" checked>
+              <span>Keep Tableau numbers (recommended)<small>Joins are merged in Power Query exactly as Tableau joins them.</small></span></label>
+            <label class="radio"><input type="radio" name="join" value="star">
+              <span>Star schema<small>Joined tables become related tables. Numbers can differ when joins duplicate rows.</small></span></label>
+          </fieldset>
+          <div class="actions" style="margin-top:16px"><button class="btn primary" id="btn-convert" disabled>Convert workbook</button></div>
+        </div>
+        <div class="panel">
+          <h2>Or try a sample</h2>
+          <p class="muted" style="margin-top:-6px">Sample workbooks cover every conversion feature and include source data for validation.</p>
+          <div class="samples" id="samples"><div class="muted">Loading…</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="convert-result" hidden>
+      <div class="job-head">
+        <div>
+          <h1 id="job-title">Workbook</h1>
+          <div class="muted" id="job-sub"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="btn-new">New conversion</button>
+          <a class="btn" id="dl-report" target="_blank" rel="noopener">Migration report</a>
+          <a class="btn" id="dl-csv">DAX mapping (CSV)</a>
+          <a class="btn" id="dl-pbip">Download PBIP</a>
+          <button class="btn primary" id="btn-to-validate">Validate numbers →</button>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="tabs" role="tablist" id="result-tabs">
+        <button role="tab" data-tab="calcs" aria-selected="true">Calculations<span class="count" id="c-calcs"></span></button>
+        <button role="tab" data-tab="data">Data &amp; SQL<span class="count" id="c-data"></span></button>
+        <button role="tab" data-tab="model">Model<span class="count" id="c-model"></span></button>
+        <button role="tab" data-tab="layout">Report layout<span class="count" id="c-layout"></span></button>
+        <button role="tab" data-tab="filters">Filters &amp; parameters<span class="count" id="c-filters"></span></button>
+        <button role="tab" data-tab="issues">Issues<span class="count" id="c-issues"></span></button>
+      </div>
+      <div id="tab-body"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ VALIDATE -->
+  <section class="view" id="view-validate" hidden>
+    <h1>Validate numbers</h1>
+    <p class="lead">Every Tableau worksheet is executed with Tableau semantics and its converted Power BI visual is executed with DAX
+      semantics, over the same source data. Results are compared cell by cell. Checks run in four layers: metadata parity,
+      data reconciliation, visual reconciliation, and scenarios (parameter changes and slicers).</p>
+    <div id="validate-empty" class="panel empty">Convert a workbook first. <button class="btn small" data-goto="convert">Go to Convert</button></div>
+    <div id="validate-form" hidden>
+      <div class="grid-2">
+        <div class="panel">
+          <h2>Source data</h2>
+          <fieldset style="margin-top:0">
+            <legend class="visually-hidden">Data source</legend>
+            <label class="radio" id="opt-sample"><input type="radio" name="src" value="sample" checked>
+              <span>Bundled sample data<small>SQLite database shipped with the sample workbooks.</small></span></label>
+            <label class="radio"><input type="radio" name="src" value="sqlite">
+              <span>SQLite database<small>A copy of the source tables (table names as in Tableau).</small></span></label>
+            <label class="radio"><input type="radio" name="src" value="csv">
+              <span>CSV files<small>One file per table, named &lt;table&gt;.csv. Packaged .twbx data is used automatically.</small></span></label>
+          </fieldset>
+          <div id="src-sqlite" hidden><label class="field" for="in-sqlite">SQLite file</label><input type="file" id="in-sqlite" accept=".db,.sqlite,.sqlite3"></div>
+          <div id="src-csv" hidden><label class="field" for="in-csv">CSV files</label><input type="file" id="in-csv" accept=".csv" multiple></div>
+        </div>
+        <div class="panel">
+          <h2>Settings</h2>
+          <div class="row">
+            <div><label class="field" for="tol-abs">Absolute tolerance</label><input type="number" id="tol-abs" value="0.01" step="0.001" min="0"></div>
+            <div><label class="field" for="tol-rel">Relative tolerance</label><input type="number" id="tol-rel" value="0.000001" step="0.000001" min="0"></div>
+          </div>
+          <label class="field" for="as-of">"Today" for relative dates</label><input type="date" id="as-of">
+          <label class="radio" style="margin-top:12px"><input type="checkbox" id="scen" checked>
+            <span>Scenario tests<small>Re-run with changed parameters and slicers to test filter propagation.</small></span></label>
+          <div class="actions" style="margin-top:12px"><button class="btn primary" id="btn-validate">Run validation</button></div>
+        </div>
+      </div>
+      <div id="validate-result" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ TRANSLATE -->
+  <section class="view" id="view-translate" hidden>
+    <h1>Formula translator</h1>
+    <p class="lead">Paste a Tableau calculation to get its Power BI DAX equivalent. After a conversion, formulas are resolved against
+      that workbook's model. Otherwise a demo schema is used (Orders, Customers, Products).</p>
+    <div class="grid-2">
+      <div class="panel">
+        <label class="field" for="formula" style="margin-top:0">Tableau formula</label>
+        <textarea id="formula" spellcheck="false">{FIXED [Region] : SUM([Sales])}</textarea>
+        <div class="chips" id="examples" style="margin-top:10px"></div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn primary" id="btn-translate">Translate to DAX</button>
+          <label class="radio" style="margin:0;padding:6px 10px" id="use-job-wrap" hidden><input type="checkbox" id="use-job" checked><span>Use converted workbook</span></label>
+        </div>
+      </div>
+      <div class="panel" aria-live="polite" id="translate-out"><div class="empty">The DAX appears here.</div></div>
+    </div>
+  </section>
+
+  <!-- ================================================================ REFERENCE -->
+  <section class="view" id="view-reference" hidden>
+    <h1>Tableau → DAX reference</h1>
+    <p class="lead" id="ref-schema">Each example was generated by the converter itself.</p>
+    <div class="toolbar"><input type="search" id="ref-search" placeholder="Search functions, e.g. DATEDIFF, LOD, RANK" aria-label="Search reference">
+      <div class="chips" id="ref-cats"></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Category</th><th>Tableau</th><th>DAX</th><th>Becomes</th><th>Notes</th></tr></thead>
+      <tbody id="ref-body"></tbody></table></div>
+    <h2 style="margin-top:28px">Structural mapping</h2>
+    <div class="table-wrap"><table><thead><tr><th>Area</th><th>Tableau</th><th>Power BI</th></tr></thead><tbody id="ref-struct"></tbody></table></div>
+  </section>
+
+  <!-- ================================================================ COMPARE -->
+  <section class="view" id="view-compare" hidden>
+    <h1>Compare exports</h1>
+    <p class="lead">Compare a Tableau crosstab export with a Power BI "Export data" file (CSV or Excel). Key columns are detected
+      automatically. Formatted numbers such as "$1,234.50", "(12)" and "45%" are parsed.</p>
+    <div class="panel">
+      <div class="row">
+        <div><label class="field" for="cmp-t">Tableau export</label><input type="file" id="cmp-t" accept=".csv,.xlsx,.txt"></div>
+        <div><label class="field" for="cmp-p">Power BI export</label><input type="file" id="cmp-p" accept=".csv,.xlsx,.txt"></div>
+        <div><label class="field" for="cmp-keys">Key columns (optional, comma separated)</label><input type="text" id="cmp-keys" placeholder="Region, Category"></div>
+        <div><label class="field" for="cmp-tol">Absolute tolerance</label><input type="number" id="cmp-tol" value="0.01" step="0.001"></div>
+      </div>
+      <div class="actions" style="margin-top:12px"><button class="btn primary" id="btn-compare">Compare</button></div>
+    </div>
+    <div id="compare-out" aria-live="polite"></div>
+  </section>
+</main>
+<div id="toast" class="toast" role="status" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

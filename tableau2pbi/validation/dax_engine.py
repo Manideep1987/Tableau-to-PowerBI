@@ -773,18 +773,29 @@ class DaxEngine:
         return out
 
     def _distinct(self, keys, filters, ctx=None):
-        t = self.table_of(keys[0])
-        # choose a frame containing all keys
-        frame_table = t
-        for cand in [t] + list(self.base):
-            ex = self.expanded(cand)
-            if all(k in ex.columns for k in keys):
-                frame_table = cand
-                if cand == t:
-                    break
-        df = self.expanded(frame_table)[self.mask(frame_table, filters)][keys]
-        df = df.drop_duplicates().reset_index(drop=True)
-        return df
+        """Existing combinations of ``keys`` under ``filters``.
+
+        Columns reachable through one expanded table give the combinations that exist
+        in that table (auto-exist); columns on unrelated tables are cross-joined, as
+        SUMMARIZECOLUMNS does."""
+        remaining = list(keys)
+        parts = []
+        while remaining:
+            best, cover = None, []
+            for cand in [self.table_of(remaining[0])] + list(self.base):
+                cols = set(self.expanded(cand).columns)
+                cov = [k for k in remaining if k in cols]
+                if len(cov) > len(cover):
+                    best, cover = cand, cov
+            if not cover:
+                raise DaxError(f"Column {remaining[0]} not found in the model")
+            df = self.expanded(best)[self.mask(best, filters)][cover].drop_duplicates()
+            parts.append(df.reset_index(drop=True))
+            remaining = [k for k in remaining if k not in cover]
+        out = parts[0]
+        for p in parts[1:]:
+            out = out.merge(p, how="cross")
+        return out[list(keys)].reset_index(drop=True)
 
     def _table_func(self, name, args, ctx: Ctx) -> TableVal:
         if name in ("ALL", "REMOVEFILTERS", "ALLNOBLANKROW"):
