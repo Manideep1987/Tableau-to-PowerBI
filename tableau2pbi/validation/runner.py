@@ -147,7 +147,10 @@ def tableau_records(wb: Workbook, ds: Datasource, binding: DataBinding) -> pd.Da
                 cols[cname] = _coerce(raw[src], col.datatype)
             else:
                 cols[cname] = pd.Series([None] * len(raw), dtype=object)
-        frames[lt.name] = pd.DataFrame(cols)
+        frame = pd.DataFrame(cols)
+        if ds.model_style == "relationships":
+            frame["__row__" + lt.name] = range(len(frame))      # row identity for native-level aggregation
+        frames[lt.name] = frame
     if len(ds.tables) == 1:
         return frames[ds.tables[0].name].reset_index(drop=True)
     if ds.model_style == "joins":
@@ -412,6 +415,17 @@ class Validator(GateChecks):
             recs = self.tab_records.get(ds.name)
             if recs is None:
                 continue
+            nullable_cols = {c.tableau_ref for t in self.res.model.tables if t.datasource == ds.name
+                             for c in t.columns if c.nullable}
+            broken = [(c, int(recs[c].isna().sum())) for c, col in ds.columns.items()
+                      if c in recs.columns and int(recs[c].isna().sum()) and c not in nullable_cols
+                      and not col.contains_null]
+            self.add("L2 Data", f"Nullability contract - {ds.caption}", "FAIL" if broken else "PASS",
+                     ("Columns declared NOT NULL contain NULLs: " + ", ".join(f"{c} ({n})" for c, n in broken) +
+                      ". Re-convert with data profiling (the CLI and the web app do this automatically when data "
+                      "is provided) so the DAX keeps Tableau NULL semantics.") if broken else
+                     "Every column with NULLs in the data is treated as nullable by the conversion",
+                     {"columns": [{"column": c, "nulls": n, "status": "FAIL"} for c, n in broken]})
             fact = None
             for t in self.res.model.tables:
                 if t.datasource == ds.name and t.kind in ("fact", "single"):
@@ -866,6 +880,35 @@ def _dax_lit(v):
         y, m, d = v.split("-")
         return f"DATE({int(y)}, {int(m)}, {int(d)})"
     return '"' + str(v).replace('"', '""') + '"'
+
+
+def nullability_findings(wb: Workbook, binding: DataBinding) -> list:
+    """Columns whose metadata says 'contains-null = false' but whose source data has NULLs.
+
+    The converter only emits NULL-preserving DAX for columns that may be NULL, so a wrong
+    metadata flag (common for CSV / Excel sources) breaks the data contract."""
+    out = []
+    for ds in wb.datasources:
+        try:
+            recs = tableau_records(wb, ds, binding)
+        except Exception:
+            continue
+        for cname, col in ds.columns.items():
+            if not col.contains_null and cname in recs.columns and int(recs[cname].isna().sum()):
+                out.append({"datasource": ds.name, "caption": ds.caption, "column": cname,
+                            "nulls": int(recs[cname].isna().sum())})
+    return out
+
+
+def apply_nullability(wb: Workbook, findings: list) -> int:
+    """Mark the columns found by :func:`nullability_findings` as nullable (before converting)."""
+    n = 0
+    for f in findings:
+        ds = wb.datasource(f["datasource"])
+        if ds and f["column"] in ds.columns and not ds.columns[f["column"]].contains_null:
+            ds.columns[f["column"]].contains_null = True
+            n += 1
+    return n
 
 
 def validate(res: ConversionResult, binding: DataBinding, today: Optional[date] = None, **kw) -> ValidationReport:

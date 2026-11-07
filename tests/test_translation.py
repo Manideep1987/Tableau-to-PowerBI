@@ -108,11 +108,11 @@ def test_if_elseif_becomes_switch_true():
 
 def test_table_calcs_use_addressing():
     a = [("Products", "Category")]
+    rel = "CALCULATETABLE(SUMMARIZE('Orders', 'Products'[Category]), ALLSELECTED('Products'[Category]))"
     assert dax("RUNNING_SUM(SUM([Sales]))", "agg", a).expression == (
-        "CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Products'[Category]), "
-        "ORDERBY('Products'[Category])))")
+        f"CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, {rel}, ORDERBY('Products'[Category])))")
     assert dax("RANK(SUM([Sales]))", "agg", a).expression == (
-        "RANKX(ALLSELECTED('Products'[Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)")
+        f"RANKX({rel}, CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)")
     assert "OFFSET(-1" in dax("LOOKUP(SUM([Sales]), -1)", "agg", a).expression
     assert dax("INDEX()", "agg", a).expression.startswith("ROWNUMBER(")
     r = dax("RANK(SUM([Sales]))", "agg", None)
@@ -124,7 +124,7 @@ def test_include_exclude_measures():
     inc = tr.lod_measure(parse_formula("{INCLUDE [Customer Name] : SUM([Sales])}"), "avg")
     assert inc.expression == "AVERAGEX(SUMMARIZE('Orders', 'Customers'[Customer Name]), CALCULATE(SUM('Orders'[Sales])))"
     exc = tr.lod_measure(parse_formula("{EXCLUDE [Region] : SUM([Sales])}"), "sum")
-    assert exc.expression == "CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS('Customers'[Region]))"
+    assert exc.expression == "CALCULATE(SUM('Orders'[Sales]), ALLSELECTED('Customers'[Region]))"
 
 
 def test_translation_errors():

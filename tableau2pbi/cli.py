@@ -21,6 +21,17 @@ def _today(args):
     return date.fromisoformat(args.as_of) if getattr(args, "as_of", None) else None
 
 
+def _profile(wb, args):
+    """With source data available, correct 'contains-null' metadata before converting."""
+    from .validation.runner import DataBinding, apply_nullability, nullability_findings
+    if not (getattr(args, "sqlite", None) or getattr(args, "csv_dir", None) or wb.packaged_files):
+        return
+    found = nullability_findings(wb, DataBinding(args.sqlite, args.csv_dir, packaged=wb.packaged_files))
+    if apply_nullability(wb, found):
+        print("Data profiling: treating as nullable (metadata said NOT NULL): " +
+              ", ".join(f"{f['column']} ({f['nulls']} NULLs)" for f in found))
+
+
 def _convert(args):
     from .converter import convert
     from .parser import read_workbook
@@ -28,6 +39,7 @@ def _convert(args):
     from .report import conversion_json, dax_mapping_csv, migration_report_html, validation_report_html
     from .validation.runner import DataBinding, validate
     wb = read_workbook(args.workbook)
+    _profile(wb, args)
     res = convert(wb, args.joins)
     os.makedirs(args.out, exist_ok=True)
     write_pbip(res, args.out)
@@ -67,6 +79,7 @@ def _validate(args):
     from .report import validation_report_html
     from .validation.runner import DataBinding, validate
     wb = read_workbook(args.workbook)
+    _profile(wb, args)
     res = convert(wb, args.joins)
     rep = validate(res, DataBinding(args.sqlite, args.csv_dir, packaged=wb.packaged_files), today=_today(args),
                    abs_tol=args.abs_tol, rel_tol=args.rel_tol).to_dict()
@@ -114,6 +127,33 @@ def _compare(args):
     return 0 if out["status"] != "FAIL" else 2
 
 
+def _live(args):
+    """Compare the published Tableau views with the published Power BI dataset (read-only)."""
+    from .converter import convert
+    from .parser import read_workbook
+    from .validation.live import PowerBIClient, TableauServerClient, live_validate
+    secret = os.environ.get(args.pat_secret_env)
+    token = os.environ.get(args.pbi_token_env)
+    if not secret or not token:
+        print(f"Set the environment variables {args.pat_secret_env} (Tableau PAT secret) and "
+              f"{args.pbi_token_env} (Azure AD access token for the Power BI REST API).", file=sys.stderr)
+        return 2
+    res = convert(read_workbook(args.workbook))
+    tab = TableauServerClient(args.tableau_server, args.site, args.pat_name, secret, args.api_version).sign_in()
+    try:
+        out = live_validate(res, tab, PowerBIClient(token), args.dataset, args.workspace, abs_tol=args.abs_tol)
+    finally:
+        tab.sign_out()
+    for r in out:
+        s = r.get("summary", {})
+        print(f"{r['status']:5} {r['worksheet']} | {s.get('matched_cells', '-')}/{s.get('total_cells', '-')} cells "
+              f"{r.get('detail', '')}")
+    if args.json:
+        with open(args.json, "w", encoding="utf-8") as f:
+            json.dump(out, f, indent=2, default=str)
+    return 0 if all(r["status"] == "PASS" for r in out) else 2
+
+
 def _serve(args):
     from .web.app import main as serve
     serve(args.host, args.port)
@@ -152,6 +192,19 @@ def main(argv=None):
     k.add_argument("--keys")
     k.add_argument("--abs-tol", type=float, default=0.01)
     k.set_defaults(fn=_compare)
+    lv = sub.add_parser("live", help="compare published Tableau views with the published Power BI dataset")
+    lv.add_argument("workbook")
+    lv.add_argument("--tableau-server", required=True, help="e.g. https://tableau.contoso.com")
+    lv.add_argument("--site", default="", help="Tableau site content URL ('' for Default)")
+    lv.add_argument("--pat-name", required=True, help="Tableau personal access token name")
+    lv.add_argument("--pat-secret-env", default="TABLEAU_PAT_SECRET", help="env var holding the PAT secret")
+    lv.add_argument("--pbi-token-env", default="POWERBI_TOKEN", help="env var holding the Power BI access token")
+    lv.add_argument("--dataset", required=True, help="Power BI dataset (semantic model) id")
+    lv.add_argument("--workspace", help="Power BI workspace (group) id")
+    lv.add_argument("--api-version", default="3.22")
+    lv.add_argument("--abs-tol", type=float, default=0.01)
+    lv.add_argument("--json")
+    lv.set_defaults(fn=_live)
     s = sub.add_parser("serve", help="start the web UI")
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8000)

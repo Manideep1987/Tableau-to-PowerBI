@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from .ast import (AGGREGATES, TABLE_CALCS, Bool, BinOp, Case, DateLit, Field, Func, If, In,
-                  LOD, Node, Null, Num, Str, Unary, is_aggregate)
+                  LOD, Node, Null, Num, Str, Unary, is_aggregate, is_scalar_minmax)
 from .parser import parse_formula
 
 
@@ -265,14 +265,25 @@ class DaxTranslator:
             return bool(col and col.nullable)
         if isinstance(n, Null):
             return True
+        if isinstance(n, In):
+            return self.may_be_null(n.subject)
         if isinstance(n, Func):
-            if n.name in ("ZN", "IFNULL", "ISNULL", "COUNT", "COUNTD", "SIZE", "INDEX", "LEN"):
+            if n.name in ("ZN", "ISNULL", "COUNT", "COUNTD", "SIZE", "INDEX", "TODAY", "NOW", "PI", "RANK",
+                          "RANK_DENSE", "RANK_UNIQUE", "RANK_MODIFIED", "FIRST", "LAST"):
                 return False
+            if n.name == "IFNULL":
+                return self.may_be_null(n.args[1]) if len(n.args) > 1 else False
+            if n.name == "IIF":
+                return any(self.may_be_null(a) for a in n.args)
             return any(self.may_be_null(a) for a in n.args)
         if isinstance(n, If):
             return n.else_ is None or any(self.may_be_null(v) for _, v in n.branches) or self.may_be_null(n.else_)
         if isinstance(n, Case):
             return n.else_ is None or any(self.may_be_null(v) for _, v in n.whens)
+        if isinstance(n, BinOp) and n.op in ("/", "%"):
+            # x / 0 is NULL in Tableau even when x and the divisor are never NULL
+            if not (isinstance(n.right, Num) and n.right.value != 0):
+                return True
         if isinstance(n, (BinOp, Unary)):
             return any(self.may_be_null(c) for c in n.children())
         return False
@@ -283,11 +294,20 @@ class DaxTranslator:
         if op in ("AND", "OR"):
             a, _ = self.tr(n.left, ctx)
             b, _ = self.tr(n.right, ctx)
-            return f"({a} {'&&' if op == 'AND' else '||'} {b})", "boolean"
+            if not (self.may_be_null(n.left) or self.may_be_null(n.right)):
+                return f"({a} {'&&' if op == 'AND' else '||'} {b})", "boolean"
+            # Tableau three-valued logic: NULL AND FALSE = FALSE, NULL AND TRUE = NULL,
+            # NULL OR TRUE = TRUE, NULL OR FALSE = NULL (DAX treats BLANK as FALSE).
+            self.functions.update({"ISBLANK", "IF"})
+            if op == "AND":
+                return (f"IF((NOT ISBLANK({a}) && NOT({a})) || (NOT ISBLANK({b}) && NOT({b})), FALSE(), "
+                        f"IF(ISBLANK({a}) || ISBLANK({b}), BLANK(), TRUE()))"), "boolean"
+            return (f"IF((NOT ISBLANK({a}) && {a}) || (NOT ISBLANK({b}) && {b}), TRUE(), "
+                    f"IF(ISBLANK({a}) || ISBLANK({b}), BLANK(), FALSE()))"), "boolean"
         a, ta = self.tr(n.left, ctx)
         b, tb = self.tr(n.right, ctx)
-        row_level = ctx.mode == "row" or ctx.in_iter is not None
-        nullable = row_level and (self.may_be_null(n.left) or self.may_be_null(n.right))
+        # Tableau NULL propagates at row level and at aggregate level (e.g. COUNTD(x) + MIN(null))
+        nullable = self.may_be_null(n.left) or self.may_be_null(n.right)
         guard_terms = [x for x, node in ((a, n.left), (b, n.right)) if self.may_be_null(node)]
         if op == "+" and ("string" in (ta, tb)):
             expr = f"{a} & {b}"
@@ -337,6 +357,8 @@ class DaxTranslator:
     def t_Unary(self, n: Unary, ctx):
         v, t = self.tr(n.operand, ctx)
         if n.op == "NOT":
+            if self.may_be_null(n.operand):          # NOT NULL is NULL in Tableau, TRUE in DAX
+                return self._null_guard([v], f"NOT({v})"), "boolean"
             return f"NOT({v})", "boolean"
         return f"-{v}" if v[0] not in "-" else f"-({v})", t
 
@@ -344,7 +366,10 @@ class DaxTranslator:
         s, _ = self.tr(n.subject, ctx)
         vals = ", ".join(self.tr(v, ctx)[0] for v in n.values)
         e = f"{s} IN {{{vals}}}"
-        return (f"NOT({e})" if n.negated else e), "boolean"
+        e = f"NOT({e})" if n.negated else e
+        if self.may_be_null(n.subject):              # NULL IN (...) is NULL; DAX would match 0 / ""
+            e = self._null_guard([s], e)
+        return e, "boolean"
 
     # ------------------------------------------------- control flow --
     def t_If(self, n: If, ctx):
@@ -368,7 +393,10 @@ class DaxTranslator:
         parts = ", ".join(f"{m}, {v}" for m, (v, _) in whens)
         tail = f", {else_[0]}" if else_ else ""
         self.functions.add("SWITCH")
-        return f"SWITCH({s}, {parts}{tail})", typ
+        expr = f"SWITCH({s}, {parts}{tail})"
+        if self.may_be_null(n.subject):              # CASE NULL -> ELSE; DAX SWITCH(BLANK) matches 0 / ""
+            expr = f"IF(ISBLANK({s}), {else_[0] if else_ else 'BLANK()'}, {expr})"
+        return expr, typ
 
     # ---------------------------------------------------------- LODs --
     def _lod_dims(self, n: LOD):
@@ -423,7 +451,10 @@ class DaxTranslator:
         if n.kind == "EXCLUDE":
             rm = ", ".join(q_col(t, c) for t, c in dims)
             self.functions.add("REMOVEFILTERS")
-            return f"CALCULATE({inner}, REMOVEFILTERS({rm}))", typ
+            # EXCLUDE drops the dimension from the view grain but dimension filters still apply
+            # (Tableau order of operations): ALLSELECTED keeps the visual filters on the column.
+            self.functions.add("ALLSELECTED")
+            return f"CALCULATE({inner}, ALLSELECTED({rm}))", typ
         # INCLUDE: evaluated at view grain + dims, then the outer aggregate applies
         return f"CALCULATE({inner})", typ
 
@@ -453,29 +484,45 @@ class DaxTranslator:
             elif n.kind == "INCLUDE":
                 expr = f"{iter_fn}(SUMMARIZE({q_table(fact)}, {grain}), CALCULATE({inner}))"
             else:
-                expr = f"CALCULATE({inner}, REMOVEFILTERS({grain}))"
+                expr = f"CALCULATE({inner}, ALLSELECTED({grain}))"   # keeps filters on the dims
         self.functions.update({"CALCULATE", iter_fn, "SUMMARIZE"})
         return DaxResult(expr, "agg", typ, list(self.warnings), set(self.functions), self.confidence)
 
     # ----------------------------------------------------- functions --
     def t_Func(self, n: Func, ctx: _Ctx):
         name = n.name
-        if name in AGGREGATES:
+        if name in AGGREGATES and not is_scalar_minmax(n):
             return self._aggregate(n, ctx)
         if name in TABLE_CALCS:
             return self._table_calc(n, ctx)
         h = getattr(self, "f_" + name, None)
         if h is not None:
-            return h(n, ctx)
+            return self._null_safe_func(n, ctx, h(n, ctx))
         simple = SIMPLE_FUNCS.get(name)
         if simple:
             args = [self.tr(a, ctx)[0] for a in n.args]
             dax_name, typ = simple
             self.functions.add(dax_name)
-            return f"{dax_name}({', '.join(args)})", typ
+            return self._null_safe_func(n, ctx, (f"{dax_name}({', '.join(args)})", typ))
         self.warn(f"Function {name}() has no automatic DAX equivalent.", "low")
         args = [self.tr(a, ctx)[0] for a in n.args]
         return f"/* TODO {name} */ {name}({', '.join(args)})", "string"
+
+    NULL_AWARE = {"ZN", "IFNULL", "ISNULL", "IIF", "IFERROR", "ISDATE", "TODAY", "NOW", "USERNAME", "FULLNAME",
+                  "USERDOMAIN", "ISMEMBEROF", "PI", "MAKEDATE"}
+
+    def _null_safe_func(self, n: Func, ctx: _Ctx, result):
+        """Tableau scalar functions return NULL for a NULL argument; DAX treats BLANK as
+        0 / "" / 1899-12-30. Guard row-level calls whose arguments may be NULL."""
+        expr, typ = result
+        row_level = ctx.mode == "row" or ctx.in_iter is not None
+        if not row_level or n.name in self.NULL_AWARE:
+            return expr, typ
+        nullable = [a for a in n.args if self.may_be_null(a) and not isinstance(a, (Str, Num, Bool))]
+        if not nullable:
+            return expr, typ
+        terms = [self.tr(a, ctx)[0] for a in nullable]
+        return self._null_guard(terms, expr), typ
 
     def _agg_target(self, arg: Node):
         """If ``arg`` is a plain column (or row-level calc column) return its DAX ref."""
@@ -488,6 +535,15 @@ class DaxTranslator:
                 if col is not None:
                     return q_col(col.table, col.column), col.datatype, col.table
         return None
+
+    def _zero_count(self, expr: str, arg: Node, table: str) -> str:
+        """Tableau COUNT / COUNTD of only-NULL values is 0 (the row is shown); DAX returns BLANK
+        (the row disappears). Return 0 when the table has rows in the current context."""
+        if not self.may_be_null(arg):
+            return expr
+        fact = self.r.fact_table if table != self.r.fact_table and self.r.is_one_side(self.r.fact_table, table) else table
+        self.functions.update({"COUNTROWS", "ISBLANK"})
+        return f"IF(ISBLANK({expr}), IF(COUNTROWS({q_table(fact)}) > 0, 0), {expr})"
 
     def _through_fact(self, expr: str, table: str, ctx: _Ctx) -> str:
         """Aggregations of a dimension-table column are cross-filtered through the fact
@@ -541,7 +597,7 @@ class DaxTranslator:
             if name == "COUNT":
                 f = "COUNT" if dt in ("integer", "real", "date", "datetime") else "COUNTA"
                 self.functions.add(f)
-                return self._through_fact(f"{f}({ref})", target[2], ctx), "integer"
+                return self._zero_count(self._through_fact(f"{f}({ref})", target[2], ctx), arg, target[2]), "integer"
             if name == "PERCENTILE":
                 p, _ = self.tr(n.args[1], ctx)
                 self.functions.add("PERCENTILE.INC")
@@ -550,8 +606,10 @@ class DaxTranslator:
             if f:
                 self.functions.add(f)
                 rtype = "integer" if name == "COUNTD" else ("real" if name in ("AVG", "STDEV", "STDEVP", "VAR", "VARP", "MEDIAN") else dt)
-                expr = f"{f}({ref})"
-                return self._through_fact(expr, target[2], ctx), rtype
+                expr = self._through_fact(f"{f}({ref})", target[2], ctx)
+                if name == "COUNTD":
+                    expr = self._zero_count(expr, arg, target[2])
+                return expr, rtype
         # aggregate over an expression -> iterator
         table = self._iter_table(arg)
         inner_ctx = ctx.child(in_iter=table)
@@ -571,8 +629,8 @@ class DaxTranslator:
         if not f:
             raise TranslationError(f"Unsupported aggregate {name}")
         self.functions.add(f)
-        return f"{f}({q_table(table)}, {inner})", ("integer" if name == "COUNT" else
-                                                    ("real" if name != "SUM" else it))
+        return self._through_fact(f"{f}({q_table(table)}, {inner})", table, ctx), (
+            "integer" if name == "COUNT" else ("real" if name != "SUM" else it))
 
     # --------------------------------------------------- table calcs --
     def _addressing(self):
@@ -589,14 +647,19 @@ class DaxTranslator:
             alls = ", ".join(q_col(t, c) for t, c in addr)
             allsel = f"ALLSELECTED({alls})"
             order = ", ".join(q_col(t, c) for t, c in addr)
+            # Tableau partitions contain only the cells that have data: the relation is the set of
+            # addressing values present in the current partition (other filters kept).
+            self.functions.update({"CALCULATETABLE", "SUMMARIZE"})
+            rel = f"CALCULATETABLE(SUMMARIZE({q_table(self.r.fact_table)}, {alls}), {allsel})"
         else:
             allsel = "ALLSELECTED()"
             order = None
+            rel = allsel
         arg = self.tr(n.args[0], ctx)[0] if n.args else None
 
         def window(frm, frm_t, to, to_t):
             self.functions.add("WINDOW")
-            return f"WINDOW({frm}, {frm_t}, {to}, {to_t}, {allsel}, ORDERBY({order}))"
+            return f"WINDOW({frm}, {frm_t}, {to}, {to_t}, {rel}, ORDERBY({order}))"
 
         if name in ("RUNNING_SUM", "RUNNING_AVG", "RUNNING_MIN", "RUNNING_MAX", "RUNNING_COUNT"):
             if not order:
@@ -615,7 +678,7 @@ class DaxTranslator:
                 e = self.tr(n.args[2], ctx)[0] if len(n.args) > 2 else "0"
                 tbl = window(s, "REL", e, "REL")
             else:
-                tbl = allsel
+                tbl = rel
             if name in ("WINDOW_SUM", "TOTAL") and len(n.args) <= 1:
                 if name == "TOTAL":
                     self.warn("TOTAL() uses ALLSELECTED: matches Tableau grand-total for additive measures.")
@@ -632,31 +695,31 @@ class DaxTranslator:
             if name in ("RANK_UNIQUE", "RANK_MODIFIED"):
                 self.warn(f"{name}() tie handling differs; RANKX SKIP used.")
             self.functions.add("RANKX")
-            return f"RANKX({allsel}, CALCULATE({arg}), , {direction}, {ties})", "integer"
+            return f"RANKX({rel}, CALCULATE({arg}), , {direction}, {ties})", "integer"
         if name == "RANK_PERCENTILE":
             self.functions.add("RANKX")
-            return (f"DIVIDE(RANKX({allsel}, CALCULATE({arg}), , ASC, SKIP) - 1, "
-                    f"COUNTROWS({allsel}) - 1)"), "real"
+            return (f"DIVIDE(RANKX({rel}, CALCULATE({arg}), , ASC, SKIP) - 1, "
+                    f"COUNTROWS({rel}) - 1)"), "real"
         if name == "INDEX":
             if not order:
                 raise TranslationError("INDEX() needs an addressing dimension")
             self.functions.add("ROWNUMBER")
-            return f"ROWNUMBER({allsel}, ORDERBY({order}))", "integer"
+            return f"ROWNUMBER({rel}, ORDERBY({order}))", "integer"
         if name == "SIZE":
-            return f"COUNTROWS({allsel})", "integer"
+            return f"COUNTROWS({rel})", "integer"
         if name in ("FIRST", "LAST"):
             self.functions.add("ROWNUMBER")
             if name == "FIRST":
-                return f"1 - ROWNUMBER({allsel}, ORDERBY({order}))", "integer"
-            return f"COUNTROWS({allsel}) - ROWNUMBER({allsel}, ORDERBY({order}))", "integer"
+                return f"1 - ROWNUMBER({rel}, ORDERBY({order}))", "integer"
+            return f"COUNTROWS({rel}) - ROWNUMBER({rel}, ORDERBY({order}))", "integer"
         if name == "LOOKUP":
             off = self.tr(n.args[1], ctx)[0] if len(n.args) > 1 else "0"
             self.functions.add("OFFSET")
-            return f"CALCULATE({arg}, OFFSET({off}, {allsel}, ORDERBY({order})))", "real"
+            return f"CALCULATE({arg}, OFFSET({off}, {rel}, ORDERBY({order})))", "real"
         if name == "PREVIOUS_VALUE":
             self.warn("PREVIOUS_VALUE() is recursive; converted as OFFSET(-1) of the expression.", "low")
             self.functions.add("OFFSET")
-            return f"CALCULATE({arg}, OFFSET(-1, {allsel}, ORDERBY({order})))", "real"
+            return f"CALCULATE({arg}, OFFSET(-1, {rel}, ORDERBY({order})))", "real"
         raise TranslationError(f"Unsupported table calculation {name}")
 
     # ------------------------------------------------ specific funcs --
@@ -665,9 +728,11 @@ class DaxTranslator:
 
     def f_IIF(self, n, ctx):
         a = self._args(n, ctx)
-        if len(a) == 4:
-            self.warn("IIF() unknown-result argument ignored.")
-        return f"IF({a[0][0]}, {a[1][0]}, {a[2][0]})", a[1][1]
+        expr = f"IF({a[0][0]}, {a[1][0]}, {a[2][0]})"
+        if self.may_be_null(n.args[0]):              # IIF(NULL, ...) returns the 'unknown' argument / NULL
+            unknown = a[3][0] if len(a) == 4 else "BLANK()"
+            expr = f"IF(ISBLANK({a[0][0]}), {unknown}, {expr})"
+        return expr, a[1][1]
 
     def f_IFNULL(self, n, ctx):
         a = self._args(n, ctx)

@@ -105,7 +105,7 @@ ENTRIES = [
     ("LOD", "{FIXED : SUM([Sales])}", "Table-scoped LOD (grand total)."),
     ("LOD", "SUM([Sales]) / SUM({FIXED [Region] : SUM([Sales])})", "LOD inside an aggregate -> evaluated per row inside SUMX."),
     ("LOD", "{INCLUDE [Customer Name] : SUM([Sales])}", "Aggregated over the view grain + included dims (SUMX/AVERAGEX over SUMMARIZE)."),
-    ("LOD", "{EXCLUDE [Region] : SUM([Sales])}", "REMOVEFILTERS on the excluded dimension."),
+    ("LOD", "{EXCLUDE [Region] : SUM([Sales])}", "ALLSELECTED on the excluded dimension: removes it from the grain, keeps filters on it (Tableau applies dimension filters first)."),
     ("Table calc", "RUNNING_SUM(SUM([Sales]))", "Addressing = worksheet dimension; WINDOW(1, ABS, 0, REL) over ALLSELECTED."),
     ("Table calc", "RUNNING_AVG(SUM([Sales]))", ""),
     ("Table calc", "WINDOW_SUM(SUM([Sales]))", ""),

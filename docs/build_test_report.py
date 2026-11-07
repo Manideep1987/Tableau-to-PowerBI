@@ -399,7 +399,32 @@ def uat_cases(samples, ui, muts, pyres):
          f"B On-time % {reg_all.get('On-time %', {}).get('status')}; C {ch.get(chr(87) + 'orksheet ' + chr(39) + 'Vendor Concentration' + chr(39)).status}",
          reg_all.get("Total Invoice Amount", {}).get("status") == "PASS" and reg_all.get("On-time %", {}).get("status") == "PASS"
          and ch["Worksheet 'Vendor Concentration'"].status == "PASS")
+    fz = load_fuzz()
+    if fz:
+        case("UAT-36", "Differential fuzzing", "Numbers must match for any calculation, not only the authored samples",
+             f"Generate {fz['total_cases']} random calculations (row-level, aggregate, FIXED/INCLUDE/EXCLUDE LOD, table calcs, "
+             f"NULL handling, dates, strings) and random worksheets (dims, measures, include/exclude, measure and Top N filters) on 3 data models",
+             "Every case converts and Tableau engine = DAX engine cell by cell",
+             f"{fz['total_pass']}/{fz['total_cases']} PASS over seeds {[x['seed'] for x in fz['seeds']]}",
+             fz["total_pass"] == fz["total_cases"])
+    rob = {n: st for n, st in pyres["by_file"].get("test_robustness", {}).get("tests", [])}
+    ok = rob and all(v == "passed" for v in rob.values())
+    case("UAT-37", "Hostile and unusual input", "Tool must not crash or produce invalid output on bad / unusual workbooks",
+         "Random bytes, truncated XML, quotes / brackets / unicode / euro sign in names, empty tables, all-NULL columns, 300-file package",
+         "Clean 400 errors or valid conversion; numbers match", f"{sum(v == 'passed' for v in rob.values())}/{len(rob)} robustness tests passed", bool(ok))
+    case("UAT-38", "Nullability data contract", "Wrong NULL metadata must not silently change numbers",
+         "Workbook declares a column NOT NULL, data contains NULLs", "Gate 1 FAIL naming the column; profiling + re-conversion -> PASS",
+         "test_quotes_brackets_unicode_in_names: " + rob.get("test_quotes_brackets_unicode_in_names", "not run"),
+         rob.get("test_quotes_brackets_unicode_in_names") == "passed")
     return cases
+
+
+def load_fuzz():
+    p = os.path.join(OUT, "fuzz_sweep.json")
+    if os.path.exists(p):
+        with open(p) as f:
+            return json.load(f)
+    return None
 
 
 # ------------------------------------------------------------------ report
@@ -424,6 +449,28 @@ DEFECTS = [
      "Translation status 'Manual review'.", "Converted as view-grain measures: AGGX(SUMMARIZE(fact, dims), CALCULATE(expr)) / REMOVEFILTERS."),
     ("D-10", "Low", "Validator", "Validation took 95 s on Superstore (calculated columns re-filtered the full frame per row).",
      "Performance measurement.", "Mask caching, vectorised isin and CALCULATE result cache: 8 s."),
+    ("D-11", "High", "Translator", "Two-argument MIN(a, b) / MAX(a, b) was treated as an aggregation (only the first argument used).",
+     "Differential fuzzing (seed 1).", "Scalar MIN/MAX recognised in the AST, translator and Tableau engine."),
+    ("D-12", "High", "Converter", "Text tables and KPI cards without dimensions dropped the measures placed on shelves (empty card).",
+     "Differential fuzzing (seed 1).", "Card / multi-row card values = shelf measures + text measures."),
+    ("D-13", "High", "Validator", "The Tableau engine aggregated fields of related (dimension) tables per fact row; Tableau relationships aggregate them at their native level.",
+     "Differential fuzzing (SUM/AVG/COUNT of Products[Unit Price], DimVendor[Vendor Name]).", "Row identity per related table; aggregations over one related table count each of its rows once."),
+    ("D-14", "Medium", "Translator", "COUNT / COUNTD of only-NULL values: Tableau 0 (row shown), DAX BLANK (row hidden).",
+     "Differential fuzzing.", "COUNT/COUNTD of nullable columns return 0 when the table has rows in context."),
+    ("D-15", "High", "Translator", "INDEX / RANK / WINDOW_* / LOOKUP ran over all addressing values; Tableau partitions only contain cells with data.",
+     "Differential fuzzing (INDEX off by one when a year was missing in a partition).", "Relation = CALCULATETABLE(SUMMARIZE(fact, addressing), ALLSELECTED(addressing))."),
+    ("D-16", "High", "Translator", "Scalar functions on NULL: DAX treats BLANK as 0 / \"\" / 1899-12-30 (WEEKDAY(BLANK-1) = 7) where Tableau returns NULL.",
+     "Differential fuzzing (seed 1).", "Row-level scalar functions with nullable arguments are NULL-guarded; the DAX engine now reproduces DAX's BLANK date arithmetic."),
+    ("D-17", "High", "Converter", "Top N combined with a dimension filter: Tableau ranks before the filter, Power BI after.",
+     "Differential fuzzing (seed 1).", "Rank measure over the unfiltered context (ALLEXCEPT fact, Top N field) + visual measure filter rank <= N."),
+    ("D-18", "High", "Translator", "NULL at aggregate level and three-valued logic: COUNTD(x) + MIN(null), IIF(NULL,...), CASE NULL, NULL IN (...), NOT NULL, NULL AND/OR.",
+     "Differential fuzzing (seeds 1, 13).", "Guards in measures too; IIF returns NULL/unknown, CASE NULL -> ELSE, Kleene AND/OR."),
+    ("D-19", "High", "Translator", "EXCLUDE LOD removed the worksheet's filter on the excluded dimension (REMOVEFILTERS); Tableau applies dimension filters first.",
+     "Differential fuzzing (seed 2).", "EXCLUDE -> CALCULATE(expr, ALLSELECTED(dims))."),
+    ("D-20", "High", "Translator", "Division by zero yields NULL in Tableau even with non-NULL inputs; comparisons on DIVIDE() results were not guarded.",
+     "Differential fuzzing (seed 13).", "Divisions (except by a non-zero literal) are treated as possibly NULL."),
+    ("D-21", "Medium", "Converter", "Metadata 'contains-null = false' contradicted by the data (CSV/Excel) produced unguarded DAX.",
+     "Robustness test with unicode / quoted names.", "Gate 1 'Nullability contract' check + automatic data profiling before conversion (CLI, web app)."),
 ]
 
 LIMITATIONS = [
@@ -433,8 +480,10 @@ LIMITATIONS = [
      "Use Dynamic M query parameters (DirectQuery) or move the filter to the model."),
     ("Context filters with FIXED LODs", "Tableau FIXED respects context filters; ALLEXCEPT / REMOVEFILTERS removes them. Flagged as a warning.",
      "Add KEEPFILTERS on the context column in the converted DAX."),
-    ("Top N combined with dimension filters", "Tableau applies Top N before dimension filters; Power BI applies it after. Flagged as a warning.",
-     "Make the dimension filter a context-like filter (page filter) or rewrite Top N as a RANKX measure."),
+    ("Top N on a field that is not in the view, combined with dimension filters", "Tableau applies Top N before dimension filters; a Power BI TopN filter applies it after. (When the field is in the view the converter reproduces Tableau's order with a rank measure.)",
+     "Add the Top N field to the visual, or rewrite the Top N as a RANKX measure."),
+    ("String comparison case sensitivity", "DAX compares text case-insensitively; most Tableau sources compare case-sensitively (CONTAINS, =). Flagged on CONTAINS.",
+     "Normalise case in Power Query when values differ only by case."),
     ("Table calculations used in several sheets with different addressing", "A DAX measure has one addressing (from the first sheet that uses it).",
      "Duplicate the measure per addressing; the validator flags mismatching sheets."),
     ("Visual formatting", "Colours, fonts, reference lines, annotations and custom shapes are not converted; layout is converted.",
@@ -471,6 +520,10 @@ def write_markdown(pyres, ui, samples, muts, cases):
         s = samples[n]["rep"].summary
         L.append(f"* **{n}:** {s['PASS']} PASS · {s['WARN']} WARN · {s['FAIL']} FAIL · {s['ERROR']} ERROR · {s['SKIP']} SKIP. Overall **{s['overall']}**.")
     L.append(f"* **Defect injection:** {sum(m['detected'] for m in muts)}/{len(muts)} injected conversion defects were detected by the validator.")
+    fz = load_fuzz()
+    if fz:
+        L.append(f"* **Differential fuzzing:** {fz['total_pass']}/{fz['total_cases']} random calculations and worksheets "
+                 f"reconcile cell by cell (Tableau engine vs DAX engine) after fixing the defects it found (D-11 to D-20).")
     L.append('* **Verdict:** every number in the four sample reports matches Tableau. The exception is one documented Power BI limitation (a parameter-driven calculated column, reported as WARN). Gates 1-2 pass on all samples. Gates 3-5 wait on human checks (click paths, live identity tests, business sign-off), which this campaign records as PENDING instead of simulating.')
     L.append("\n## 2. Scope and approach\n")
     L.append("**In scope:** metadata extraction, conversion of data sources, custom SQL, joins, relationships, calculations, "
@@ -562,6 +615,21 @@ def write_markdown(pyres, ui, samples, muts, cases):
                           [[m.tableau_name, m.tableau_formula, f"{m.pbi_table}[{m.pbi_object}] ({m.kind})", m.dax, m.strategy,
                             m.classification] for m in samples[n]["res"].calc_mappings]))
         L.append("")
+    fz = load_fuzz()
+    if fz:
+        L.append("\n## 7b. Differential fuzzing\n")
+        L.append("Hand-written tests only cover the cases someone thought of. The fuzzer (`tests/fuzz/differential_fuzz.py`) "
+                 "generates random, type-correct Tableau calculations and random worksheets on the Superstore, Invoice Health "
+                 "and HR models. It converts them and compares the Tableau engine with the DAX engine for every cell. "
+                 "The first 150-case run found 36 mismatches. They had eight root causes, all fixed (D-11 to D-18). Later "
+                 "runs on fresh seeds found two more (D-19 EXCLUDE, D-20 division by zero). The final sweep is below. "
+                 "`tests/test_robustness.py` runs 100 fixed-seed cases in every `pytest` run.\n")
+        L.append(md_table(["Seed", "Cases", "PASS", "Mismatches", "Errors", "Unsupported", "Seconds"],
+                          [[x["seed"], x["cases"], x["pass"], x["mismatches"], x["errors"], x["unsupported"], x["seconds"]]
+                           for x in fz["seeds"]] + [["**Total**", fz["total_cases"], fz["total_pass"],
+                                                     sum(x["mismatches"] for x in fz["seeds"]), sum(x["errors"] for x in fz["seeds"]),
+                                                     sum(x["unsupported"] for x in fz["seeds"]), round(sum(x["seconds"] for x in fz["seeds"]))]]))
+        L.append("")
     L.append("## 9. Defects found and fixed during testing\n")
     L.append(md_table(["ID", "Severity", "Component", "Defect", "How it was found", "Fix"], DEFECTS))
     L.append("\n## 10. Known limitations and recommendations\n")
@@ -627,7 +695,7 @@ def _f(v):
     return str(v)
 
 
-def write_docx(md_text):
+def write_docx(md_text, out_name="Test_Report.docx"):
     """Render the Markdown report into a formatted Word document."""
     from docx import Document
     from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -712,12 +780,16 @@ def write_docx(md_text):
         elif ln.strip():
             add_runs(doc.add_paragraph(), ln)
         i += 1
-    path = os.path.join(DOCS, "Test_Report.docx")
+    path = os.path.join(DOCS, out_name)
     doc.save(path)
     return path
 
 
 def main():
+    if "--guide" in sys.argv:            # render docs/USER_GUIDE.md to Word
+        with open(os.path.join(DOCS, "USER_GUIDE.md"), encoding="utf-8") as f:
+            print(write_docx(f.read(), "User_Guide.docx"))
+        return
     if "--docx-only" in sys.argv:       # re-render the Word file from an existing TEST_REPORT.md
         with open(os.path.join(DOCS, "TEST_REPORT.md"), encoding="utf-8") as f:
             print(write_docx(f.read()))

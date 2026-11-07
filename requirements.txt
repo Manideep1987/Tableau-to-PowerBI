@@ -5,6 +5,9 @@ fastapi>=0.110
 uvicorn>=0.27
 python-multipart>=0.0.9
 openpyxl>=3.1
+jsonschema>=4.20
+# optional: AI suggestions for unsupported calculations (used only with ANTHROPIC_API_KEY)
+anthropic>=2.0
 # tests and documentation
 pytest>=8.0
 httpx>=0.27

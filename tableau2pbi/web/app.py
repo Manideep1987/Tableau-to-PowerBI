@@ -201,6 +201,17 @@ async def api_validate(job_id: str, use_sample_data: bool = Form(False), sqlite:
         today = date.fromisoformat(as_of) if as_of else date(2025, 12, 31) if j["sample"] else date.today()
     except ValueError:
         raise HTTPException(400, "as_of must be YYYY-MM-DD")
+    from ..validation.runner import apply_nullability, nullability_findings
+    found = nullability_findings(res.workbook, binding)
+    if found and not any(m.overridden for m in res.calc_mappings):
+        from ..converter import Converter
+        apply_nullability(res.workbook, found)
+        conv = Converter(res.workbook, j["join_strategy"])
+        res = conv.convert()
+        j["res"], j["conv"] = res, conv
+        _refresh(j)
+        j["audit"].append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "re-converted",
+                           "detail": "Data profiling: nullable columns " + ", ".join(f["column"] for f in found)})
     rep = validate(res, binding, today=today, abs_tol=abs_tol, rel_tol=rel_tol, scenarios=scenarios).to_dict()
     from ..validation.gates import compute_gates, verdict
     rep["gates"] = compute_gates(rep, j["signoff"])

@@ -749,7 +749,7 @@ class Converter:
             self.calc_info[(ds.name, name)] = CalcInfo(kind, host, tidy(cf.caption), dt, ast, nullable)
         # nullability after all infos exist
         for name, info in list(self.calc_info.items()):
-            if name[0] != ds.name or info.ast is None or info.kind != "column":
+            if name[0] != ds.name or info.ast is None or info.kind not in ("column", "measure"):
                 continue
             tr = DaxTranslator(_DsResolver(self, ds))
             try:
@@ -1219,8 +1219,9 @@ class Converter:
             v.roles["Y"] = meas(size or all_meas or text_meas)
         elif mark in ("text",) or (mark == "automatic" and not all_meas and text_meas):
             if not row_dims and not col_dims:
-                v.visual_type = "card" if len(text_meas) == 1 else "multiRowCard"
-                v.roles["Values"] = meas(text_meas)
+                kpis = _dedupe(text_meas + all_meas)
+                v.visual_type = "card" if len(kpis) == 1 else "multiRowCard"
+                v.roles["Values"] = meas(kpis)
             elif row_dims and col_dims:
                 v.visual_type = "pivotTable"
                 v.roles["Rows"] = cols(row_dims)
@@ -1330,13 +1331,37 @@ class Converter:
                 self.issue("info", "Filter", ws.name,
                            f"Top N bound to parameter '{p.caption if p else fl.top_param}' converted with its "
                            f"current value ({n}); Power BI Top N filters cannot be parameter-driven.")
-            others = [f for f in ws.filters if f is not fl and f.kind in ("categorical",) and not f.is_context]
-            if others:
-                self.issue("warning", "Filter", ws.name,
-                           "Top N filter combined with dimension filters: Tableau computes Top N before "
-                           "dimension filters (unless they are context filters); Power BI computes it after.")
+            others = [f for f in ws.filters if f is not fl and f.kind in ("categorical", "quantitative")
+                      and not f.is_context and not self.is_measure_ref(f.field)]
             if tgt is None:
                 return None
+            in_view = any(self.dim_target(r) == tgt for r in ws.all_fields() if not self.is_measure_ref(r))
+            if others and in_view and by:
+                # Tableau order of operations: Top N is computed before dimension filters (only context
+                # filters apply). Reproduce it with a rank over the unfiltered context + a measure filter.
+                ctx_cols = [self.dim_target(f.field) for f in ws.filters if f.is_context]
+                keep = ", ".join(q_col(t, c) for t, c in [tgt] + [x for x in ctx_cols if x])
+                fact = self.fact_of.get(ds.name)
+                order = "DESC" if fl.top_direction == "top" else "ASC"
+                rank_name = f"Top N rank: {tgt[1]} by {by}"
+                if not self.model.measure(rank_name):
+                    expr = (f"RANKX(ALL({q_col(*tgt)}), CALCULATE({q_measure(by)}, ALLEXCEPT({q_table(fact)}, {keep})), , "
+                            f"{order}, SKIP)")
+                    self.model.table(self.measure_table).measures.append(PbiMeasure(
+                        rank_name, expr, "0", "Rank used to apply Top N before dimension filters (Tableau order)",
+                        "Filter helpers", f"top:{ref.field}", "integer"))
+                    self.calc_mappings.append(CalcMapping(
+                        ds.caption, rank_name, f"TOP {n} [{ref.field}] BY {fl.top_by}", "base-measure", rank_name,
+                        self.measure_table, expr, "Converted with notes",
+                        ["Top N combined with dimension filters: converted to a rank measure filter so that Top N is "
+                         "computed before the other filters, as in Tableau."], ["RANKX", "ALLEXCEPT"],
+                        fl.xml_path, "rule:topn-before-dimension-filters", "high"))
+                return PbiFilter("measure-range", measure=rank_name, max=n,
+                                 note=f"Top {n} {tgt[1]} by {by}, computed before dimension filters")
+            if others:
+                self.issue("warning", "Filter", ws.name,
+                           "Top N filter on a field that is not in the view, combined with dimension filters: "
+                           "Power BI computes Top N after those filters (Tableau before). Review the numbers.")
             return PbiFilter("topn", tgt[0], tgt[1], top_n=n, top_direction=fl.top_direction, by_measure=by)
         if fl.kind == "categorical-all":
             return None

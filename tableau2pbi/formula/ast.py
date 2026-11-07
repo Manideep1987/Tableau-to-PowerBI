@@ -137,6 +137,11 @@ TABLE_CALCS = {"RUNNING_SUM", "RUNNING_AVG", "RUNNING_MIN", "RUNNING_MAX", "RUNN
                "RANK_PERCENTILE", "INDEX", "FIRST", "LAST", "SIZE", "LOOKUP", "PREVIOUS_VALUE"}
 
 
+def is_scalar_minmax(node) -> bool:
+    """MIN(a, b) / MAX(a, b) with two arguments are scalar functions, not aggregations."""
+    return isinstance(node, Func) and node.name in ("MIN", "MAX") and len(node.args) == 2
+
+
 def is_aggregate(node: Node, calc_lookup=None, _seen=None) -> bool:
     """True when the expression produces an aggregate (measure-level) result.
 
@@ -147,7 +152,7 @@ def is_aggregate(node: Node, calc_lookup=None, _seen=None) -> bool:
     if isinstance(node, LOD):
         return False            # LODs are row-level results
     if isinstance(node, Func):
-        if node.name in AGGREGATES or node.name in TABLE_CALCS:
+        if (node.name in AGGREGATES and not is_scalar_minmax(node)) or node.name in TABLE_CALCS:
             return True
     if isinstance(node, Field) and calc_lookup and not node.is_parameter:
         if node.name in _seen:

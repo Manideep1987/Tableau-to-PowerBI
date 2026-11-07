@@ -355,6 +355,9 @@ class Ctx:
     env: dict = field(default_factory=dict)
 
 
+DAX_ZERO_DATE = datetime(1899, 12, 30)     # BLANK as a date in DAX
+
+
 class Missing:
     pass
 
@@ -869,6 +872,8 @@ class DaxEngine:
                 vals.append(v)
                 v += st
             return TableVal(pd.DataFrame({"[Value]": vals}), [], ident="series")
+        if name == "CALCULATETABLE":
+            return self.table(args[0], Ctx(self.calc_filters(args[1:], ctx), ctx.rows, ctx.env))
         if name == "TOPN":
             raise DaxError("TOPN not supported")
         raise DaxError(f"Unsupported table function {name}")
@@ -964,6 +969,16 @@ class DaxEngine:
 
     # ------------------------------------------------------- CALCULATE --
     def calculate(self, expr, fargs, ctx: Ctx):
+        filters = self.calc_filters(fargs, ctx)
+        if _pure(expr):
+            ck = ("calc", id(expr), filters)
+            if ck not in self._eval_cache:
+                self._eval_cache[ck] = self.eval(expr, Ctx(filters, (), {}))
+            return self._eval_cache[ck]
+        return self.eval(expr, Ctx(filters, ctx.rows, ctx.env))
+
+    def calc_filters(self, fargs, ctx: Ctx) -> tuple:
+        """Filter context produced by CALCULATE / CALCULATETABLE arguments."""
         new_filters, keep_filters, removals = [], [], []
         for fa in fargs:
             if fa[0] == "missing":
@@ -1029,13 +1044,7 @@ class DaxEngine:
             elif isinstance(f, TupF):
                 filters = self.remove(filters, keys=set(f.keys))
             filters = filters + (f,)
-        filters = filters + tuple(keep_filters)
-        if _pure(expr):
-            ck = ("calc", id(expr), filters)
-            if ck not in self._eval_cache:
-                self._eval_cache[ck] = self.eval(expr, Ctx(filters, (), {}))
-            return self._eval_cache[ck]
-        return self.eval(expr, Ctx(filters, ctx.rows, ctx.env))
+        return filters + tuple(keep_filters)
 
     def _expanded_tables(self, t):
         out, stack = {t}, [t]
@@ -1290,15 +1299,11 @@ class DaxEngine:
             return _format(v0, vals[1])
         # dates
         if name in ("YEAR", "MONTH", "DAY", "QUARTER", "HOUR", "MINUTE", "SECOND"):
-            d = _to_dt(v0)
-            if d is None:
-                return None
+            d = _to_dt(v0) if v0 is not None else DAX_ZERO_DATE
             return {"YEAR": d.year, "MONTH": d.month, "DAY": d.day, "QUARTER": (d.month - 1) // 3 + 1,
                     "HOUR": d.hour, "MINUTE": d.minute, "SECOND": d.second}[name]
         if name == "WEEKDAY":
-            d = _to_dt(v0)
-            if d is None:
-                return None
+            d = _to_dt(v0) if v0 is not None else DAX_ZERO_DATE
             rt = int(vals[1]) if len(vals) > 1 else 1
             wd = d.isoweekday()  # Mon=1..Sun=7
             if rt == 1:
@@ -1307,9 +1312,7 @@ class DaxEngine:
                 return wd
             return wd - 1
         if name == "WEEKNUM":
-            d = _to_dt(v0)
-            if d is None:
-                return None
+            d = _to_dt(v0) if v0 is not None else DAX_ZERO_DATE
             rt = int(vals[1]) if len(vals) > 1 else 1
             if rt == 21:
                 return d.isocalendar()[1]
@@ -1333,9 +1336,8 @@ class DaxEngine:
             day = min(d.day, calendar.monthrange(y, m)[1])
             return datetime(y, m, day, d.hour, d.minute, d.second)
         if name == "DATEDIFF":
-            a, b = _to_dt(vals[0]), _to_dt(vals[1])
-            if a is None or b is None:
-                return None
+            a = _to_dt(vals[0]) if vals[0] is not None else DAX_ZERO_DATE
+            b = _to_dt(vals[1]) if vals[1] is not None else DAX_ZERO_DATE
             unit = vals[2][1] if isinstance(vals[2], tuple) else str(vals[2])
             if unit == "DAY":
                 return (b.date() - a.date()).days

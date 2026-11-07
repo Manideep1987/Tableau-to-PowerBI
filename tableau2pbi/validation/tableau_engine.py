@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 from ..formula.ast import (AGGREGATES, TABLE_CALCS, Bool, BinOp, Case, DateLit, Field, Func, If, In,
-                           LOD, Node, Null, Num, Str, Unary, is_aggregate)
+                           LOD, Node, Null, Num, Str, Unary, is_aggregate, is_scalar_minmax)
 from ..formula.parser import parse_formula
 from ..model import AGG_DERIVATIONS, Datasource, FieldRef, Filter, Workbook, Worksheet
 
@@ -90,6 +90,11 @@ class TableauEngine:
                 self.asts.setdefault(cf.caption, ast)
         self._vec = {}
         self.context = np.ones(self.n, dtype=bool)
+        # Relationships (logical layer): fields of a related table are aggregated at that table's
+        # native level of detail - each related row counts once, not once per fact record.
+        self.root = ds.tables[0].name if ds.tables else None
+        self.row_ids = {c[len("__row__"):]: self.cols[c] for c in self.cols if c.startswith("__row__")}
+        self.col_table = {name: col.table for name, col in ds.columns.items()}
 
     # ---------------------------------------------------------- lookup --
     def _calc_ast(self, name):
@@ -166,6 +171,41 @@ class TableauEngine:
             return [v in top for v in src]
         raise TableauEvalError(f"Unsupported set type {e.get('set_type')}")
 
+    def tables_of(self, node: Node, _seen=None) -> set:
+        _seen = _seen or set()
+        out = set()
+        for n in node.walk():
+            if isinstance(n, LOD):
+                out.add(self.root)
+            if isinstance(n, Field) and not n.is_parameter:
+                if n.name in self.col_table:
+                    out.add(self.col_table[n.name])
+                elif n.name not in _seen and self._calc_ast(n.name) is not None:
+                    out |= self.tables_of(self._calc_ast(n.name), _seen | {n.name})
+                elif n.name in self.calcs and self.calcs[n.name].extra.get("source"):
+                    out.add(self.col_table.get(self.calcs[n.name].extra["source"]))
+        out.discard(None)
+        return out
+
+    def native_rows(self, arg: Node, idx):
+        if self.ds.model_style != "relationships" or not self.row_ids:
+            return idx
+        tables = self.tables_of(arg)
+        if len(tables) != 1:
+            return idx
+        t = next(iter(tables))
+        if t == self.root or t not in self.row_ids:
+            return idx
+        rid = self.row_ids[t]
+        seen, keep = set(), []
+        for i in idx:
+            r = rid[i]
+            if r is None or r in seen:
+                continue
+            seen.add(r)
+            keep.append(i)
+        return np.array(keep, dtype=int)
+
     def row_vector(self, node: Node):
         key = ("node", id(node), self._ctx_key())
         if key in self._vec:
@@ -236,7 +276,7 @@ class TableauEngine:
             r = any(_eq(s, self.row_value(v, i)) for v in node.values)
             return (not r) if node.negated else r
         if isinstance(node, Func):
-            if node.name in AGGREGATES or node.name in TABLE_CALCS:
+            if (node.name in AGGREGATES and not is_scalar_minmax(node)) or node.name in TABLE_CALCS:
                 raise TableauEvalError(f"{node.name}() in a row-level context")
             return self._scalar(node, lambda a: self.row_value(a, i))
         raise TableauEvalError(f"Cannot evaluate {type(node).__name__}")
@@ -462,8 +502,9 @@ class TableauEngine:
     # ------------------------------------------------------ aggregates --
     def agg(self, node: Node, idx: np.ndarray, view=None):
         """Evaluate an aggregate expression over the records ``idx``."""
-        if isinstance(node, Func) and node.name in AGGREGATES:
+        if isinstance(node, Func) and node.name in AGGREGATES and not is_scalar_minmax(node):
             vec = self.row_vector(node.args[0])
+            idx = self.native_rows(node.args[0], idx)
             vals = [vec[i] for i in idx]
             return _aggregate(node.name, vals, None if len(node.args) < 2 else self.agg(node.args[1], idx, view))
         if isinstance(node, Func) and node.name in TABLE_CALCS:
@@ -616,6 +657,7 @@ class TableauEngine:
         if ast is not None and is_aggregate(ast, self._calc_ast):
             return self.agg(ast, idx, view)
         vec = self.field_vector(ref.field)
+        idx = self.native_rows(Field(ref.field), idx)
         return _aggregate(fn, [vec[i] for i in idx])
 
     def _member_match(self, vec, members):

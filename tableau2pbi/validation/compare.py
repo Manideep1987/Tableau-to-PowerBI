@@ -69,7 +69,7 @@ def compare_frames(tab: pd.DataFrame, pbi: pd.DataFrame, keys: list, measures: l
         p_rows[tuple(norm_key(r.get(k)) for k in pkeys)] = [to_number(r.get(m)) for m in pbi_measures]
     all_keys = list(dict.fromkeys(list(t_rows) + list(p_rows)))
     rows, mism, matched_cells, total_cells, null_zero = [], 0, 0, 0, 0
-    missing_p = missing_t = 0
+    missing_p = missing_t = empty_hidden = 0
     totals = {m: [0.0, 0.0] for m in measures}
     for k in all_keys:
         tv, pv = t_rows.get(k), p_rows.get(k)
@@ -78,17 +78,25 @@ def compare_frames(tab: pd.DataFrame, pbi: pd.DataFrame, keys: list, measures: l
             row["status"] = "MISSING_IN_TABLEAU"
             row["values"] = [{"measure": m, "tableau": None, "powerbi": pv[i]} for i, m in enumerate(measures)]
             missing_t += 1
-            if all(v is None or v == 0 for v in pv):
+            if all(v is None for v in pv):
                 row["status"] = "EXTRA_BLANK_ROW"
             rows.append(row)
             total_cells += len(measures)
             continue
         if pv is None:
-            row["status"] = "MISSING_IN_POWERBI"
             row["values"] = [{"measure": m, "tableau": tv[i], "powerbi": None} for i, m in enumerate(measures)]
+            total_cells += len(measures)
+            if all(v is None for v in tv):
+                # Tableau shows a header for a combination whose measures are all NULL; Power BI hides
+                # rows with only blank measures ("Show items with no data"). No number differs.
+                row["status"] = "EMPTY_ROW_HIDDEN"
+                empty_hidden += 1
+                matched_cells += len(measures)
+                rows.append(row)
+                continue
+            row["status"] = "MISSING_IN_POWERBI"
             missing_p += 1
             rows.append(row)
-            total_cells += len(measures)
             continue
         vals, ok_row = [], True
         for i, m in enumerate(measures):
@@ -114,7 +122,8 @@ def compare_frames(tab: pd.DataFrame, pbi: pd.DataFrame, keys: list, measures: l
             mism += 1
         rows.append(row)
     hard = mism - _rows_only_null_zero(rows) + missing_p + (missing_t - sum(1 for r in rows if r["status"] == "EXTRA_BLANK_ROW"))
-    if hard == 0 and null_zero == 0 and missing_t == 0:
+    extra_blank = sum(1 for r in rows if r["status"] == "EXTRA_BLANK_ROW")
+    if hard == 0 and null_zero == 0 and missing_t == extra_blank:
         status = "PASS"
     elif hard == 0:
         status = "WARN"
@@ -123,12 +132,14 @@ def compare_frames(tab: pd.DataFrame, pbi: pd.DataFrame, keys: list, measures: l
     summary = {"tableau_rows": len(t_rows), "powerbi_rows": len(p_rows), "matched_rows": sum(1 for r in rows if r["status"] == "MATCH"),
                "mismatched_rows": mism, "missing_in_powerbi": missing_p, "missing_in_tableau": missing_t,
                "matched_cells": matched_cells, "total_cells": total_cells, "null_vs_zero": null_zero,
+               "empty_rows_hidden": empty_hidden, "extra_blank_rows": extra_blank,
                "match_rate": round(100.0 * matched_cells / total_cells, 2) if total_cells else 100.0,
                "totals": {m: {"tableau": round(v[0], 6), "powerbi": round(v[1], 6),
                               "diff": round(v[1] - v[0], 6)} for m, v in totals.items()}}
     # keep the payload small: mismatches first, then a sample of matches
-    bad = [r for r in rows if r["status"] != "MATCH"]
-    good = [r for r in rows if r["status"] == "MATCH"]
+    ok_st = ("MATCH", "EMPTY_ROW_HIDDEN", "EXTRA_BLANK_ROW")
+    bad = [r for r in rows if r["status"] not in ok_st]
+    good = [r for r in rows if r["status"] in ok_st]
     return {"status": status, "summary": summary, "keys": keys, "measures": measures,
             "rows": bad[:200] + good[:max(0, 60 - len(bad))]}
 
