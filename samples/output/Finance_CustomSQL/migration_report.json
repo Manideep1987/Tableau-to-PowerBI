@@ -209,7 +209,7 @@
           },
           {
             "name": "Sales YoY Prior",
-            "expression": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+            "expression": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))",
             "format": null,
             "folder": null,
             "tableau": "Calculation_F05"
@@ -223,7 +223,7 @@
           },
           {
             "name": "Avg Monthly Sales",
-            "expression": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+            "expression": "AVERAGEX(CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), CALCULATE(SUM('Finance Orders'[sales])))",
             "format": null,
             "folder": null,
             "tableau": "Calculation_F09"
@@ -682,13 +682,15 @@
       "kind": "measure",
       "pbi_object": "Sales YoY Prior",
       "pbi_table": "_Measures",
-      "dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))",
       "status": "Converted",
       "warnings": [],
       "functions": [
         "ALLSELECTED",
+        "CALCULATETABLE",
         "OFFSET",
-        "SUM"
+        "SUM",
+        "SUMMARIZE"
       ],
       "xml_path": "/workbook/datasources/datasource[2]/column[5]",
       "strategy": "rule:table-calc-window",
@@ -775,13 +777,15 @@
       "kind": "measure",
       "pbi_object": "Avg Monthly Sales",
       "pbi_table": "_Measures",
-      "dax": "AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))",
+      "dax": "AVERAGEX(CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), CALCULATE(SUM('Finance Orders'[sales])))",
       "status": "Converted",
       "warnings": [],
       "functions": [
         "ALLSELECTED",
         "AVERAGEX",
-        "SUM"
+        "CALCULATETABLE",
+        "SUM",
+        "SUMMARIZE"
       ],
       "xml_path": "/workbook/datasources/datasource[2]/column[9]",
       "strategy": "rule:table-calc-window",
@@ -1588,21 +1592,21 @@
   "validation": {
     "workbook": "Finance_CustomSQL",
     "binding": "SQLite: superstore.db",
-    "started": "2026-11-06T17:26:55",
-    "duration_s": 0.5,
+    "started": "2026-11-07T09:24:46",
+    "duration_s": 0.51,
     "tolerance": {
       "absolute": 0.01,
       "relative": 1e-06
     },
     "summary": {
-      "PASS": 25,
+      "PASS": 26,
       "WARN": 0,
       "FAIL": 0,
       "ERROR": 0,
       "SKIP": 1,
       "PENDING": 3,
       "N/A": 1,
-      "total": 30,
+      "total": 31,
       "pass_rate": 100.0,
       "overall": "PASS"
     },
@@ -1669,6 +1673,16 @@
         "status": "PASS",
         "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 1)",
         "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L2 Data",
+        "name": "Nullability contract - Finance Orders",
+        "status": "PASS",
+        "detail": "Every column with NULLs in the data is treated as nullable by the conversion",
+        "data": {
+          "columns": []
+        },
         "gate": 1
       },
       {
@@ -1817,6 +1831,8 @@
             "matched_cells": 12,
             "total_cells": 12,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:sales:qk": {
@@ -2007,6 +2023,8 @@
             "matched_cells": 16,
             "total_cells": 16,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:sales:qk": {
@@ -2236,6 +2254,8 @@
             "matched_cells": 16,
             "total_cells": 16,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "cnt:order_id:qk": {
@@ -2455,6 +2475,8 @@
             "matched_cells": 4,
             "total_cells": 4,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:profit:qk": {
@@ -3012,6 +3034,8 @@
             "matched_cells": 12,
             "total_cells": 12,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:sales:qk": {
@@ -3202,6 +3226,8 @@
             "matched_cells": 16,
             "total_cells": 16,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:sales:qk": {
@@ -3431,6 +3457,8 @@
             "matched_cells": 16,
             "total_cells": 16,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "cnt:order_id:qk": {
@@ -3650,6 +3678,8 @@
             "matched_cells": 1,
             "total_cells": 1,
             "null_vs_zero": 0,
+            "empty_rows_hidden": 0,
+            "extra_blank_rows": 0,
             "match_rate": 100.0,
             "totals": {
               "sum:profit:qk": {
@@ -4046,8 +4076,8 @@
         "gate": 1,
         "name": "Data contract",
         "status": "PASS",
-        "automated_checks": 9,
-        "passed": 9,
+        "automated_checks": 10,
+        "passed": 10,
         "failed": 0,
         "warnings": 0,
         "pending_human_checks": []

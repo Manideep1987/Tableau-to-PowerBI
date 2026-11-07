@@ -22,7 +22,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_H10
 
-	measure 'Hires Running Total' = CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))
+	measure 'Hires Running Total' = CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('employees.csv', 'employees.csv'[Hire Year]), ALLSELECTED('employees.csv'[Hire Year])), ORDERBY('employees.csv'[Hire Year])))
 		lineageTag: 101069a2-51a3-5ab8-a2f5-0d4b7f407011
 
 		annotation TableauSource = Calculation_H11

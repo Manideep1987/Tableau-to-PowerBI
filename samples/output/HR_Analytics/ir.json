@@ -661,7 +661,7 @@
       "xml_path": "/workbook/datasources/datasource/column[11]",
       "pbi_object": "Hires Running Total",
       "pbi_table": "_Measures",
-      "pbi_dax": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year])))",
+      "pbi_dax": "CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('employees.csv', 'employees.csv'[Hire Year]), ALLSELECTED('employees.csv'[Hire Year])), ORDERBY('employees.csv'[Hire Year])))",
       "strategy": "rule:table-calc-window",
       "confidence": "high",
       "status": "Converted",
@@ -934,14 +934,14 @@
   ],
   "validation": {
     "summary": {
-      "PASS": 27,
+      "PASS": 28,
       "WARN": 0,
       "FAIL": 0,
       "ERROR": 0,
       "SKIP": 0,
       "PENDING": 3,
       "N/A": 1,
-      "total": 31,
+      "total": 32,
       "pass_rate": 100.0,
       "overall": "PASS"
     },
@@ -950,8 +950,8 @@
         "gate": 1,
         "name": "Data contract",
         "status": "PASS",
-        "automated_checks": 9,
-        "passed": 9,
+        "automated_checks": 10,
+        "passed": 10,
         "failed": 0,
         "warnings": 0,
         "pending_human_checks": []

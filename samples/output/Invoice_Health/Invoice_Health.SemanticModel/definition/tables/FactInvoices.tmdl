@@ -91,7 +91,7 @@ table FactInvoices
 
 		annotation TableauSource = tmn:Invoice Date
 
-	column 'Days Late' = DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY)
+	column 'Days Late' = IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY))
 		dataType: int64
 		lineageTag: 895c3694-8f27-5c96-84ae-86d3699c5743
 		summarizeBy: none

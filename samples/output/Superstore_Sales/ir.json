@@ -718,7 +718,7 @@
       "xml_path": "/workbook/datasources/datasource[2]/column[14]",
       "pbi_object": "Running Sales",
       "pbi_table": "_Measures",
-      "pbi_dax": "CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start])))",
+      "pbi_dax": "CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('Orders', 'Orders'[Order Date Quarter Start]), ALLSELECTED('Orders'[Order Date Quarter Start])), ORDERBY('Orders'[Order Date Quarter Start])))",
       "strategy": "rule:table-calc-window",
       "confidence": "high",
       "status": "Converted",
@@ -756,7 +756,7 @@
       "xml_path": "/workbook/datasources/datasource[2]/column[15]",
       "pbi_object": "Sales Rank",
       "pbi_table": "_Measures",
-      "pbi_dax": "RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)",
+      "pbi_dax": "RANKX(CALCULATETABLE(SUMMARIZE('Orders', 'Products'[Sub-Category]), ALLSELECTED('Products'[Sub-Category])), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)",
       "strategy": "rule:table-calc-window",
       "confidence": "high",
       "status": "Converted",
@@ -2312,15 +2312,15 @@
   ],
   "validation": {
     "summary": {
-      "PASS": 47,
+      "PASS": 48,
       "WARN": 2,
       "FAIL": 0,
       "ERROR": 0,
       "SKIP": 0,
       "PENDING": 3,
       "N/A": 1,
-      "total": 53,
-      "pass_rate": 95.9,
+      "total": 54,
+      "pass_rate": 96.0,
       "overall": "WARN"
     },
     "gates": [
@@ -2328,8 +2328,8 @@
         "gate": 1,
         "name": "Data contract",
         "status": "PASS",
-        "automated_checks": 10,
-        "passed": 10,
+        "automated_checks": 11,
+        "passed": 11,
         "failed": 0,
         "warnings": 0,
         "pending_human_checks": []

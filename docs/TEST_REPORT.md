@@ -4,20 +4,21 @@
 |---|---|
 | Product | Tableau to Power BI Migrator v1.0.0 |
 | Document | Test strategy, execution evidence and UAT sign-off |
-| Executed | 2026-11-06 17:30 |
+| Executed | 2026-11-07 09:24 |
 | Prepared by | Claude Code (automated test campaign) |
 | Environment | Python 3.13.18 · Linux · Chromium (Playwright) |
 
 ## 1. Executive summary
 
-* **Automated tests:** 155 passed, 0 failed, 0 skipped (85.7 s).
+* **Automated tests:** 163 passed, 0 failed, 0 skipped (257.6 s).
 * **UI walkthrough (real browser):** 27/27 checks passed.
-* **UAT:** 36/36 cases passed.
-* **Superstore_Sales.twb:** 47 PASS · 2 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **WARN**.
-* **Finance_CustomSQL.twb:** 25 PASS · 0 WARN · 0 FAIL · 0 ERROR · 1 SKIP. Overall **PASS**.
-* **HR_Analytics.twbx:** 27 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
-* **Invoice_Health.twb:** 42 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
+* **UAT:** 39/39 cases passed.
+* **Superstore_Sales.twb:** 48 PASS · 2 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **WARN**.
+* **Finance_CustomSQL.twb:** 26 PASS · 0 WARN · 0 FAIL · 0 ERROR · 1 SKIP. Overall **PASS**.
+* **HR_Analytics.twbx:** 28 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
+* **Invoice_Health.twb:** 43 PASS · 0 WARN · 0 FAIL · 0 ERROR · 0 SKIP. Overall **PASS**.
 * **Defect injection:** 11/11 injected conversion defects were detected by the validator.
+* **Differential fuzzing:** 2000/2000 random calculations and worksheets reconcile cell by cell (Tableau engine vs DAX engine) after fixing the defects it found (D-11 to D-20).
 * **Verdict:** every number in the four sample reports matches Tableau. The exception is one documented Power BI limitation (a parameter-driven calculated column, reported as WARN). Gates 1-2 pass on all samples. Gates 3-5 wait on human checks (click paths, live identity tests, business sign-off), which this campaign records as PENDING instead of simulating.
 
 ## 2. Scope and approach
@@ -55,12 +56,13 @@ Data: deterministic generator (`samples/generate_samples.py`, seed 42): 3,000 or
 | test_engines | 12 | 0 | 0 |
 | test_guide_features | 23 | 0 | 0 |
 | test_parser | 18 | 0 | 0 |
+| test_robustness | 8 | 0 | 0 |
 | test_translation | 46 | 0 | 0 |
 | test_validation | 23 | 0 | 0 |
 | test_web_live | 9 | 0 | 0 |
-| **Total** | 155 | 0 | 0 |
+| **Total** | 163 | 0 | 0 |
 
-`155 passed in 84.91s (0:01:24)`. Full log: `docs/test-results/pytest.log`; JUnit: `docs/test-results/pytest.xml`.
+`163 passed in 256.93s (0:04:16)`. Full log: `docs/test-results/pytest.log`; JUnit: `docs/test-results/pytest.xml`.
 
 ## 5. UAT test cases
 
@@ -86,11 +88,11 @@ Data: deterministic generator (`samples/generate_samples.py`, seed 42): 3,000 or
 | UAT-17 | Formula translator | Users can translate any formula | Translate an LOD and an invalid formula in the UI | DAX returned; syntax error explained | UI-16, UI-17 PASS | **PASS** |
 | UAT-18 | Compare exported reports | Validate numbers of both reports from exports | Upload a Tableau crosstab CSV and a Power BI export with one seeded difference | Formatted numbers parsed; the single different row is reported | UI-19 PASS | **PASS** |
 | UAT-19 | Simple UI following design principles | UI must be very simple | Playwright walkthrough: 4-step flow, responsive, dark mode, no JS errors | All UI checks pass | 22/22 UI checks passed | **PASS** |
-| UAT-20 | Performance | Interactive response times | Measure conversion and validation time | Conversion < 5 s, validation < 60 s per sample workbook | Superstore_Sales.twb: convert 0.01s, validate 9.4s; Finance_CustomSQL.twb: convert 0.0s, validate 0.7s; HR_Analytics.twbx: convert 0.0s, validate 0.4s; Invoice_Health.twb: convert 0.0s, validate 2.7s | **PASS** |
+| UAT-20 | Performance | Interactive response times | Measure conversion and validation time | Conversion < 5 s, validation < 60 s per sample workbook | Superstore_Sales.twb: convert 0.01s, validate 9.8s; Finance_CustomSQL.twb: convert 0.0s, validate 0.6s; HR_Analytics.twbx: convert 0.0s, validate 0.4s; Invoice_Health.twb: convert 0.0s, validate 3.0s | **PASS** |
 | UAT-21 | Live validation (Tableau Server + Power BI service) | Validate published reports | Run live_validate against Tableau REST and Power BI executeQueries stubs | PAT sign-in, view data download, DAX executeQueries, comparison PASS | test_live_validation_against_stub: passed | **PASS** |
 | UAT-22 | Error handling | Bad input must be handled gracefully | Upload a PDF, a corrupt .twbx, nothing, a path-traversal sample name | 400/404 with a clear message; no crash | test_upload_and_errors: passed | **PASS** |
 | UAT-23 | Known limitations reported | The tool must be transparent about what it cannot do | Review WARN/SKIP checks and issues | Parameter-driven calculated column -> WARN with fix; custom SQL parameter scenario -> SKIP with instruction | Parameter is used in custom SQL: Power BI applies it at refresh (Power Query parameter); re-run validation after changin | **PASS** |
-| UAT-24 | Overall number parity | Numbers of both reports must match | Run full validation on the 4 samples | No FAIL / ERROR | Superstore_Sales.twb: {'PASS': 47, 'WARN': 2, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'PENDING': 3, 'N/A': 1, 'total': 53, 'pass_rate': 95.9, 'overall': 'WARN'}; Finance_CustomSQL.twb: {'PASS': 25, 'WARN': 0, 'FAIL': 0, 'ERROR': 0, 'SKIP': 1, 'PENDING': 3, 'N/A': 1, 'total': 30, 'pass_rate': 100.0, 'overall': 'PASS'}; HR_Analytics.twbx: {'PASS': 27, 'WARN': 0, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'PENDING' | **PASS** |
+| UAT-24 | Overall number parity | Numbers of both reports must match | Run full validation on the 4 samples | No FAIL / ERROR | Superstore_Sales.twb: {'PASS': 48, 'WARN': 2, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'PENDING': 3, 'N/A': 1, 'total': 54, 'pass_rate': 96.0, 'overall': 'WARN'}; Finance_CustomSQL.twb: {'PASS': 26, 'WARN': 0, 'FAIL': 0, 'ERROR': 0, 'SKIP': 1, 'PENDING': 3, 'N/A': 1, 'total': 31, 'pass_rate': 100.0, 'overall': 'PASS'}; HR_Analytics.twbx: {'PASS': 28, 'WARN': 0, 'FAIL': 0, 'ERROR': 0, 'SKIP': 0, 'PENDING' | **PASS** |
 | UAT-25 | Canonical IR v0.1.0 | Guide 6: versioned JSON IR with stable IDs, deps, confidence | Build ir.json for the 4 samples; validate against schemas/ir-0.1.0.schema.json; build twice | Schema-valid and deterministic | Superstore_Sales.twb: 0 schema errors; Finance_CustomSQL.twb: 0 schema errors; HR_Analytics.twbx: 0 schema errors; Invoice_Health.twb: 0 schema errors | **PASS** |
 | UAT-26 | Secure ingestion | Guide 15: XML entity / ZIP path attacks | Upload a .twbx with ../ paths, a 30 MB zero-filled member, and a TWB with an external entity | All three rejected with a clear error; no file written to disk | path traversal / zip bomb / XXE tests: passed | **PASS** |
 | UAT-27 | Unknown nodes preserved | Guide 6: preserve unknown node + review flag | Parse a workbook with an unrecognised element | Listed with XPath; parse completeness < 100% | test_unknown_nodes_preserved_with_xpath: passed; Superstore completeness 100.0% | **PASS** |
@@ -102,16 +104,19 @@ Data: deterministic generator (`samples/generate_samples.py`, seed 42): 3,000 or
 | UAT-33 | Mapping override with provenance | Guide 15 checklist: reviewer can trace and override each field | Override On-time % with an invalid then a valid DAX; re-validate | Invalid rejected; valid applied, original kept, audit trail, re-validation detects the change | API test + UI-05: passed | **PASS** |
 | UAT-34 | Opt-in AI assistance | Guide 5/11/15: AI only for ambiguous expressions, redacted, reviewed | Request a suggestion without credentials; with a stubbed Claude response; with a refusal | Opt-in error without credentials; suggestion parsed + reference-checked + REVIEW only; identifiers redacted | AI tests: passed (model claude-opus-5-5, structured JSON output, server-side fallback) | **PASS** |
 | UAT-35 | Finance showcase: the guide's three translation challenges | Guide 8 A/B/C: total, on-time paid amount with NULLs, vendor FIXED LOD | Validate Invoice Health KPI register and 'Vendor Concentration' | A, B and C reconcile exactly (C as a record-level FIXED column, not ALLEXCEPT) | A Total 8222130.46 = 8222130.46; B On-time % PASS; C PASS | **PASS** |
+| UAT-36 | Differential fuzzing | Numbers must match for any calculation, not only the authored samples | Generate 2000 random calculations (row-level, aggregate, FIXED/INCLUDE/EXCLUDE LOD, table calcs, NULL handling, dates, strings) and random worksheets (dims, measures, include/exclude, measure and Top N filters) on 3 data models | Every case converts and Tableau engine = DAX engine cell by cell | 2000/2000 PASS over seeds [1, 2, 3, 4, 11, 12, 13, 14, 21, 22] | **PASS** |
+| UAT-37 | Hostile and unusual input | Tool must not crash or produce invalid output on bad / unusual workbooks | Random bytes, truncated XML, quotes / brackets / unicode / euro sign in names, empty tables, all-NULL columns, 300-file package | Clean 400 errors or valid conversion; numbers match | 8/8 robustness tests passed | **PASS** |
+| UAT-38 | Nullability data contract | Wrong NULL metadata must not silently change numbers | Workbook declares a column NOT NULL, data contains NULLs | Gate 1 FAIL naming the column; profiling + re-conversion -> PASS | test_quotes_brackets_unicode_in_names: passed | **PASS** |
 
 ## 6. Number validation results
 
 ### 6.1 Superstore_Sales.twb: **WARN**
 
-Conversion: 3 tables, 3 relationships, 25 measures, 18 calculated columns, 9 pages, 19 visuals in 0.01 s; validation 9.4 s.
+Conversion: 3 tables, 3 relationships, 25 measures, 18 calculated columns, 9 pages, 19 visuals in 0.01 s; validation 9.8 s.
 
 | Gate | Status | Automated (pass / fail / warn) | Pending human checks |
 |---|---|---|---|
-| 1 Data contract | **PASS** | 10 (10 / 0 / 0) |  |
+| 1 Data contract | **PASS** | 11 (11 / 0 / 0) |  |
 | 2 Numeric / KPI parity | **WARN** | 28 (27 / 0 / 1) |  |
 | 3 Interactions | **WARN** | 11 (10 / 0 / 1) | Click paths, slicer defaults, tooltips, drillthrough |
 | 4 Security (RLS) | **PENDING** | 1 (0 / 0 / 0) | Confirm no row-level security requirement |
@@ -128,6 +133,7 @@ Verdict: **Automated gates passed with warnings; human checks pending**. Readine
 | 1 | L1 Metadata | Worksheet filters converted | **PASS** | 7/7 worksheet filters -> visual-level filters |
 | 1 | L1 Metadata | Columns mapped | **PASS** | 21/21 source columns in the semantic model |
 | 1 | L1 Metadata | Relationships converted | **PASS** | 2/2 Tableau relationships -> model relationships (joins flattened: 0) |
+| 1 | L2 Data | Nullability contract - Superstore | **PASS** | Every column with NULLs in the data is treated as nullable by the conversion |
 | 1 | L2 Data | Row count - Superstore | **PASS** | Tableau data source rows 3,000 vs Power BI 'Orders' rows 3,000 |
 | 1 | L2 Data | Column profile - Superstore | **PASS** | 11 columns profiled (sum / null count / distinct count) |
 | 1 | L2 Data | SQL ground truth - Orders | **PASS** | SUM() of 5 numeric columns: source SQL = Tableau = Power BI |
@@ -177,11 +183,11 @@ Verdict: **Automated gates passed with warnings; human checks pending**. Readine
 
 ### 6.2 Finance_CustomSQL.twb: **PASS**
 
-Conversion: 1 tables, 1 relationships, 13 measures, 3 calculated columns, 2 pages, 4 visuals in 0.00 s; validation 0.7 s.
+Conversion: 1 tables, 1 relationships, 13 measures, 3 calculated columns, 2 pages, 4 visuals in 0.00 s; validation 0.6 s.
 
 | Gate | Status | Automated (pass / fail / warn) | Pending human checks |
 |---|---|---|---|
-| 1 Data contract | **PASS** | 9 (9 / 0 / 0) |  |
+| 1 Data contract | **PASS** | 10 (10 / 0 / 0) |  |
 | 2 Numeric / KPI parity | **PASS** | 10 (9 / 0 / 0) |  |
 | 3 Interactions | **PENDING** | 7 (7 / 0 / 0) | Click paths, slicer defaults, tooltips, drillthrough |
 | 4 Security (RLS) | **PENDING** | 1 (0 / 0 / 0) | Confirm no row-level security requirement |
@@ -198,6 +204,7 @@ Verdict: **Automated gates passed; human checks pending**. Readiness: Parse comp
 | 1 | L1 Metadata | Worksheet filters converted | **PASS** | 1/1 worksheet filters -> visual-level filters |
 | 1 | L1 Metadata | Columns mapped | **PASS** | 9/9 source columns in the semantic model |
 | 1 | L1 Metadata | Relationships converted | **PASS** | 0/0 Tableau relationships -> model relationships (joins flattened: 1) |
+| 1 | L2 Data | Nullability contract - Finance Orders | **PASS** | Every column with NULLs in the data is treated as nullable by the conversion |
 | 1 | L2 Data | Row count - Finance Orders | **PASS** | Tableau data source rows 2,672 vs Power BI 'Finance Orders' rows 2,672 |
 | 1 | L2 Data | Column profile - Finance Orders | **PASS** | 9 columns profiled (sum / null count / distinct count) |
 | 2 | L3 Visual | Worksheet 'Attainment by Region' | **PASS** | tableEx \| 4 vs 4 rows \| 12/12 cells match |
@@ -228,7 +235,7 @@ Conversion: 1 tables, 1 relationships, 9 measures, 6 calculated columns, 2 pages
 
 | Gate | Status | Automated (pass / fail / warn) | Pending human checks |
 |---|---|---|---|
-| 1 Data contract | **PASS** | 9 (9 / 0 / 0) |  |
+| 1 Data contract | **PASS** | 10 (10 / 0 / 0) |  |
 | 2 Numeric / KPI parity | **PASS** | 10 (10 / 0 / 0) |  |
 | 3 Interactions | **PENDING** | 8 (8 / 0 / 0) | Click paths, slicer defaults, tooltips, drillthrough |
 | 4 Security (RLS) | **PENDING** | 1 (0 / 0 / 0) | Confirm no row-level security requirement |
@@ -245,6 +252,7 @@ Verdict: **Automated gates passed; human checks pending**. Readiness: Parse comp
 | 1 | L1 Metadata | Worksheet filters converted | **PASS** | 2/2 worksheet filters -> visual-level filters |
 | 1 | L1 Metadata | Columns mapped | **PASS** | 10/10 source columns in the semantic model |
 | 1 | L1 Metadata | Relationships converted | **PASS** | 0/0 Tableau relationships -> model relationships (joins flattened: 0) |
+| 1 | L2 Data | Nullability contract - Employees | **PASS** | Every column with NULLs in the data is treated as nullable by the conversion |
 | 1 | L2 Data | Row count - Employees | **PASS** | Tableau data source rows 400 vs Power BI 'employees.csv' rows 400 |
 | 1 | L2 Data | Column profile - Employees | **PASS** | 10 columns profiled (sum / null count / distinct count) |
 | 2 | L3 Visual | Worksheet 'Headcount by Department' | **PASS** | tableEx \| 6 vs 6 rows \| 18/18 cells match |
@@ -272,11 +280,11 @@ Verdict: **Automated gates passed; human checks pending**. Readiness: Parse comp
 
 ### 6.4 Invoice_Health.twb: **PASS**
 
-Conversion: 4 tables, 3 relationships, 13 measures, 5 calculated columns, 5 pages, 12 visuals in 0.00 s; validation 2.7 s.
+Conversion: 4 tables, 3 relationships, 13 measures, 5 calculated columns, 5 pages, 12 visuals in 0.00 s; validation 3.0 s.
 
 | Gate | Status | Automated (pass / fail / warn) | Pending human checks |
 |---|---|---|---|
-| 1 Data contract | **PASS** | 10 (10 / 0 / 0) |  |
+| 1 Data contract | **PASS** | 11 (11 / 0 / 0) |  |
 | 2 Numeric / KPI parity | **PASS** | 16 (16 / 0 / 0) |  |
 | 3 Interactions | **PENDING** | 11 (11 / 0 / 0) | Click paths, slicer defaults, tooltips, drillthrough |
 | 4 Security (RLS) | **PENDING** | 5 (5 / 0 / 0) | Live identity test (real users, groups, SSO) |
@@ -293,6 +301,7 @@ Verdict: **Automated gates passed; human checks pending**. Readiness: Parse comp
 | 1 | L1 Metadata | Worksheet filters converted | **PASS** | 3/3 worksheet filters -> visual-level filters |
 | 1 | L1 Metadata | Columns mapped | **PASS** | 23/23 source columns in the semantic model |
 | 1 | L1 Metadata | Relationships converted | **PASS** | 3/3 Tableau relationships -> model relationships (joins flattened: 0) |
+| 1 | L2 Data | Nullability contract - Invoice Health | **PASS** | Every column with NULLs in the data is treated as nullable by the conversion |
 | 1 | L2 Data | Row count - Invoice Health | **PASS** | Tableau data source rows 1,500 vs Power BI 'FactInvoices' rows 1,500 |
 | 1 | L2 Data | Column profile - Invoice Health | **PASS** | 10 columns profiled (sum / null count / distinct count) |
 | 1 | L2 Data | SQL ground truth - FactInvoices | **PASS** | SUM() of 2 numeric columns: source SQL = Tableau = Power BI |
@@ -489,8 +498,8 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | Customer Lifetime Sales | {FIXED [Customer Name] : SUM([Sales])} | Orders[Customer Lifetime Sales] (column) | (VAR __lod1 = RELATED('Customers'[Customer Name]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Customer Name] = __lod1)) | rule:fixed-lod-column | PASS |
 | Region Sales | { FIXED [Region] : SUM([Sales]) } | Orders[Region Sales] (column) | (VAR __lod1 = RELATED('Customers'[Region]) RETURN CALCULATE(SUM('Orders'[Sales]), REMOVEFILTERS(), 'Customers'[Region] = __lod1)) | rule:fixed-lod-column | PASS |
 | Sales vs Target | SUM([Sales]) - [Parameters].[Parameter 1] | _Measures[Sales vs Target] (measure) | (SUM('Orders'[Sales]) - [Sales Target Value]) | rule:aggregate-measure | PASS |
-| Running Sales | RUNNING_SUM(SUM([Sales])) | _Measures[Running Sales] (measure) | CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start]))) | rule:table-calc-window | PASS |
-| Sales Rank | RANK(SUM([Sales])) | _Measures[Sales Rank] (measure) | RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP) | rule:table-calc-window | PASS |
+| Running Sales | RUNNING_SUM(SUM([Sales])) | _Measures[Running Sales] (measure) | CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('Orders', 'Orders'[Order Date Quarter Start]), ALLSELECTED('Orders'[Order Date Quarter Start])), ORDERBY('Orders'[Order Date Quarter Start]))) | rule:table-calc-window | PASS |
+| Sales Rank | RANK(SUM([Sales])) | _Measures[Sales Rank] (measure) | RANKX(CALCULATETABLE(SUMMARIZE('Orders', 'Products'[Sub-Category]), ALLSELECTED('Products'[Sub-Category])), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP) | rule:table-calc-window | PASS |
 | Order Count | COUNTD([Order ID]) | _Measures[Order Count] (measure) | DISTINCTCOUNTNOBLANK('Orders'[Order ID]) | rule:aggregate-measure | PASS |
 | Avg Sales per Customer | SUM([Sales]) / COUNTD([Customer Name]) | _Measures[Avg Sales per Customer] (measure) | DIVIDE(SUM('Orders'[Sales]), CALCULATE(DISTINCTCOUNTNOBLANK('Customers'[Customer Name]), 'Orders')) | rule:aggregate-measure | REVIEW |
 | Selected Metric | CASE [Parameters].[Parameter 4] WHEN 'Sales' THEN SUM([Sales]) WHEN 'Profit' THEN SUM([Profit]) ELSE SUM([Quantity]) END | _Measures[Selected Metric] (measure) | SWITCH([Metric Selector Value], "Sales", SUM('Orders'[Sales]), "Profit", SUM('Orders'[Profit]), SUM('Orders'[Quantity])) | rule:aggregate-measure | PASS |
@@ -529,11 +538,11 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | Projected Sales | SUM([sales]) * (1 + [Parameters].[Growth Rate]) | _Measures[Projected Sales] (measure) | (SUM('Finance Orders'[sales]) * (1 + [Growth Rate Value])) | rule:aggregate-measure | PASS |
 | Margin % | IF SUM([sales]) = 0 THEN NULL ELSE SUM([profit]) / SUM([sales]) END | _Measures[Margin %] (measure) | IF((SUM('Finance Orders'[sales]) = 0), BLANK(), DIVIDE(SUM('Finance Orders'[profit]), SUM('Finance Orders'[sales]))) | rule:aggregate-measure | PASS |
 | Fiscal Year | IF DATEPART('month', [order_date]) >= 7 THEN YEAR([order_date]) + 1 ELSE YEAR([order_date]) END | Finance Orders[Fiscal Year] (column) | IF((MONTH('Finance Orders'[order_date]) >= 7), (YEAR('Finance Orders'[order_date]) + 1), YEAR('Finance Orders'[order_date])) | rule:row-level-calculated-column | PASS |
-| Sales YoY Prior | LOOKUP(SUM([sales]), -1) | _Measures[Sales YoY Prior] (measure) | CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year]))) | rule:table-calc-window | PASS |
+| Sales YoY Prior | LOOKUP(SUM([sales]), -1) | _Measures[Sales YoY Prior] (measure) | CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))) | rule:table-calc-window | PASS |
 | Order Size | CASE [quantity] WHEN 1 THEN 'Single' WHEN 2 THEN 'Pair' ELSE 'Bulk' END | Finance Orders[Order Size] (column) | SWITCH('Finance Orders'[quantity], 1, "Single", 2, "Pair", "Bulk") | rule:row-level-calculated-column | PASS |
 | Loss Orders | SUM(IF [profit] < 0 THEN 1 ELSE 0 END) | _Measures[Loss Orders] (measure) | SUMX('Finance Orders', IF(('Finance Orders'[profit] < 0), 1, 0)) | rule:aggregate-measure | PASS |
 | Region Code | UPPER(LEFT([region], 1)) + STR(LEN([region])) | Finance Orders[Region Code] (column) | UPPER(LEFT('Finance Orders'[region], 1)) & CONVERT(LEN('Finance Orders'[region]), STRING) | rule:row-level-calculated-column | PASS |
-| Avg Monthly Sales | WINDOW_AVG(SUM([sales])) | _Measures[Avg Monthly Sales] (measure) | AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales]))) | rule:table-calc-window | PASS |
+| Avg Monthly Sales | WINDOW_AVG(SUM([sales])) | _Measures[Avg Monthly Sales] (measure) | AVERAGEX(CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), CALCULATE(SUM('Finance Orders'[sales]))) | rule:table-calc-window | PASS |
 | Max Order Value | MAX([sales]) | _Measures[Max Order Value] (measure) | MAX('Finance Orders'[sales]) | rule:aggregate-measure | PASS |
 | Sum of sales | SUM([sales]) | _Measures[Sum of sales] (base-measure) | SUM('Finance Orders'[sales]) | rule:explicit-base-measure | PASS |
 | Sum of sales_target | SUM([sales_target]) | _Measures[Sum of sales_target] (base-measure) | SUM('Finance Orders'[sales_target]) | rule:explicit-base-measure | PASS |
@@ -554,7 +563,7 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | High Performer | [Performance Score] >= 4 | employees.csv[High Performer] (column) | IF(ISBLANK('employees.csv'[Performance Score]), BLANK(), ('employees.csv'[Performance Score] >= 4)) | rule:row-level-calculated-column | PASS |
 | Hire Year | YEAR([Hire Date]) | employees.csv[Hire Year] (column) | YEAR('employees.csv'[Hire Date]) | rule:row-level-calculated-column | PASS |
 | Median Salary | MEDIAN([Salary]) | _Measures[Median Salary] (measure) | MEDIAN('employees.csv'[Salary]) | rule:aggregate-measure | PASS |
-| Hires Running Total | RUNNING_SUM(COUNTD([Employee ID])) | _Measures[Hires Running Total] (measure) | CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, ALLSELECTED('employees.csv'[Hire Year]), ORDERBY('employees.csv'[Hire Year]))) | rule:table-calc-window | PASS |
+| Hires Running Total | RUNNING_SUM(COUNTD([Employee ID])) | _Measures[Hires Running Total] (measure) | CALCULATE(DISTINCTCOUNTNOBLANK('employees.csv'[Employee ID]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('employees.csv', 'employees.csv'[Hire Year]), ALLSELECTED('employees.csv'[Hire Year])), ORDERBY('employees.csv'[Hire Year]))) | rule:table-calc-window | PASS |
 | Average of Tenure Years | AVG([Calculation_H04]) | _Measures[Average of Tenure Years] (base-measure) | AVERAGE('employees.csv'[Tenure Years]) | rule:explicit-base-measure | PASS |
 | Average of Salary | AVG([Salary]) | _Measures[Average of Salary] (base-measure) | AVERAGE('employees.csv'[Salary]) | rule:explicit-base-measure | PASS |
 | Average of Performance Score | AVG([Performance Score]) | _Measures[Average of Performance Score] (base-measure) | AVERAGE('employees.csv'[Performance Score]) | rule:explicit-base-measure | PASS |
@@ -567,22 +576,41 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | Status Selector | "All" | Status Selector[Status Selector Value] (parameter) | Status Selector = SELECTCOLUMNS({"All", "Late invoices", "On time"}, "Status Selector", [Value])  [Status Selector Value] = SELECTEDVALUE('Status Selector'[Status Selector], "All") | rule:parameter-table+selectedvalue | PASS |
 | TMN([Invoice Date]) | DATETRUNC('month', [Invoice Date]) | FactInvoices[Invoice Date Month Start] (date-part) | DATE(YEAR('FactInvoices'[Invoice Date]), MONTH('FactInvoices'[Invoice Date]), 1) | rule:date-part-column | PASS |
 | Total Invoice Amount | SUM([Invoice Amount]) | _Measures[Total Invoice Amount] (measure) | SUM('FactInvoices'[Invoice Amount]) | rule:aggregate-measure | PASS |
-| On Time Paid Amount | SUM(IF [Paid Flag] = TRUE AND [Payment Date] <= [Due Date] THEN [Invoice Amount] ELSE 0 END) | _Measures[On Time Paid Amount] (measure) | SUMX('FactInvoices', IF((('FactInvoices'[Paid Flag] = TRUE()) && IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), 'FactInvoices'[Invoice Amount], 0)) | rule:aggregate-measure | PASS |
+| On Time Paid Amount | SUM(IF [Paid Flag] = TRUE AND [Payment Date] <= [Due Date] THEN [Invoice Amount] ELSE 0 END) | _Measures[On Time Paid Amount] (measure) | SUMX('FactInvoices', IF(IF((NOT ISBLANK(('FactInvoices'[Paid Flag] = TRUE())) && NOT(('FactInvoices'[Paid Flag] = TRUE()))) \|\| (NOT ISBLANK(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))) && NOT(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])))), FALSE(), IF(ISBLANK(('FactInvoices'[Paid Flag] = TRUE())) \|\| ISBLANK(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), BLANK(), TRUE())), 'FactInvoices'[Invoice Amount], 0)) | rule:aggregate-measure | PASS |
 | Paid Amount | SUM(IF [Paid Flag] THEN [Invoice Amount] END) | _Measures[Paid Amount] (measure) | SUMX('FactInvoices', IF('FactInvoices'[Paid Flag], 'FactInvoices'[Invoice Amount])) | rule:aggregate-measure | PASS |
 | On-time % | [On Time Paid Amount] / [Paid Amount] | _Measures[On-time %] (measure) | DIVIDE([On Time Paid Amount], [Paid Amount]) | rule:aggregate-measure | PASS |
-| Days Late | DATEDIFF('day', [Due Date], [Payment Date]) | FactInvoices[Days Late] (column) | DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY) | rule:row-level-calculated-column | PASS |
+| Days Late | DATEDIFF('day', [Due Date], [Payment Date]) | FactInvoices[Days Late] (column) | IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), DATEDIFF('FactInvoices'[Due Date], 'FactInvoices'[Payment Date], DAY)) | rule:row-level-calculated-column | PASS |
 | Payment Status | IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Payment Date] <= [Due Date] THEN 'On time' ELSE 'Late' END | FactInvoices[Payment Status] (column) | SWITCH(TRUE(),         ISBLANK('FactInvoices'[Payment Date]), "Unpaid",         IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])), "On time",         "Late"     ) | rule:row-level-calculated-column | PASS |
 | Aging Bucket | IF ISNULL([Payment Date]) THEN 'Unpaid' ELSEIF [Days Late] <= 0 THEN 'Not late' ELSEIF [Days Late] <= 15 THEN '1-15 days' ELSEIF [Days Late] <= 30 THEN '16-30 days' ELSE '30+ days' END | FactInvoices[Aging Bucket] (column) | SWITCH(TRUE(),         ISBLANK('FactInvoices'[Payment Date]), "Unpaid",         IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 0)), "Not late",         IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 15)), "1-15 days",         IF(ISBLANK('FactInvoices'[Days Late]), BLANK(), ('FactInvoices'[Days Late] <= 30)), "16-30 days",         "30+ days"     ) | rule:row-level-calculated-column | PASS |
 | Vendor Fixed Amount | { FIXED [Vendor Name] : SUM([Invoice Amount]) } | FactInvoices[Vendor Fixed Amount] (column) | (VAR __lod1 = RELATED('DimVendor'[Vendor Name]) RETURN CALCULATE(SUM('FactInvoices'[Invoice Amount]), REMOVEFILTERS(), 'DimVendor'[Vendor Name] = __lod1)) | rule:fixed-lod-column | PASS |
 | Overdue Invoices | SUM(IF ISNULL([Payment Date]) AND [Due Date] < #2025-12-31# THEN 1 ELSE 0 END) | _Measures[Overdue Invoices] (measure) | SUMX('FactInvoices', IF((ISBLANK('FactInvoices'[Payment Date]) && ('FactInvoices'[Due Date] < DATE(2025, 12, 31))), 1, 0)) | rule:aggregate-measure | PASS |
 | Invoice Count | COUNTD([Invoice ID]) | _Measures[Invoice Count] (measure) | DISTINCTCOUNTNOBLANK('FactInvoices'[Invoice ID]) | rule:aggregate-measure | PASS |
-| Avg Days to Pay | AVG(DATEDIFF('day', [Invoice Date], [Payment Date])) | _Measures[Avg Days to Pay] (measure) | AVERAGEX('FactInvoices', DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY)) | rule:aggregate-measure | PASS |
+| Avg Days to Pay | AVG(DATEDIFF('day', [Invoice Date], [Payment Date])) | _Measures[Avg Days to Pay] (measure) | AVERAGEX('FactInvoices', IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY))) | rule:aggregate-measure | PASS |
 | Selected Metric Amount | CASE [Parameters].[Status Selector] WHEN 'Late invoices' THEN SUM(IF [Payment Status] = 'Late' THEN [Invoice Amount] END) WHEN 'On time' THEN [On Time Paid Amount] ELSE SUM([Invoice Amount]) END | _Measures[Selected Metric Amount] (measure) | SWITCH([Status Selector Value], "Late invoices", SUMX('FactInvoices', IF(('FactInvoices'[Payment Status] = "Late"), 'FactInvoices'[Invoice Amount])), "On time", [On Time Paid Amount], SUM('FactInvoices'[Invoice Amount])) | rule:aggregate-measure | PASS |
 | Manager Security | [Manager UPN] = USERNAME() | DimEmployeeSecurity[Manager Security] (rls-role) | 'DimEmployeeSecurity'[Manager UPN] = USERPRINCIPALNAME() | rule:user-filter-to-rls-role | REVIEW |
 | Vendor Share of Region | SUM([Invoice Amount]) / TOTAL(SUM([Invoice Amount])) | _Measures[Vendor Share of Region] (measure) | DIVIDE(SUM('FactInvoices'[Invoice Amount]), CALCULATE(SUM('FactInvoices'[Invoice Amount]), ALLSELECTED('DimVendor'[Vendor Name]))) | rule:table-calc-window | REVIEW |
 | Sum of Invoice Amount | SUM([Invoice Amount]) | _Measures[Sum of Invoice Amount] (base-measure) | SUM('FactInvoices'[Invoice Amount]) | rule:explicit-base-measure | PASS |
 | Average of Days Late | AVG([Calculation_I05]) | _Measures[Average of Days Late] (base-measure) | AVERAGE('FactInvoices'[Days Late]) | rule:explicit-base-measure | PASS |
 | Max of Vendor Fixed Amount | MAX([Calculation_I08]) | _Measures[Max of Vendor Fixed Amount] (base-measure) | MAX('FactInvoices'[Vendor Fixed Amount]) | rule:explicit-base-measure | PASS |
+
+
+## 7b. Differential fuzzing
+
+Hand-written tests only cover the cases someone thought of. The fuzzer (`tests/fuzz/differential_fuzz.py`) generates random, type-correct Tableau calculations and random worksheets on the Superstore, Invoice Health and HR models. It converts them and compares the Tableau engine with the DAX engine for every cell. The first 150-case run found 36 mismatches. They had eight root causes, all fixed (D-11 to D-18). Later runs on fresh seeds found two more (D-19 EXCLUDE, D-20 division by zero). The final sweep is below. `tests/test_robustness.py` runs 100 fixed-seed cases in every `pytest` run.
+
+| Seed | Cases | PASS | Mismatches | Errors | Unsupported | Seconds |
+|---|---|---|---|---|---|---|
+| 1 | 200 | 200 | 0 | 0 | 0 | 279.0 |
+| 2 | 200 | 200 | 0 | 0 | 0 | 126.6 |
+| 3 | 200 | 200 | 0 | 0 | 0 | 180.1 |
+| 4 | 200 | 200 | 0 | 0 | 0 | 114.3 |
+| 11 | 200 | 200 | 0 | 0 | 0 | 129.9 |
+| 12 | 200 | 200 | 0 | 0 | 0 | 105.1 |
+| 13 | 200 | 200 | 0 | 0 | 0 | 269.1 |
+| 14 | 200 | 200 | 0 | 0 | 0 | 147.6 |
+| 21 | 200 | 200 | 0 | 0 | 0 | 298.3 |
+| 22 | 200 | 200 | 0 | 0 | 0 | 209.6 |
+| **Total** | 2000 | 2000 | 0 | 0 | 0 | 1860 |
 
 ## 9. Defects found and fixed during testing
 
@@ -598,6 +626,17 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | D-08 | Medium | DAX engine | Visual query with dimensions on unrelated tables raised an error instead of cross-joining like SUMMARIZECOLUMNS. | Mutation M5 returned ERROR. | Cross join of unrelated column sets; missing relationship now surfaces as a number mismatch. |
 | D-09 | Medium | Converter | Top-level INCLUDE/EXCLUDE LODs were converted as static calculated columns (wrong grain). | Translation status 'Manual review'. | Converted as view-grain measures: AGGX(SUMMARIZE(fact, dims), CALCULATE(expr)) / REMOVEFILTERS. |
 | D-10 | Low | Validator | Validation took 95 s on Superstore (calculated columns re-filtered the full frame per row). | Performance measurement. | Mask caching, vectorised isin and CALCULATE result cache: 8 s. |
+| D-11 | High | Translator | Two-argument MIN(a, b) / MAX(a, b) was treated as an aggregation (only the first argument used). | Differential fuzzing (seed 1). | Scalar MIN/MAX recognised in the AST, translator and Tableau engine. |
+| D-12 | High | Converter | Text tables and KPI cards without dimensions dropped the measures placed on shelves (empty card). | Differential fuzzing (seed 1). | Card / multi-row card values = shelf measures + text measures. |
+| D-13 | High | Validator | The Tableau engine aggregated fields of related (dimension) tables per fact row; Tableau relationships aggregate them at their native level. | Differential fuzzing (SUM/AVG/COUNT of Products[Unit Price], DimVendor[Vendor Name]). | Row identity per related table; aggregations over one related table count each of its rows once. |
+| D-14 | Medium | Translator | COUNT / COUNTD of only-NULL values: Tableau 0 (row shown), DAX BLANK (row hidden). | Differential fuzzing. | COUNT/COUNTD of nullable columns return 0 when the table has rows in context. |
+| D-15 | High | Translator | INDEX / RANK / WINDOW_* / LOOKUP ran over all addressing values; Tableau partitions only contain cells with data. | Differential fuzzing (INDEX off by one when a year was missing in a partition). | Relation = CALCULATETABLE(SUMMARIZE(fact, addressing), ALLSELECTED(addressing)). |
+| D-16 | High | Translator | Scalar functions on NULL: DAX treats BLANK as 0 / "" / 1899-12-30 (WEEKDAY(BLANK-1) = 7) where Tableau returns NULL. | Differential fuzzing (seed 1). | Row-level scalar functions with nullable arguments are NULL-guarded; the DAX engine now reproduces DAX's BLANK date arithmetic. |
+| D-17 | High | Converter | Top N combined with a dimension filter: Tableau ranks before the filter, Power BI after. | Differential fuzzing (seed 1). | Rank measure over the unfiltered context (ALLEXCEPT fact, Top N field) + visual measure filter rank <= N. |
+| D-18 | High | Translator | NULL at aggregate level and three-valued logic: COUNTD(x) + MIN(null), IIF(NULL,...), CASE NULL, NULL IN (...), NOT NULL, NULL AND/OR. | Differential fuzzing (seeds 1, 13). | Guards in measures too; IIF returns NULL/unknown, CASE NULL -> ELSE, Kleene AND/OR. |
+| D-19 | High | Translator | EXCLUDE LOD removed the worksheet's filter on the excluded dimension (REMOVEFILTERS); Tableau applies dimension filters first. | Differential fuzzing (seed 2). | EXCLUDE -> CALCULATE(expr, ALLSELECTED(dims)). |
+| D-20 | High | Translator | Division by zero yields NULL in Tableau even with non-NULL inputs; comparisons on DIVIDE() results were not guarded. | Differential fuzzing (seed 13). | Divisions (except by a non-zero literal) are treated as possibly NULL. |
+| D-21 | Medium | Converter | Metadata 'contains-null = false' contradicted by the data (CSV/Excel) produced unguarded DAX. | Robustness test with unicode / quoted names. | Gate 1 'Nullability contract' check + automatic data profiling before conversion (CLI, web app). |
 
 ## 10. Known limitations and recommendations
 
@@ -606,7 +645,8 @@ ORDER BY 'Orders'[Order Date Quarter Start]
 | Parameter-driven calculated columns | Power BI calculated columns are computed at refresh, so they don't react to slicers. Numbers match only at the parameter's default value. The validator reports this as WARN. | Rebuild as a measure, or use a field parameter / dynamic segmentation table. |
 | Parameters inside custom SQL | Converted to Power Query parameters, which are applied at refresh. They can't be changed from a slicer. | Use Dynamic M query parameters (DirectQuery) or move the filter to the model. |
 | Context filters with FIXED LODs | Tableau FIXED respects context filters; ALLEXCEPT / REMOVEFILTERS removes them. Flagged as a warning. | Add KEEPFILTERS on the context column in the converted DAX. |
-| Top N combined with dimension filters | Tableau applies Top N before dimension filters; Power BI applies it after. Flagged as a warning. | Make the dimension filter a context-like filter (page filter) or rewrite Top N as a RANKX measure. |
+| Top N on a field that is not in the view, combined with dimension filters | Tableau applies Top N before dimension filters; a Power BI TopN filter applies it after. (When the field is in the view the converter reproduces Tableau's order with a rank measure.) | Add the Top N field to the visual, or rewrite the Top N as a RANKX measure. |
+| String comparison case sensitivity | DAX compares text case-insensitively; most Tableau sources compare case-sensitively (CONTAINS, =). Flagged on CONTAINS. | Normalise case in Power Query when values differ only by case. |
 | Table calculations used in several sheets with different addressing | A DAX measure has one addressing (from the first sheet that uses it). | Duplicate the measure per addressing; the validator flags mismatching sheets. |
 | Visual formatting | Colours, fonts, reference lines, annotations and custom shapes are not converted; layout is converted. | Apply a Power BI theme; rebuild formatting by design (no pixel-perfect replication). |
 | Extracts (.hyper) | Power BI can't read .hyper files; the converted model points at the original source. | Repoint credentials and refresh. |

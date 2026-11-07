@@ -1,0 +1,108 @@
+{
+  "started": "2026-11-07 08:46:51",
+  "cases_per_seed": 200,
+  "seeds": [
+    {
+      "seed": 1,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 279.0,
+      "failures": []
+    },
+    {
+      "seed": 2,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 126.6,
+      "failures": []
+    },
+    {
+      "seed": 3,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 180.1,
+      "failures": []
+    },
+    {
+      "seed": 4,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 114.3,
+      "failures": []
+    },
+    {
+      "seed": 11,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 129.9,
+      "failures": []
+    },
+    {
+      "seed": 12,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 105.1,
+      "failures": []
+    },
+    {
+      "seed": 13,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 269.1,
+      "failures": []
+    },
+    {
+      "seed": 14,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 147.6,
+      "failures": []
+    },
+    {
+      "seed": 21,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 298.3,
+      "failures": []
+    },
+    {
+      "seed": 22,
+      "cases": 200,
+      "pass": 200,
+      "mismatches": 0,
+      "errors": 0,
+      "unsupported": 0,
+      "seconds": 209.6,
+      "failures": []
+    }
+  ],
+  "total_cases": 2000,
+  "total_pass": 2000
+}

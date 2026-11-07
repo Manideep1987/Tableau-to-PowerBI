@@ -36,6 +36,8 @@ local. Nothing is published.
 
 ![Validation center](docs/screenshots/11_validation_gates.png)
 
+**Step-by-step instructions: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)** (also as Word: docs/User_Guide.docx).
+
 ## Quick start
 
 ```bash
@@ -141,8 +143,9 @@ docs/                  test report (Markdown + Word), screenshots, test evidence
 ## Testing
 
 ```bash
-python -m pytest -q                  # 155 tests: parser, security, IR, translator, engines, PBIP, gates, RLS, API, AI, live clients
-python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 36 UAT cases + defect injection
+python -m pytest -q                  # 163 tests incl. 100 fixed-seed differential fuzz cases and hostile-input tests
+python tests/fuzz/sweep.py           # 2,000 random calculations/worksheets: Tableau engine vs DAX engine
+python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 39 UAT cases + defect injection
 ```
 
 Results are in [docs/TEST_REPORT.md](docs/TEST_REPORT.md) and [docs/Test_Report.docx](docs/Test_Report.docx).

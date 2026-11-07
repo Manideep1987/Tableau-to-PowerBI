@@ -14,12 +14,12 @@ table _Measures
 
 		annotation TableauSource = Calculation_0007
 
-	measure 'Running Sales' = CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, ALLSELECTED('Orders'[Order Date Quarter Start]), ORDERBY('Orders'[Order Date Quarter Start])))
+	measure 'Running Sales' = CALCULATE(SUM('Orders'[Sales]), WINDOW(1, ABS, 0, REL, CALCULATETABLE(SUMMARIZE('Orders', 'Orders'[Order Date Quarter Start]), ALLSELECTED('Orders'[Order Date Quarter Start])), ORDERBY('Orders'[Order Date Quarter Start])))
 		lineageTag: 8c751315-7a09-5de4-a477-65e0816f18cd
 
 		annotation TableauSource = Calculation_0008
 
-	measure 'Sales Rank' = RANKX(ALLSELECTED('Products'[Sub-Category]), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)
+	measure 'Sales Rank' = RANKX(CALCULATETABLE(SUMMARIZE('Orders', 'Products'[Sub-Category]), ALLSELECTED('Products'[Sub-Category])), CALCULATE(SUM('Orders'[Sales])), , DESC, SKIP)
 		lineageTag: d91ecd71-6184-5058-a3ea-abf32aaa4dde
 
 		annotation TableauSource = Calculation_0009

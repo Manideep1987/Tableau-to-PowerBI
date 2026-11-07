@@ -18,7 +18,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_F03
 
-	measure 'Sales YoY Prior' = CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, ALLSELECTED('Finance Orders'[Fiscal Year]), ORDERBY('Finance Orders'[Fiscal Year])))
+	measure 'Sales YoY Prior' = CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))
 		lineageTag: 369827f9-4457-5306-abdb-07f85e6befcb
 
 		annotation TableauSource = Calculation_F05
@@ -28,7 +28,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_F07
 
-	measure 'Avg Monthly Sales' = AVERAGEX(ALLSELECTED('Finance Orders'[Fiscal Year]), CALCULATE(SUM('Finance Orders'[sales])))
+	measure 'Avg Monthly Sales' = AVERAGEX(CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), CALCULATE(SUM('Finance Orders'[sales])))
 		lineageTag: 2f16e6b7-3525-5c10-b2d9-3a02779f39a7
 
 		annotation TableauSource = Calculation_F09

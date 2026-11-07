@@ -1,22 +1,22 @@
 {
   "workbook": "Superstore_Sales",
   "binding": "SQLite: superstore.db",
-  "started": "2026-11-06T17:27:10",
-  "duration_s": 9.0,
+  "started": "2026-11-07T09:24:35",
+  "duration_s": 10.09,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 47,
+    "PASS": 48,
     "WARN": 2,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
     "PENDING": 3,
     "N/A": 1,
-    "total": 53,
-    "pass_rate": 95.9,
+    "total": 54,
+    "pass_rate": 96.0,
     "overall": "WARN"
   },
   "checks": [
@@ -82,6 +82,16 @@
       "status": "PASS",
       "detail": "2/2 Tableau relationships -> model relationships (joins flattened: 0)",
       "data": {},
+      "gate": 1
+    },
+    {
+      "layer": "L2 Data",
+      "name": "Nullability contract - Superstore",
+      "status": "PASS",
+      "detail": "Every column with NULLs in the data is treated as nullable by the conversion",
+      "data": {
+        "columns": []
+      },
       "gate": 1
     },
     {
@@ -294,6 +304,8 @@
           "matched_cells": 12,
           "total_cells": 12,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -545,6 +557,8 @@
           "matched_cells": 48,
           "total_cells": 48,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -1139,6 +1153,8 @@
           "matched_cells": 9,
           "total_cells": 9,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Profit:qk": {
@@ -1303,6 +1319,8 @@
           "matched_cells": 19,
           "total_cells": 19,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -1689,6 +1707,8 @@
           "matched_cells": 10,
           "total_cells": 10,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -1905,6 +1925,8 @@
           "matched_cells": 3,
           "total_cells": 3,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -2008,6 +2030,8 @@
           "matched_cells": 24,
           "total_cells": 24,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Profit:qk": {
@@ -2333,6 +2357,8 @@
           "matched_cells": 4,
           "total_cells": 4,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -2438,6 +2464,8 @@
           "matched_cells": 24,
           "total_cells": 24,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -2762,6 +2790,8 @@
           "matched_cells": 16,
           "total_cells": 16,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -3063,6 +3093,8 @@
           "matched_cells": 36,
           "total_cells": 36,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -3488,6 +3520,8 @@
           "matched_cells": 18,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "ctd:Customer Name:qk": {
@@ -3746,6 +3780,8 @@
           "matched_cells": 18,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Calculation_0013:qk": {
@@ -4004,6 +4040,8 @@
           "matched_cells": 36,
           "total_cells": 36,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_0018:qk": {
@@ -4430,6 +4468,8 @@
           "matched_cells": 7,
           "total_cells": 7,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "cnt:Order ID:qk": {
@@ -4599,6 +4639,8 @@
           "matched_cells": 80,
           "total_cells": 80,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_0012:qk": {
@@ -5581,6 +5623,8 @@
           "matched_cells": 4,
           "total_cells": 4,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -5695,6 +5739,8 @@
           "matched_cells": 2,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 11.11,
           "totals": {
             "sum:Calculation_0013:qk": {
@@ -5950,6 +5996,8 @@
           "matched_cells": 80,
           "total_cells": 80,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_0012:qk": {
@@ -7721,6 +7769,8 @@
           "matched_cells": 12,
           "total_cells": 12,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -7972,6 +8022,8 @@
           "matched_cells": 48,
           "total_cells": 48,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -8566,6 +8618,8 @@
           "matched_cells": 9,
           "total_cells": 9,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Profit:qk": {
@@ -8730,6 +8784,8 @@
           "matched_cells": 18,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -9099,6 +9155,8 @@
           "matched_cells": 10,
           "total_cells": 10,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -9315,6 +9373,8 @@
           "matched_cells": 3,
           "total_cells": 3,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "sum:Sales:qk": {
@@ -10005,8 +10065,8 @@
       "gate": 1,
       "name": "Data contract",
       "status": "PASS",
-      "automated_checks": 10,
-      "passed": 10,
+      "automated_checks": 11,
+      "passed": 11,
       "failed": 0,
       "warnings": 0,
       "pending_human_checks": []

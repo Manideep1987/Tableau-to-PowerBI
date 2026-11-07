@@ -7,7 +7,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_I01
 
-	measure 'On Time Paid Amount' = SUMX('FactInvoices', IF((('FactInvoices'[Paid Flag] = TRUE()) && IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), 'FactInvoices'[Invoice Amount], 0))
+	measure 'On Time Paid Amount' = SUMX('FactInvoices', IF(IF((NOT ISBLANK(('FactInvoices'[Paid Flag] = TRUE())) && NOT(('FactInvoices'[Paid Flag] = TRUE()))) || (NOT ISBLANK(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))) && NOT(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date])))), FALSE(), IF(ISBLANK(('FactInvoices'[Paid Flag] = TRUE())) || ISBLANK(IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), ('FactInvoices'[Payment Date] <= 'FactInvoices'[Due Date]))), BLANK(), TRUE())), 'FactInvoices'[Invoice Amount], 0))
 		formatString: \$#,0;(\$#,0);\$#,0
 		lineageTag: 78e1ccd2-889b-582b-88ba-455027139844
 
@@ -35,7 +35,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_I10
 
-	measure 'Avg Days to Pay' = AVERAGEX('FactInvoices', DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY))
+	measure 'Avg Days to Pay' = AVERAGEX('FactInvoices', IF(ISBLANK('FactInvoices'[Payment Date]), BLANK(), DATEDIFF('FactInvoices'[Invoice Date], 'FactInvoices'[Payment Date], DAY)))
 		lineageTag: 36255249-d7a7-5db7-a570-f1229f8fa21c
 
 		annotation TableauSource = Calculation_I11

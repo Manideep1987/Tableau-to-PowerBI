@@ -1,21 +1,21 @@
 {
   "workbook": "HR_Analytics",
   "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
-  "started": "2026-11-06T17:26:56",
-  "duration_s": 0.38,
+  "started": "2026-11-07T09:24:47",
+  "duration_s": 0.42,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 27,
+    "PASS": 28,
     "WARN": 0,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
     "PENDING": 3,
     "N/A": 1,
-    "total": 31,
+    "total": 32,
     "pass_rate": 100.0,
     "overall": "PASS"
   },
@@ -82,6 +82,16 @@
       "status": "PASS",
       "detail": "0/0 Tableau relationships -> model relationships (joins flattened: 0)",
       "data": {},
+      "gate": 1
+    },
+    {
+      "layer": "L2 Data",
+      "name": "Nullability contract - Employees",
+      "status": "PASS",
+      "detail": "Every column with NULLs in the data is treated as nullable by the conversion",
+      "data": {
+        "columns": []
+      },
       "gate": 1
     },
     {
@@ -234,6 +244,8 @@
           "matched_cells": 18,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -482,6 +494,8 @@
           "matched_cells": 12,
           "total_cells": 12,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -693,6 +707,8 @@
           "matched_cells": 90,
           "total_cells": 90,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "avg:Salary:qk": {
@@ -1662,6 +1678,8 @@
           "matched_cells": 20,
           "total_cells": 20,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -1942,6 +1960,8 @@
           "matched_cells": 3,
           "total_cells": 3,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "cnt:Employee ID:qk": {
@@ -2476,6 +2496,8 @@
           "matched_cells": 18,
           "total_cells": 18,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -2724,6 +2746,8 @@
           "matched_cells": 12,
           "total_cells": 12,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -2935,6 +2959,8 @@
           "matched_cells": 87,
           "total_cells": 87,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "avg:Salary:qk": {
@@ -3874,6 +3900,8 @@
           "matched_cells": 20,
           "total_cells": 20,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "usr:Calculation_H01:qk": {
@@ -4154,6 +4182,8 @@
           "matched_cells": 3,
           "total_cells": 3,
           "null_vs_zero": 0,
+          "empty_rows_hidden": 0,
+          "extra_blank_rows": 0,
           "match_rate": 100.0,
           "totals": {
             "cnt:Employee ID:qk": {
@@ -4580,8 +4610,8 @@
       "gate": 1,
       "name": "Data contract",
       "status": "PASS",
-      "automated_checks": 9,
-      "passed": 9,
+      "automated_checks": 10,
+      "passed": 10,
       "failed": 0,
       "warnings": 0,
       "pending_human_checks": []
