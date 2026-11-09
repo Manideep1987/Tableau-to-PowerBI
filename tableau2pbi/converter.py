@@ -277,6 +277,59 @@ class ConversionResult:
         }
 
 
+USER_FUNCS = {"USERNAME", "FULLNAME", "USERDOMAIN", "ISMEMBEROF", "ISUSERNAME", "ISFULLNAME", "USERATTRIBUTE",
+              "USERATTRIBUTEINCLUDES"}
+# DAX functions Power BI only allows in measures and RLS filter expressions
+DYNAMIC_SECURITY_DAX = re.compile(r"\b(USERPRINCIPALNAME|USERNAME|CUSTOMDATA|USERCULTURE|USEROBJECTID)\s*\(", re.I)
+
+
+def _uses_user_function(ast, lookup, _seen=None) -> bool:
+    """True when the expression (or a calculation it references) calls a Tableau user function."""
+    _seen = _seen or set()
+    for n in ast.walk():
+        if isinstance(n, Func) and n.name in USER_FUNCS:
+            return True
+        if isinstance(n, FField) and not n.is_parameter and n.name not in _seen and lookup(n.name) is not None:
+            if _uses_user_function(lookup(n.name), lookup, _seen | {n.name}):
+                return True
+    return False
+
+
+def model_lint(model) -> list:
+    """Static checks for rules Power BI Desktop enforces when it loads a project. Each finding would
+    stop the .pbip from opening, so they are reported as errors (and fail validation)."""
+    out = []
+    names = {}
+    m2m = {(r.to_table, r.from_table) for r in model.relationships
+           if getattr(r, "cardinality", "many-to-one") == "many-to-many"}
+    m2m |= {(b, a) for a, b in m2m}
+    for t in model.tables:
+        cols = {c.name.lower() for c in t.columns}
+        seen = set()
+        for c in t.columns:
+            if c.name.lower() in seen:
+                out.append(f"Table '{t.name}' has two columns named '{c.name}'.")
+            seen.add(c.name.lower())
+            if c.expression and DYNAMIC_SECURITY_DAX.search(c.expression):
+                out.append(f"Calculated column '{t.name}'[{c.name}] uses a user function (USERPRINCIPALNAME, ...); "
+                           f"Power BI allows these only in measures and RLS roles.")
+            if c.expression:
+                for other in re.findall(r"RELATED\(\s*'([^']+)'", c.expression):
+                    if (t.name, other) in m2m:
+                        out.append(f"Calculated column '{t.name}'[{c.name}] uses RELATED() across the many-to-many "
+                                   f"relationship to '{other}'.")
+        if t.dax_expression and DYNAMIC_SECURITY_DAX.search(t.dax_expression):
+            out.append(f"Calculated table '{t.name}' uses a user function.")
+        for m in t.measures:
+            key = m.name.lower()
+            if key in names:
+                out.append(f"Measure name '{m.name}' is used twice ('{names[key]}' and '{t.name}').")
+            names[key] = t.name
+            if key in cols:
+                out.append(f"Measure '{m.name}' has the same name as a column of '{t.name}'.")
+    return out
+
+
 def tidy(name: str) -> str:
     return re.sub(r"\s+", " ", name.replace("[", "(").replace("]", ")")).strip()
 
@@ -380,6 +433,8 @@ class Converter:
             self._translate_calcs(ds)
         self._addressing_variants()
         self._date_table()
+        for problem in model_lint(self.model):
+            self.issue("error", "Power BI Desktop", "Model", problem)
         visuals = {ws.name: self._visual(ws) for ws in self.wb.worksheets}
         pages = self._pages(visuals)
         self._actions()
@@ -788,6 +843,13 @@ class Converter:
             if isinstance(ast, LOD) and ast.kind in ("INCLUDE", "EXCLUDE"):
                 self.lod_measures.add((ds.name, name))
                 agg, kind = True, "measure"
+            if not agg and _uses_user_function(ast, lk):
+                # USERNAME()/USERPRINCIPALNAME() are not allowed in calculated columns (Power BI Desktop
+                # refuses to load the model); outside a user filter the calculation becomes a measure.
+                agg, kind = True, "measure"
+                self.issue("warning", "Security", cf.caption,
+                           "Uses USERNAME() outside a user filter: converted as a measure (Power BI does not allow "
+                           "USERPRINCIPALNAME() in calculated columns). Column references use SELECTEDVALUE.")
             host = self.measure_table if agg else self._host_for(ds, ast, lookup)
             dt = cf.datatype or "real"
             nullable = False

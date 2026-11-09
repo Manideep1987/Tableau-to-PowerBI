@@ -117,6 +117,8 @@ def _workbook_xml():
         _calc("C12", "Vendor On Time %", "{ FIXED [Vendor Name]: SUM([C02])/SUM([C01]) }"),
         _calc("C13", "Amount % of Total", "SUM([Amount])/TOTAL(SUM([Amount]))"),
         _calc("C14", "Days Open", "IF [C01]=0 THEN DATEDIFF('day',[Due Date],[Parameters].[As Of]) END", "integer"),
+        _calc("C15", "Viewer Is Admin", "USERNAME() = 'admin@example.com'", "boolean", "dimension", "nominal"),
+        _calc("C16", "Admin Flag", "IF [C15] THEN 1 ELSE 0 END", "integer"),
     ])
     conn = "excel-direct.0aptest"
     objs = [("Access", "AC"), ("Bills", "BI"), ("Vendors", "VE")]          # Access first, on purpose
@@ -297,3 +299,28 @@ def test_all_numbers_match(ap):
     bad = [(c["name"], c["status"], c["detail"]) for c in ap["rep"]["checks"]
            if c["layer"] in ("L2 Data", "L3 Visual") and c["status"] in ("FAIL", "ERROR")]
     assert not bad
+
+
+def test_user_functions_never_in_calculated_columns(ap):
+    """Power BI Desktop refuses to load a model with USERPRINCIPALNAME() in a calculated column
+    (PFE_XL_DYNAMIC_SECURITY_FUNCTION_NOT_ALLOWED), also through a dependent calculation."""
+    from tableau2pbi.converter import DYNAMIC_SECURITY_DAX
+    res = ap["res"]
+    for name in ("Viewer Is Admin", "Admin Flag"):
+        assert next(m for m in res.calc_mappings if m.tableau_name == name).kind == "measure"
+    assert not [c.name for t in res.model.tables for c in t.columns
+                if c.expression and DYNAMIC_SECURITY_DAX.search(c.expression)]
+    chk = next(c for c in ap["rep"]["checks"] if c["name"] == "Power BI Desktop load rules")
+    assert chk["status"] == "PASS"
+
+
+def test_model_lint_flags_desktop_load_errors(ap):
+    import copy
+    from tableau2pbi.converter import PbiColumn, PbiMeasure, model_lint
+    model = copy.deepcopy(ap["res"].model)
+    bills = model.table("Bills")
+    bills.columns.append(PbiColumn("Me", "boolean", expression="USERPRINCIPALNAME() = \"x\""))
+    bills.columns.append(PbiColumn("Acc", "string", expression="RELATED('Access'[User Email])"))
+    model.table("_Measures").measures.append(PbiMeasure("On Time %", "1"))
+    found = " | ".join(model_lint(model))
+    assert "user function" in found and "many-to-many" in found and "used twice" in found

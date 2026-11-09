@@ -415,6 +415,11 @@ class Validator(GateChecks):
                  f"{pcols}/{cols} source columns in the semantic model")
         rels = sum(len(d.relationships) for d in wb.datasources if d.model_style == "relationships")
         prels = len([r for r in res.model.relationships if r.to_table != "Date"])
+        from ..converter import model_lint
+        lint = model_lint(res.model)
+        self.add("L1 Metadata", "Power BI Desktop load rules", "FAIL" if lint else "PASS",
+                 "; ".join(lint) if lint else "No calculated column uses a user function, no duplicate names, "
+                 "no RELATED() across a many-to-many relationship", {"findings": lint})
         self.add("L1 Metadata", "Relationships converted", "PASS" if prels >= rels else "WARN",
                  f"{prels}/{rels} Tableau relationships -> model relationships (joins flattened: "
                  f"{sum(1 for d in wb.datasources if d.model_style == 'joins')})")

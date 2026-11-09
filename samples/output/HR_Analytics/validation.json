@@ -1,21 +1,21 @@
 {
   "workbook": "HR_Analytics",
   "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
-  "started": "2026-11-09T14:20:50",
-  "duration_s": 0.45,
+  "started": "2026-11-09T14:36:08",
+  "duration_s": 0.52,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 28,
+    "PASS": 29,
     "WARN": 0,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
     "PENDING": 3,
     "N/A": 1,
-    "total": 32,
+    "total": 33,
     "pass_rate": 100.0,
     "overall": "PASS"
   },
@@ -74,6 +74,16 @@
       "status": "PASS",
       "detail": "10/10 source columns in the semantic model",
       "data": {},
+      "gate": 1
+    },
+    {
+      "layer": "L1 Metadata",
+      "name": "Power BI Desktop load rules",
+      "status": "PASS",
+      "detail": "No calculated column uses a user function, no duplicate names, no RELATED() across a many-to-many relationship",
+      "data": {
+        "findings": []
+      },
       "gate": 1
     },
     {
@@ -4610,8 +4620,8 @@
       "gate": 1,
       "name": "Data contract",
       "status": "PASS",
-      "automated_checks": 10,
-      "passed": 10,
+      "automated_checks": 11,
+      "passed": 11,
       "failed": 0,
       "warnings": 0,
       "pending_human_checks": []

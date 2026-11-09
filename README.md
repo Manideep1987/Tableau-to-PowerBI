@@ -136,14 +136,14 @@ tableau2pbi/
   report.py            JSON + HTML migration / validation reports
   web/                 FastAPI app + single-page UI (no external dependencies)
 samples/               data generator, sample workbooks, converted outputs
-tests/                 175 automated tests + Playwright UI walkthrough
+tests/                 177 automated tests + Playwright UI walkthrough
 docs/                  test report (Markdown + Word), screenshots, test evidence
 ```
 
 ## Testing
 
 ```bash
-python -m pytest -q                  # 175 tests incl. 100 fixed-seed differential fuzz cases and hostile-input tests
+python -m pytest -q                  # 177 tests incl. 100 fixed-seed differential fuzz cases and hostile-input tests
 python tests/fuzz/sweep.py           # 2,000 random calculations/worksheets: Tableau engine vs DAX engine
 python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 39 UAT cases + defect injection
 ```

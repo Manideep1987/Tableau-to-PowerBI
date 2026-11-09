@@ -1639,14 +1639,14 @@
   ],
   "validation": {
     "summary": {
-      "PASS": 43,
+      "PASS": 44,
       "WARN": 0,
       "FAIL": 0,
       "ERROR": 0,
       "SKIP": 0,
       "PENDING": 3,
       "N/A": 0,
-      "total": 46,
+      "total": 47,
       "pass_rate": 100.0,
       "overall": "PASS"
     },
@@ -1655,8 +1655,8 @@
         "gate": 1,
         "name": "Data contract",
         "status": "PASS",
-        "automated_checks": 11,
-        "passed": 11,
+        "automated_checks": 12,
+        "passed": 12,
         "failed": 0,
         "warnings": 0,
         "pending_human_checks": []

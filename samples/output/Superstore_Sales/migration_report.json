@@ -4632,22 +4632,22 @@
   "validation": {
     "workbook": "Superstore_Sales",
     "binding": "SQLite: superstore.db",
-    "started": "2026-11-09T14:20:37",
-    "duration_s": 11.9,
+    "started": "2026-11-09T14:35:55",
+    "duration_s": 11.59,
     "tolerance": {
       "absolute": 0.01,
       "relative": 1e-06
     },
     "summary": {
-      "PASS": 48,
+      "PASS": 49,
       "WARN": 2,
       "FAIL": 0,
       "ERROR": 0,
       "SKIP": 0,
       "PENDING": 3,
       "N/A": 1,
-      "total": 54,
-      "pass_rate": 96.0,
+      "total": 55,
+      "pass_rate": 96.1,
       "overall": "WARN"
     },
     "checks": [
@@ -4705,6 +4705,16 @@
         "status": "PASS",
         "detail": "21/21 source columns in the semantic model",
         "data": {},
+        "gate": 1
+      },
+      {
+        "layer": "L1 Metadata",
+        "name": "Power BI Desktop load rules",
+        "status": "PASS",
+        "detail": "No calculated column uses a user function, no duplicate names, no RELATED() across a many-to-many relationship",
+        "data": {
+          "findings": []
+        },
         "gate": 1
       },
       {
@@ -14696,8 +14706,8 @@
         "gate": 1,
         "name": "Data contract",
         "status": "PASS",
-        "automated_checks": 11,
-        "passed": 11,
+        "automated_checks": 12,
+        "passed": 12,
         "failed": 0,
         "warnings": 0,
         "pending_human_checks": []

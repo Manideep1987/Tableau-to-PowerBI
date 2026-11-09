@@ -16,8 +16,8 @@ def _by_name(rep):
     return {c.name: c for c in rep.checks}
 
 
-@pytest.mark.parametrize("name,expected_pass", [("Superstore_Sales.twb", 48), ("Finance_CustomSQL.twb", 26),
-                                                ("HR_Analytics.twbx", 28), ("Invoice_Health.twb", 43)])
+@pytest.mark.parametrize("name,expected_pass", [("Superstore_Sales.twb", 49), ("Finance_CustomSQL.twb", 27),
+                                                ("HR_Analytics.twbx", 29), ("Invoice_Health.twb", 44)])
 def test_samples_validate(validations, name, expected_pass):
     s = validations[name].summary
     assert s["FAIL"] == 0 and s["ERROR"] == 0, [(c.name, c.detail) for c in validations[name].checks if c.status in ("FAIL", "ERROR")]

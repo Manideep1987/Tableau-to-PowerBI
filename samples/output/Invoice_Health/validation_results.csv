@@ -5,6 +5,7 @@ gate,check,scenario,metric,power_bi_object,tableau_value,powerbi_value,delta,tol
 1,Dashboards converted to pages,,L1 Metadata,,,,,,,PASS,BI migration engineer,
 1,Worksheet filters converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
 1,Columns mapped,,L1 Metadata,,,,,,,PASS,BI migration engineer,
+1,Power BI Desktop load rules,,L1 Metadata,,,,,,,PASS,BI migration engineer,
 1,Relationships converted,,L1 Metadata,,,,,,,PASS,BI migration engineer,
 1,Nullability contract - Invoice Health,,L2 Data,,,,,,,PASS,BI migration engineer,
 1,Row count - Invoice Health,,L2 Data,,,,,,,PASS,BI migration engineer,

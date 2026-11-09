@@ -1,21 +1,21 @@
 {
   "workbook": "Invoice_Health",
   "binding": "SQLite: superstore.db",
-  "started": "2026-11-09T14:20:51",
-  "duration_s": 3.32,
+  "started": "2026-11-09T14:36:09",
+  "duration_s": 3.86,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
   },
   "summary": {
-    "PASS": 43,
+    "PASS": 44,
     "WARN": 0,
     "FAIL": 0,
     "ERROR": 0,
     "SKIP": 0,
     "PENDING": 3,
     "N/A": 0,
-    "total": 46,
+    "total": 47,
     "pass_rate": 100.0,
     "overall": "PASS"
   },
@@ -74,6 +74,16 @@
       "status": "PASS",
       "detail": "23/23 source columns in the semantic model",
       "data": {},
+      "gate": 1
+    },
+    {
+      "layer": "L1 Metadata",
+      "name": "Power BI Desktop load rules",
+      "status": "PASS",
+      "detail": "No calculated column uses a user function, no duplicate names, no RELATED() across a many-to-many relationship",
+      "data": {
+        "findings": []
+      },
       "gate": 1
     },
     {
@@ -5125,8 +5135,8 @@
       "gate": 1,
       "name": "Data contract",
       "status": "PASS",
-      "automated_checks": 11,
-      "passed": 11,
+      "automated_checks": 12,
+      "passed": 12,
       "failed": 0,
       "warnings": 0,
       "pending_human_checks": []
