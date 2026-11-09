@@ -253,7 +253,7 @@
       {
         "name": "employees.csv",
         "kind": "single",
-        "m": "let\n    Source = File.Contents(\"Data/hr/employees.csv\"),\n    Csv = Csv.Document(Source, [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),\n    Selected = Table.SelectColumns(Data, {\"employee_id\", \"employee_name\", \"department\", \"job_level\", \"gender\", \"location\", \"hire_date\", \"termination_date\", \"salary\", \"performance_score\"}, MissingField.UseNull),\n    Renamed = Table.RenameColumns(Selected, {{\"employee_id\", \"Employee ID\"}, {\"employee_name\", \"Employee Name\"}, {\"department\", \"Department\"}, {\"job_level\", \"Job Level\"}, {\"gender\", \"Gender\"}, {\"location\", \"Location\"}, {\"hire_date\", \"Hire Date\"}, {\"termination_date\", \"Termination Date\"}, {\"salary\", \"Salary\"}, {\"performance_score\", \"Performance Score\"}}),\n    Typed = Table.TransformColumnTypes(Renamed, {{\"Employee ID\", type text}, {\"Employee Name\", type text}, {\"Department\", type text}, {\"Job Level\", type text}, {\"Gender\", type text}, {\"Location\", type text}, {\"Hire Date\", type date}, {\"Termination Date\", type date}, {\"Salary\", type number}, {\"Performance Score\", Int64.Type}})\nin\n    Typed",
+        "m": "let\n    Source = File.Contents(#\"Employees File\"),\n    Csv = Csv.Document(Source, [Delimiter = \",\", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),\n    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),\n    Selected = Table.SelectColumns(Data, {\"employee_id\", \"employee_name\", \"department\", \"job_level\", \"gender\", \"location\", \"hire_date\", \"termination_date\", \"salary\", \"performance_score\"}, MissingField.UseNull),\n    Renamed = Table.RenameColumns(Selected, {{\"employee_id\", \"Employee ID\"}, {\"employee_name\", \"Employee Name\"}, {\"department\", \"Department\"}, {\"job_level\", \"Job Level\"}, {\"gender\", \"Gender\"}, {\"location\", \"Location\"}, {\"hire_date\", \"Hire Date\"}, {\"termination_date\", \"Termination Date\"}, {\"salary\", \"Salary\"}, {\"performance_score\", \"Performance Score\"}}),\n    Typed = Table.TransformColumnTypes(Renamed, {{\"Employee ID\", type text}, {\"Employee Name\", type text}, {\"Department\", type text}, {\"Job Level\", type text}, {\"Gender\", type text}, {\"Location\", type text}, {\"Hire Date\", type date}, {\"Termination Date\", type date}, {\"Salary\", type number}, {\"Performance Score\", Int64.Type}})\nin\n    Typed",
         "dax_source": null,
         "columns": [
           {
@@ -486,10 +486,16 @@
         "to_column": "Date",
         "cross_filter": "oneDirection",
         "active": true,
-        "tableau_join": "relationship"
+        "tableau_join": "relationship",
+        "cardinality": "many-to-one"
       }
     ],
-    "expressions": []
+    "expressions": [
+      {
+        "name": "Employees File",
+        "expression": "\"Data/hr/employees.csv\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      }
+    ]
   },
   "calculations": [
     {
@@ -1611,6 +1617,12 @@
   "actions": [],
   "issues": [
     {
+      "severity": "warning",
+      "area": "Data source",
+      "object": "Employees",
+      "message": "File source 'Data/hr/employees.csv': set the Power Query parameter 'Employees File' to the file's full path (Transform data > Edit parameters) before refreshing."
+    },
+    {
       "severity": "info",
       "area": "Model",
       "object": "Date",
@@ -1621,8 +1633,8 @@
   "validation": {
     "workbook": "HR_Analytics",
     "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
-    "started": "2026-11-07T09:24:47",
-    "duration_s": 0.42,
+    "started": "2026-11-09T14:20:50",
+    "duration_s": 0.45,
     "tolerance": {
       "absolute": 0.01,
       "relative": 1e-06
@@ -6312,7 +6324,7 @@
         },
         {
           "metric": "Manual effort (estimate)",
-          "value": 0,
+          "value": 5,
           "unit": "minutes",
           "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
         }

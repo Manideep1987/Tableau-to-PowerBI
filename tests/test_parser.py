@@ -82,7 +82,7 @@ def test_worksheet_shelves_and_filters(workbooks):
     assert rng.kind == "quantitative" and rng.min == 1000 and rng.max is None
     rs = wb.worksheet("Running Sales by Quarter")
     tc = [r for r in rs.rows if r.table_calc]
-    assert tc and tc[0].table_calc["ordering_type"] == "Columns"
+    assert tc and tc[0].table_calc["ordering_type"] == "Rows"      # Table (across): quarters on Columns
 
 
 def test_dashboard_zones(workbooks):

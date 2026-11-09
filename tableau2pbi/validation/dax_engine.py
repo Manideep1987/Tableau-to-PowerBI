@@ -1166,6 +1166,10 @@ class DaxEngine:
             if len(vals) == 1:
                 vals.append(0)   # DAX: BLANK treated as 0 in scalar MIN/MAX
             return min(vals) if name == "MIN" else max(vals)
+        if name == "ISEMPTY":
+            if not args:
+                raise DaxError("ISEMPTY() needs a table")
+            return len(self.table(args[0], ctx).df) == 0
         if name == "COUNTROWS":
             if not args:
                 raise DaxError("COUNTROWS() needs a table")

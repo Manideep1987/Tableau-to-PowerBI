@@ -152,7 +152,7 @@ def parse_shelf(text: Optional[str]) -> list[FieldRef]:
     out = []
     for m in FIELD_REF_RE.finditer(text):
         ref = parse_instance_name(m.group(1), m.group(2))
-        if ref and ref.derivation != "special":
+        if ref and ref.derivation != "special" and ref.field != "Multiple Values":
             out.append(ref)
     return out
 
@@ -602,11 +602,26 @@ class TableauReader:
             if dss is not None:
                 ws.datasources = [d.get("name") for d in _children(dss, "datasource")]
             for dep in _children(view, "datasource-dependencies"):
+                dsx = wb.datasource(dep.get("datasource"))
+                for col_el in _children(dep, "column"):
+                    # ad-hoc calculations typed on a shelf live only in the worksheet
+                    nm = strip_brackets(col_el.get("name") or "")
+                    if dsx is not None and _child(col_el, "calculation") is not None and nm \
+                            and nm not in dsx.calculations:
+                        self._read_column(col_el, dsx)
+                        cf = dsx.calculations.get(nm)
+                        if cf is not None:
+                            cf.extra["adhoc"] = ws.name
+                            n_adhoc = sum(1 for c in dsx.calculations.values() if c.extra.get("adhoc"))
+                            cf.caption = f"Ad-hoc {n_adhoc} ({ws.name})"
                 for ci in _children(dep, "column-instance"):
                     tc = _child(ci, "table-calc")
                     if tc is not None:
                         order_fields = [strip_brackets(o.get("field")) for o in _children(tc, "order")]
-                        tc_by_instance[(dep.get("datasource"), strip_brackets(ci.get("name")))] = {
+                        inst = strip_brackets(ci.get("name"))
+                        if re.search(r":\d+$", inst) and inst.count(":") >= 3:
+                            inst = inst.rsplit(":", 1)[0]          # [usr:Calc:qk:1] -> usr:Calc:qk
+                        tc_by_instance[(dep.get("datasource"), inst)] = {
                             "ordering_type": tc.get("ordering-type", "Rows"),
                             "ordering_fields": order_fields, "type": tc.get("type")}
             for f in _children(view, "filter"):
@@ -617,7 +632,7 @@ class TableauReader:
             for s in (el for el in view.iter() if _local(el.tag) in sort_tags):
                 ref = parse_field_ref(s.get("column", ""))
                 using = parse_field_ref(s.get("using", "")) if s.get("using") else None
-                if ref:
+                if ref and ref.derivation != "special":     # a Measure Names sort = measure column order
                     ws.sorts.append({"field": ref, "direction": s.get("direction", "ASC"),
                                      "using": using, "class": s.get("class")})
         ws.rows = parse_shelf(_text(table, "rows"))
@@ -643,12 +658,36 @@ class TableauReader:
                     pass
             if len(_children(panes, "pane")) > 2:
                 ws.dual_axis = True
+        self._measure_values(ws, table)
+        for ref in ws.all_fields():
+            tc = tc_by_instance.get((ref.datasource, f"{ref.derivation}:{ref.field}:{ref.pill_type}"))
+            if tc and not ref.table_calc:
+                ref.table_calc = tc
         title = None
         for t in _iter(ws_el, "title"):
             title = " ".join(x.strip() for x in t.itertext() if x.strip())
             break
         ws.title = title
         return ws
+
+    def _measure_values(self, ws: Worksheet, table):
+        """[:Measure Names] / [:Measure Values]: the Measure Names filter lists the measures shown.
+        They become the worksheet's value measures (Power BI: one column per measure)."""
+        shelves = (_text(table, "rows") or "") + (_text(table, "cols") or "")
+        mn_filters = [f for f in ws.filters if f.field.field == ":Measure Names"]
+        ws.filters = [f for f in ws.filters if not f.field.field.startswith(":Measure")]
+        if ":Measure Names]" not in shelves and not mn_filters:
+            return
+        refs = []
+        for f in mn_filters:
+            for m in f.members:
+                r = parse_field_ref(str(m)) if m is not None else None
+                if r and r.derivation != "special":
+                    refs.append(r)
+        if refs:
+            ws.measure_values = refs
+            have = {r.key for r in ws.encodings.get("text", [])}
+            ws.encodings.setdefault("text", []).extend(r for r in refs if r.key not in have)
 
     def _read_filter(self, f, ds_name) -> Optional[Filter]:
         cls = f.get("class")

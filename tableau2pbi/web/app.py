@@ -201,17 +201,24 @@ async def api_validate(job_id: str, use_sample_data: bool = Form(False), sqlite:
         today = date.fromisoformat(as_of) if as_of else date(2025, 12, 31) if j["sample"] else date.today()
     except ValueError:
         raise HTTPException(400, "as_of must be YYYY-MM-DD")
-    from ..validation.runner import apply_nullability, nullability_findings
+    from ..validation.runner import apply_keys, apply_nullability, key_findings, nullability_findings
     found = nullability_findings(res.workbook, binding)
-    if found and not any(m.overridden for m in res.calc_mappings):
+    mm_before = {id(r) for d in res.workbook.datasources for r in d.relationships if r.cardinality == "many-to-many"}
+    mm = apply_keys(res.workbook, key_findings(res.workbook, binding))
+    mm_new = [id(r) for d in res.workbook.datasources for r in d.relationships
+              if r.cardinality == "many-to-many" and id(r) not in mm_before]
+    if (found or mm_new) and not any(m.overridden for m in res.calc_mappings):
         from ..converter import Converter
         apply_nullability(res.workbook, found)
+        if mm:
+            j["audit"].append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "profiled",
+                               "detail": "Many-to-many relationships: " + ", ".join(mm)})
         conv = Converter(res.workbook, j["join_strategy"])
         res = conv.convert()
         j["res"], j["conv"] = res, conv
         _refresh(j)
         j["audit"].append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "event": "re-converted",
-                           "detail": "Data profiling: nullable columns " + ", ".join(f["column"] for f in found)})
+                           "detail": "Data profiling: nullable columns " + (", ".join(f["column"] for f in found) or "none")})
     rep = validate(res, binding, today=today, abs_tol=abs_tol, rel_tol=rel_tol, scenarios=scenarios).to_dict()
     from ..validation.gates import compute_gates, verdict
     rep["gates"] = compute_gates(rep, j["signoff"])

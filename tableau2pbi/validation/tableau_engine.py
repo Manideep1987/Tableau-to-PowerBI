@@ -25,7 +25,7 @@ import pandas as pd
 from ..formula.ast import (AGGREGATES, TABLE_CALCS, Bool, BinOp, Case, DateLit, Field, Func, If, In,
                            LOD, Node, Null, Num, Str, Unary, is_aggregate, is_scalar_minmax)
 from ..formula.parser import parse_formula
-from ..model import AGG_DERIVATIONS, Datasource, FieldRef, Filter, Workbook, Worksheet
+from ..model import AGG_DERIVATIONS, Datasource, hub_table, FieldRef, Filter, Workbook, Worksheet
 
 
 class TableauEvalError(Exception):
@@ -92,7 +92,7 @@ class TableauEngine:
         self.context = np.ones(self.n, dtype=bool)
         # Relationships (logical layer): fields of a related table are aggregated at that table's
         # native level of detail - each related row counts once, not once per fact record.
-        self.root = ds.tables[0].name if ds.tables else None
+        self.root = hub_table(ds)
         self.row_ids = {c[len("__row__"):]: self.cols[c] for c in self.cols if c.startswith("__row__")}
         self.col_table = {name: col.table for name, col in ds.columns.items()}
 
@@ -190,17 +190,20 @@ class TableauEngine:
     def native_rows(self, arg: Node, idx):
         if self.ds.model_style != "relationships" or not self.row_ids:
             return idx
+        # Tableau evaluates an aggregate over the rows of the tables its expression references
+        # (joined along the relationship path through the root), never over rows multiplied by
+        # an unrelated many-to-many table that happens to be in the record set.
         tables = self.tables_of(arg)
-        if len(tables) != 1:
+        if not tables or any(t not in self.row_ids for t in tables):
             return idx
-        t = next(iter(tables))
-        if t == self.root or t not in self.row_ids:
-            return idx
-        rid = self.row_ids[t]
+        if len(tables) > 1:
+            tables = tables | {self.root}
+        rids = [self.row_ids[t] for t in sorted(tables)]
+        single = len(rids) == 1
         seen, keep = set(), []
         for i in idx:
-            r = rid[i]
-            if r is None or r in seen:
+            r = rids[0][i] if single else tuple(x[i] for x in rids)
+            if r is None or (single and isinstance(r, float) and r != r) or r in seen:
                 continue
             seen.add(r)
             keep.append(i)
@@ -503,6 +506,14 @@ class TableauEngine:
     def agg(self, node: Node, idx: np.ndarray, view=None):
         """Evaluate an aggregate expression over the records ``idx``."""
         if isinstance(node, Func) and node.name in AGGREGATES and not is_scalar_minmax(node):
+            arg = node.args[0]
+            lod = arg if isinstance(arg, LOD) else (
+                self._calc_ast(arg.name) if isinstance(arg, Field) and not arg.is_parameter else None)
+            if (isinstance(lod, LOD) and lod.kind in ("INCLUDE", "EXCLUDE") and view is not None
+                    and view.current is not None and node.name in ("SUM", "AVG", "MIN", "MAX", "MEDIAN")):
+                # INCLUDE / EXCLUDE inside an aggregate: evaluated at the view grain +/- the LOD
+                # dimensions, then aggregated over those rows (not over records)
+                return view.lod_measure(lod, node.name, idx)
             vec = self.row_vector(node.args[0])
             idx = self.native_rows(node.args[0], idx)
             vals = [vec[i] for i in idx]
@@ -725,10 +736,10 @@ class _View:
         ot = (tc.get("ordering_type") or "").lower()
         rows = [d for d in self.dims if any(d.key == r.key for r in self.ws.rows)]
         cols = [d for d in self.dims if any(d.key == r.key for r in self.ws.cols)]
-        if ot == "rows":
-            return rows
-        if ot == "columns":
+        if ot == "rows":           # Table (across): along the Columns shelf
             return cols
+        if ot == "columns":        # Table (down): along the Rows shelf
+            return rows
         if ot == "field" and tc.get("ordering_fields"):
             sel = [d for d in self.dims if any(d.field in f for f in tc["ordering_fields"])]
             if sel:

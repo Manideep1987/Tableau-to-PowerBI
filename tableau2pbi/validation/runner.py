@@ -30,7 +30,7 @@ import pandas as pd
 
 from ..converter import ConversionResult, PbiFilter, PbiVisual
 from ..mcode import SQL_PARAM_RE, split_table
-from ..model import Datasource, FieldRef, Filter, Workbook
+from ..model import Datasource, FieldRef, Filter, Workbook, hub_table
 from .compare import compare_frames
 from .dax_engine import ColF, DaxEngine, _norm
 from .tableau_engine import TableauEngine
@@ -131,6 +131,11 @@ def _coerce(series: pd.Series, datatype: str) -> pd.Series:
 
 # ===================================================== tableau records ==
 def tableau_records(wb: Workbook, ds: Datasource, binding: DataBinding) -> pd.DataFrame:
+    frames = _table_frames(wb, ds, binding)
+    return _combine(ds, frames)
+
+
+def _table_frames(wb: Workbook, ds: Datasource, binding: DataBinding) -> dict:
     params = {p.caption: p.current_value for p in wb.parameters.values()}
     params.update({p.internal_name: p.current_value for p in wb.parameters.values()})
     conn_by = {c.name: c for c in ds.connections}
@@ -151,6 +156,10 @@ def tableau_records(wb: Workbook, ds: Datasource, binding: DataBinding) -> pd.Da
         if ds.model_style == "relationships":
             frame["__row__" + lt.name] = range(len(frame))      # row identity for native-level aggregation
         frames[lt.name] = frame
+    return frames
+
+
+def _combine(ds: Datasource, frames: dict) -> pd.DataFrame:
     if len(ds.tables) == 1:
         return frames[ds.tables[0].name].reset_index(drop=True)
     if ds.model_style == "joins":
@@ -166,8 +175,8 @@ def tableau_records(wb: Workbook, ds: Datasource, binding: DataBinding) -> pd.Da
             joined = joined.merge(frames[other], how=how, left_on=lc, right_on=rc)
             done.add(other)
         return joined.reset_index(drop=True)
-    # relationships: records are the root (first) object, related tables attached
-    root = ds.tables[0].name
+    # relationships: records are the hub table with the related tables attached
+    root = hub_table(ds) or ds.tables[0].name
     joined = frames[root]
     done = {root}
     pending = list(ds.relationships)
@@ -375,7 +384,8 @@ class Validator(GateChecks):
     def metadata_parity(self):
         res, wb = self.res, self.wb
         calcs = sum(len(d.calculations) for d in wb.datasources)
-        mapped = [m for m in res.calc_mappings if m.kind not in ("base-measure", "date-part", "parameter")]
+        mapped = [m for m in res.calc_mappings if m.kind not in ("base-measure", "date-part", "parameter")
+                  and "(compute using " not in m.tableau_name]          # per-addressing variants
         ok = [m for m in mapped if m.status in ("Converted", "Converted with notes")]
         self.add("L1 Metadata", "Calculated fields converted", "PASS" if len(ok) == calcs else
                  ("WARN" if len(ok) >= calcs * 0.9 else "FAIL"),
@@ -433,6 +443,12 @@ class Validator(GateChecks):
             if fact is None:
                 continue
             pbi = self.dax.base.get(fact.name)
+            rid = "__row__" + fact.name
+            if ds.model_style == "relationships" and rid in recs.columns:
+                # relationships: the fact table's own rows (a many-to-many related table does not
+                # multiply them in Tableau; it only joins when a view uses its fields)
+                recs = recs.drop_duplicates(subset=[rid])
+                recs = recs[recs[rid].notna()]
             n_t, n_p = len(recs), len(pbi) if pbi is not None else 0
             self.add("L2 Data", f"Row count - {ds.caption}", "PASS" if n_t == n_p else "FAIL",
                      f"Tableau data source rows {n_t:,} vs Power BI '{fact.name}' rows {n_p:,}",
@@ -898,6 +914,45 @@ def nullability_findings(wb: Workbook, binding: DataBinding) -> list:
                 out.append({"datasource": ds.name, "caption": ds.caption, "column": cname,
                             "nulls": int(recs[cname].isna().sum())})
     return out
+
+
+def key_findings(wb: Workbook, binding: DataBinding) -> list:
+    """Relationship keys profiled from the data: a key that is not unique on either side makes the
+    relationship many-to-many (Tableau relationships allow it; a Power BI one-side must be unique)."""
+    out = []
+    for ds in wb.datasources:
+        if ds.model_style != "relationships" or not ds.relationships:
+            continue
+        try:
+            frames = _table_frames(wb, ds, binding)
+        except Exception:
+            continue
+        for i, r in enumerate(ds.relationships):
+            for side, t, c in (("left", r.left_table, r.left_column), ("right", r.right_table, r.right_column)):
+                f = frames.get(t)
+                col = _local(ds, t, c)
+                if f is None or col not in f.columns:
+                    continue
+                vals = f[col].dropna()
+                out.append({"datasource": ds.name, "relationship": i, "side": side, "table": t, "column": col,
+                            "unique": bool(vals.is_unique), "duplicates": int(vals.duplicated().sum())})
+    return out
+
+
+def apply_keys(wb: Workbook, findings: list) -> list:
+    """Record key uniqueness on the relationships; returns the many-to-many relationships."""
+    for f in findings:
+        ds = wb.datasource(f["datasource"])
+        if ds is None or f["relationship"] >= len(ds.relationships):
+            continue
+        setattr(ds.relationships[f["relationship"]], f["side"] + "_unique", f["unique"])
+    mm = []
+    for ds in wb.datasources:
+        for r in ds.relationships:
+            if r.left_unique is False and r.right_unique is False:
+                r.cardinality = "many-to-many"
+                mm.append(f"{r.left_table}[{r.left_column}] - {r.right_table}[{r.right_column}]")
+    return mm
 
 
 def apply_nullability(wb: Workbook, findings: list) -> int:

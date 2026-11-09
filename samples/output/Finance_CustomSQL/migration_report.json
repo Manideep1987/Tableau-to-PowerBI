@@ -60,7 +60,9 @@
           "right_table": "Targets",
           "right_column": "region",
           "join_type": "inner",
-          "cardinality": "many-to-one"
+          "cardinality": "many-to-one",
+          "left_unique": null,
+          "right_unique": null
         }
       ],
       "columns": [
@@ -209,7 +211,7 @@
           },
           {
             "name": "Sales YoY Prior",
-            "expression": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))",
+            "expression": "IF(ISEMPTY(OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))), BLANK(), CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))))",
             "format": null,
             "folder": null,
             "tableau": "Calculation_F05"
@@ -520,7 +522,8 @@
         "to_column": "Date",
         "cross_filter": "oneDirection",
         "active": true,
-        "tableau_join": "relationship"
+        "tableau_join": "relationship",
+        "cardinality": "many-to-one"
       }
     ],
     "expressions": [
@@ -682,12 +685,13 @@
       "kind": "measure",
       "pbi_object": "Sales YoY Prior",
       "pbi_table": "_Measures",
-      "dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "dax": "IF(ISEMPTY(OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))), BLANK(), CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))))",
       "status": "Converted",
       "warnings": [],
       "functions": [
         "ALLSELECTED",
         "CALCULATETABLE",
+        "ISEMPTY",
         "OFFSET",
         "SUM",
         "SUMMARIZE"
@@ -1592,8 +1596,8 @@
   "validation": {
     "workbook": "Finance_CustomSQL",
     "binding": "SQLite: superstore.db",
-    "started": "2026-11-07T09:24:46",
-    "duration_s": 0.51,
+    "started": "2026-11-09T14:20:49",
+    "duration_s": 0.71,
     "tolerance": {
       "absolute": 0.01,
       "relative": 1e-06

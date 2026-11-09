@@ -18,7 +18,7 @@ table _Measures
 
 		annotation TableauSource = Calculation_F03
 
-	measure 'Sales YoY Prior' = CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))
+	measure 'Sales YoY Prior' = IF(ISEMPTY(OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))), BLANK(), CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))))
 		lineageTag: 369827f9-4457-5306-abdb-07f85e6befcb
 
 		annotation TableauSource = Calculation_F05

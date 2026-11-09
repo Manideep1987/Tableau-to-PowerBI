@@ -845,7 +845,9 @@
     "requires_identity_review": false
   },
   "unknown_nodes": [],
-  "warnings": [],
+  "warnings": [
+    "File source 'Data/hr/employees.csv': set the Power Query parameter 'Employees File' to the file's full path (Transform data > Edit parameters) before refreshing."
+  ],
   "inventory": [
     {
       "category": "Data source",

@@ -23,13 +23,17 @@ def _today(args):
 
 def _profile(wb, args):
     """With source data available, correct 'contains-null' metadata before converting."""
-    from .validation.runner import DataBinding, apply_nullability, nullability_findings
+    from .validation.runner import DataBinding, apply_keys, apply_nullability, key_findings, nullability_findings
     if not (getattr(args, "sqlite", None) or getattr(args, "csv_dir", None) or wb.packaged_files):
         return
-    found = nullability_findings(wb, DataBinding(args.sqlite, args.csv_dir, packaged=wb.packaged_files))
+    binding = DataBinding(args.sqlite, args.csv_dir, packaged=wb.packaged_files)
+    found = nullability_findings(wb, binding)
     if apply_nullability(wb, found):
         print("Data profiling: treating as nullable (metadata said NOT NULL): " +
               ", ".join(f"{f['column']} ({f['nulls']} NULLs)" for f in found))
+    mm = apply_keys(wb, key_findings(wb, binding))
+    if mm:
+        print("Data profiling: many-to-many relationships (key not unique on either side): " + ", ".join(mm))
 
 
 def _convert(args):

@@ -1,8 +1,8 @@
 {
   "workbook": "HR_Analytics",
   "binding": "SQLite: superstore.db; Packaged files: Data/hr/employees.csv",
-  "started": "2026-11-07T09:24:47",
-  "duration_s": 0.42,
+  "started": "2026-11-09T14:20:50",
+  "duration_s": 0.45,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
@@ -4692,7 +4692,7 @@
       },
       {
         "metric": "Manual effort (estimate)",
-        "value": 0,
+        "value": 5,
         "unit": "minutes",
         "detail": "45/unsupported calc, 10/review item, 5/warning, 20/manual action, 30/failed and 15/warned check"
       }

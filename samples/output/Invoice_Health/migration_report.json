@@ -72,7 +72,9 @@
           "right_table": "DimVendor",
           "right_column": "Vendor Key (DimVendor)",
           "join_type": "relationship",
-          "cardinality": "many-to-one"
+          "cardinality": "many-to-one",
+          "left_unique": false,
+          "right_unique": true
         },
         {
           "left_table": "FactInvoices",
@@ -80,7 +82,9 @@
           "right_table": "DimEmployeeSecurity",
           "right_column": "Employee Key (DimEmployeeSecurity)",
           "join_type": "relationship",
-          "cardinality": "many-to-one"
+          "cardinality": "many-to-one",
+          "left_unique": false,
+          "right_unique": true
         },
         {
           "left_table": "FactInvoices",
@@ -88,7 +92,9 @@
           "right_table": "DimDate",
           "right_column": "Date Key (DimDate)",
           "join_type": "relationship",
-          "cardinality": "many-to-one"
+          "cardinality": "many-to-one",
+          "left_unique": false,
+          "right_unique": true
         }
       ],
       "columns": [
@@ -801,7 +807,8 @@
         "to_column": "Vendor Key",
         "cross_filter": "oneDirection",
         "active": true,
-        "tableau_join": "relationship"
+        "tableau_join": "relationship",
+        "cardinality": "many-to-one"
       },
       {
         "from_table": "FactInvoices",
@@ -810,7 +817,8 @@
         "to_column": "Employee Key",
         "cross_filter": "oneDirection",
         "active": true,
-        "tableau_join": "relationship"
+        "tableau_join": "relationship",
+        "cardinality": "many-to-one"
       },
       {
         "from_table": "FactInvoices",
@@ -819,7 +827,8 @@
         "to_column": "Date Key",
         "cross_filter": "oneDirection",
         "active": true,
-        "tableau_join": "relationship"
+        "tableau_join": "relationship",
+        "cardinality": "many-to-one"
       }
     ],
     "expressions": [
@@ -2647,8 +2656,8 @@
   "validation": {
     "workbook": "Invoice_Health",
     "binding": "SQLite: superstore.db",
-    "started": "2026-11-07T09:24:47",
-    "duration_s": 3.1,
+    "started": "2026-11-09T14:20:51",
+    "duration_s": 3.32,
     "tolerance": {
       "absolute": 0.01,
       "relative": 1e-06

@@ -148,6 +148,8 @@ def relationships_tmdl(res: ConversionResult) -> str:
             out.append("\tisActive: false")
         if r.cross_filter != "oneDirection":
             out.append(f"\tcrossFilteringBehavior: {r.cross_filter}")
+        if getattr(r, "cardinality", "many-to-one") == "many-to-many":
+            out.append("\ttoCardinality: many")         # 'to' table filters 'from' (single direction)
         out.append(f"\tfromColumn: {tmdl_name(r.from_table)}.{tmdl_name(r.from_column)}")
         out.append(f"\ttoColumn: {tmdl_name(r.to_table)}.{tmdl_name(r.to_column)}")
         out.append("")

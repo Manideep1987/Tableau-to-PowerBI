@@ -58,9 +58,9 @@ def source_step(conn: Connection, server_param: Optional[str] = None,
         notes.append("SQLite is reached through ODBC in Power BI; install an SQLite ODBC driver.")
         return f"Odbc.DataSource(\"driver={{SQLite3 ODBC Driver}};database=\" & {db})", notes
     if cls == "excel-direct":
-        return f"Excel.Workbook(File.Contents({m_str(conn.filename or '')}), null, true)", notes
+        return f"Excel.Workbook(File.Contents({db_param or m_str(conn.filename or '')}), null, true)", notes
     if cls == "textscan":
-        return f"File.Contents({m_str(conn.filename or '')})", notes
+        return f"File.Contents({db_param or m_str(conn.filename or '')})", notes
     if cls == "hyper" or cls == "dataengine":
         notes.append("Tableau extract (.hyper) cannot be read by Power BI; re-point to the original source.")
         return "#table({}, {})", notes

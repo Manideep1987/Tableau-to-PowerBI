@@ -464,7 +464,7 @@
       "xml_path": "/workbook/datasources/datasource[2]/column[5]",
       "pbi_object": "Sales YoY Prior",
       "pbi_table": "_Measures",
-      "pbi_dax": "CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year])))",
+      "pbi_dax": "IF(ISEMPTY(OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))), BLANK(), CALCULATE(SUM('Finance Orders'[sales]), OFFSET(-1, CALCULATETABLE(SUMMARIZE('Finance Orders', 'Finance Orders'[Fiscal Year]), ALLSELECTED('Finance Orders'[Fiscal Year])), ORDERBY('Finance Orders'[Fiscal Year]))))",
       "strategy": "rule:table-calc-window",
       "confidence": "high",
       "status": "Converted",

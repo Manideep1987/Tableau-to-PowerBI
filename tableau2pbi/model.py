@@ -87,6 +87,8 @@ class Relationship:
     right_column: str
     join_type: str = "relationship"   # relationship|inner|left|right|full
     cardinality: str = "many-to-one"
+    left_unique: Optional[bool] = None    # key uniqueness profiled from the source data
+    right_unique: Optional[bool] = None
 
 
 @dataclass
@@ -131,6 +133,24 @@ class Datasource:
     aliases: dict = field(default_factory=dict)         # column -> {key: alias}
     datasource_filters: list = field(default_factory=list)
     xml_path: Optional[str] = None   # XPath of the source element (lineage)
+
+
+def hub_table(ds: "Datasource") -> Optional[str]:
+    """Relationship (logical-layer) data sources have no root table: the anchor is the hub, the
+    table in the most relationships (ties -> the earlier left table), as in the converter."""
+    if not ds.tables:
+        return None
+    degree, order = {}, []
+    for r in ds.relationships:
+        for t in (r.left_table, r.right_table):
+            degree[t] = degree.get(t, 0) + 1
+        if r.left_table not in order:
+            order.append(r.left_table)
+    names = [t.name for t in ds.tables]
+    cands = [t for t in degree if t in names]
+    if not cands:
+        return names[0]
+    return max(cands, key=lambda t: (degree[t], -(order.index(t) if t in order else 99)))
 
 
 @dataclass
@@ -192,6 +212,7 @@ class Worksheet:
     sorts: list = field(default_factory=list)
     title: Optional[str] = None
     dual_axis: bool = False
+    measure_values: list = field(default_factory=list)   # measures listed by the Measure Names filter
 
     xml_path: Optional[str] = None   # XPath of the source element (lineage)
     def all_fields(self):

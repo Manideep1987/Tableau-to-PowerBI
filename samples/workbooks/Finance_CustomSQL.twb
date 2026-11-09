@@ -64,7 +64,7 @@ WHERE o.quantity &gt;= &lt;Parameters.Min Quantity&gt;</relation>
       <table>
         <view>
           <datasources><datasource caption='Finance Orders' name='federated.0fin7qz2x1lb9e0a8m3k' /></datasources>
-          <datasource-dependencies datasource='federated.0fin7qz2x1lb9e0a8m3k'><column-instance column='[Calculation_F05]' derivation='User' name='[usr:Calculation_F05:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Rows' /></column-instance></datasource-dependencies>
+          <datasource-dependencies datasource='federated.0fin7qz2x1lb9e0a8m3k'><column-instance column='[Calculation_F05]' derivation='User' name='[usr:Calculation_F05:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Columns' /></column-instance></datasource-dependencies>
           
           
           <aggregation value='true' />

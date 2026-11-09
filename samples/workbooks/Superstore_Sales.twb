@@ -278,7 +278,7 @@ END' /></column><column caption='Net Sales' datatype='real' name='[Calculation_0
       <table>
         <view>
           <datasources><datasource caption='Superstore' name='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt' /></datasources>
-          <datasource-dependencies datasource='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt'><column-instance column='[Calculation_0008]' derivation='User' name='[usr:Calculation_0008:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Columns' /></column-instance></datasource-dependencies>
+          <datasource-dependencies datasource='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt'><column-instance column='[Calculation_0008]' derivation='User' name='[usr:Calculation_0008:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Rows' /></column-instance></datasource-dependencies>
           
           
           <aggregation value='true' />
@@ -322,7 +322,7 @@ END' /></column><column caption='Net Sales' datatype='real' name='[Calculation_0
       <table>
         <view>
           <datasources><datasource caption='Superstore' name='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt' /></datasources>
-          <datasource-dependencies datasource='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt'><column-instance column='[Calculation_0009]' derivation='User' name='[usr:Calculation_0009:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Rows' /></column-instance></datasource-dependencies>
+          <datasource-dependencies datasource='federated.1x2k9wq0ab3k7l1e8cm4h0qz5lzt'><column-instance column='[Calculation_0009]' derivation='User' name='[usr:Calculation_0009:qk]' pivot='key' type='quantitative'><table-calc ordering-type='Columns' /></column-instance></datasource-dependencies>
           
           
           <aggregation value='true' />

@@ -133,7 +133,7 @@ table 'employees.csv'
 		mode: import
 		source =
 				let
-				    Source = File.Contents("Data/hr/employees.csv"),
+				    Source = File.Contents(#"Employees File"),
 				    Csv = Csv.Document(Source, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				    Data = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]),
 				    Selected = Table.SelectColumns(Data, {"employee_id", "employee_name", "department", "job_level", "gender", "location", "hire_date", "termination_date", "salary", "performance_score"}, MissingField.UseNull),

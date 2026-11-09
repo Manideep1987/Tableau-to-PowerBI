@@ -1,0 +1,6 @@
+/// Converted from Tableau connection
+expression 'Employees File' = "Data/hr/employees.csv" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 78542bce-de99-57ba-ab51-3a02f0c19dac
+
+	annotation PBI_ResultType = Text
+

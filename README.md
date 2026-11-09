@@ -136,14 +136,14 @@ tableau2pbi/
   report.py            JSON + HTML migration / validation reports
   web/                 FastAPI app + single-page UI (no external dependencies)
 samples/               data generator, sample workbooks, converted outputs
-tests/                 131 automated tests + Playwright UI walkthrough
+tests/                 175 automated tests + Playwright UI walkthrough
 docs/                  test report (Markdown + Word), screenshots, test evidence
 ```
 
 ## Testing
 
 ```bash
-python -m pytest -q                  # 163 tests incl. 100 fixed-seed differential fuzz cases and hostile-input tests
+python -m pytest -q                  # 175 tests incl. 100 fixed-seed differential fuzz cases and hostile-input tests
 python tests/fuzz/sweep.py           # 2,000 random calculations/worksheets: Tableau engine vs DAX engine
 python docs/build_test_report.py     # full campaign: pytest + browser UI walkthrough + 39 UAT cases + defect injection
 ```
@@ -168,5 +168,8 @@ Results are in [docs/TEST_REPORT.md](docs/TEST_REPORT.md) and [docs/Test_Report.
 | Filters | Basic / Advanced / TopN / RelativeDate visual filters; measure filters on aggregated values |
 | Dashboard | Report page (zones scaled to 1280×720), quick filters and parameter controls become slicers |
 | `USERNAME()` user filter | TMDL role with `USERPRINCIPALNAME()` table permission (tested per identity) |
+| Measure Names / Measure Values | The measures listed by the Measure Names filter become the visual's values |
+| Relationship with a non-unique key on both sides | Many-to-many relationship (`toCardinality: many`), detected by profiling the data |
+| Excel / CSV source | Power Query parameter `<source> File`: set it to the file's full path before refreshing |
 
 Known limitations are listed in the [test report](docs/TEST_REPORT.md#10-known-limitations-and-recommendations).

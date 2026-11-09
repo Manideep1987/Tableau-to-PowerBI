@@ -105,6 +105,7 @@ class PbiRelationship:
     cross_filter: str = "oneDirection"
     active: bool = True
     tableau_join: str = "relationship"
+    cardinality: str = "many-to-one"      # many-to-one | many-to-many
 
 
 @dataclass
@@ -355,6 +356,8 @@ class Converter:
         self.fact_of: dict = {}
         self.many_to_one: dict = defaultdict(set)   # table -> set(one-side tables)
         self.addressing: dict = {}       # (ds, calc) -> addressing [(t, c)]
+        self.addr_variants: dict = {}    # (worksheet, ds, calc) -> other addressing on that worksheet
+        self.variant_names: dict = {}    # (worksheet, ds, calc) -> PBI measure name
         self.sql_reviews: list = []
         self.field_map: dict = {}
         self.lod_measures: set = set()
@@ -375,6 +378,7 @@ class Converter:
         self._date_parts_and_addressing()
         for ds in self.wb.datasources:
             self._translate_calcs(ds)
+        self._addressing_variants()
         self._date_table()
         visuals = {ws.name: self._visual(ws) for ws in self.wb.worksheets}
         pages = self._pages(visuals)
@@ -425,6 +429,7 @@ class Converter:
             server_p = self._m_param(f"{ds.caption} Server", default_conn.server)
         if default_conn and default_conn.dbname:
             db_p = self._m_param(f"{ds.caption} Database", default_conn.dbname)
+        db_p = self._file_param(ds, default_conn) or db_p
         steps, leaves = [], []
         for i, lt in enumerate(ds.tables):
             spec = []
@@ -502,6 +507,7 @@ class Converter:
             server_p = self._m_param(f"{ds.caption} Server", default_conn.server)
         if default_conn and default_conn.dbname:
             db_p = self._m_param(f"{ds.caption} Database", default_conn.dbname)
+        db_p = self._file_param(ds, default_conn) or db_p
         for lt in ds.tables:
             pname = table_names[lt.name]
             tbl = PbiTable(pname, "single" if len(ds.tables) == 1 else "dim", datasource=ds.name)
@@ -567,6 +573,17 @@ class Converter:
             self.issue("warning", "Data source", ds.caption,
                        f"Data source filter on [{f.field.field}] must be applied in Power Query or RLS.")
 
+    def _file_param(self, ds, conn):
+        """Excel / text sources: the path in the workbook is relative to the .twbx package, so the
+        file becomes a Power Query parameter that is set to the full path in Power BI Desktop."""
+        if conn is None or conn.cls not in ("excel-direct", "textscan") or not conn.filename:
+            return None
+        name = self._m_param(f"{ds.caption} File", conn.filename.replace("\\", "/"))
+        self.issue("warning", "Data source", ds.caption,
+                   f"File source '{conn.filename}': set the Power Query parameter '{name}' to the file's full path "
+                   f"(Transform data > Edit parameters) before refreshing.")
+        return name
+
     def _m_param(self, name, value):
         if not any(e[0] == name for e in self.model.expressions):
             self.model.expressions.append(
@@ -609,7 +626,7 @@ class Converter:
                 self.issue("warning", "Relationship", f"{r.left_table}-{r.right_table}",
                            "Relationship columns could not be resolved; create it manually.")
                 continue
-            resolved.append((lt, lc, rt, rc, r.join_type))
+            resolved.append((lt, lc, rt, rc, r.join_type, r))
             degree[lt] += 1
             degree[rt] += 1
         if not resolved:
@@ -619,10 +636,24 @@ class Converter:
         fact = max(degree, key=lambda t: (degree[t], -[x[0] for x in resolved].index(t)
                                           if t in [x[0] for x in resolved] else -99))
         self.fact_of[ds.name] = fact
-        for lt, lc, rt, rc, jt in resolved:
+        for lt, lc, rt, rc, jt, r in resolved:
             # many side: fact side / the side closer to the fact
+            l_unique, r_unique = r.left_unique, r.right_unique
             if rt == fact:
                 lt, lc, rt, rc = rt, rc, lt, lc
+                l_unique, r_unique = r_unique, l_unique
+            if r_unique is False and l_unique is True:          # profiled data: the other way round
+                lt, lc, rt, rc = rt, rc, lt, lc
+                l_unique, r_unique = r_unique, l_unique
+            if r_unique is False and l_unique is False:
+                # Tableau relationships allow many-to-many; a Power BI one-side must be unique
+                self.model.relationships.append(PbiRelationship(lt, lc, rt, rc, tableau_join=jt,
+                                                                cardinality="many-to-many"))
+                self.issue("warning", "Relationship", f"{lt} - {rt}",
+                           f"'{rt}'[{rc}] is not unique in the data: converted as a many-to-many relationship "
+                           f"('{rt}' filters '{lt}', single direction). RELATED() is not available across it; "
+                           f"consider a bridge table of distinct {rc} values.")
+                continue
             self.model.relationships.append(PbiRelationship(lt, lc, rt, rc, tableau_join=jt))
             self.many_to_one[lt].add(rt)
             if jt in ("inner",):
@@ -665,9 +696,23 @@ class Converter:
         return False
 
     # ------------------------------------------------------- parameters --
+    @staticmethod
+    def _param_literal(p, v):
+        """Date parameters become DATE()/DATETIME literals, not text."""
+        if p.datatype in ("date", "datetime") and isinstance(v, str):
+            m = re.match(r"^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?", v.strip("#"))
+            if m:
+                y, mo, d = (int(x) for x in m.groups()[:3])
+                if p.datatype == "datetime" and m.group(4):
+                    h, mi, se = (int(x) for x in m.groups()[3:])
+                    return f"DATE({y}, {mo}, {d}) + TIME({h}, {mi}, {se})"
+                return f"DATE({y}, {mo}, {d})"
+        return dax_literal(v)
+
     def _parameters(self):
         for p in self.wb.parameters.values():
             col = p.caption
+            lit = lambda v, _p=p: self._param_literal(_p, v)
             if p.domain_type == "range" and p.min is not None and p.max is not None:
                 step = p.step or 1
                 src = (f"SELECTCOLUMNS(GENERATESERIES({dax_literal(p.min)}, {dax_literal(p.max)}, "
@@ -680,15 +725,15 @@ class Converter:
             elif p.members:
                 values = [m[0] for m in p.members]
                 rows = ", ".join("{" + dax_literal(v) + "}" for v in values)
-                src = f"SELECTCOLUMNS({{{', '.join(dax_literal(v) for v in values)}}}, {dax_str(col)}, [Value])"
+                src = f"SELECTCOLUMNS({{{', '.join(lit(v) for v in values)}}}, {dax_str(col)}, [Value])"
             else:
                 values = [p.current_value]
-                src = f"SELECTCOLUMNS({{{dax_literal(p.current_value)}}}, {dax_str(col)}, [Value])"
+                src = f"SELECTCOLUMNS({{{lit(p.current_value)}}}, {dax_str(col)}, [Value])"
             t = PbiTable(p.caption, "parameter", dax_expression=src, param_values=values,
                          param_default=p.current_value)
             t.columns.append(PbiColumn(col, PBI_TYPES.get(p.datatype, "string"), source_column=f"[{col}]",
                                        tableau_ref=f"[Parameters].[{p.internal_name}]"))
-            dax = f"SELECTEDVALUE({q_col(p.caption, col)}, {dax_literal(p.current_value)})"
+            dax = f"SELECTEDVALUE({q_col(p.caption, col)}, {lit(p.current_value)})"
             t.measures.append(PbiMeasure(f"{p.caption} Value", dax,
                                          description=f"Selected value of Tableau parameter '{p.caption}'",
                                          tableau_ref=p.internal_name,
@@ -854,6 +899,37 @@ class Converter:
             for w in res.warnings:
                 self.issue("warning" if res.confidence != "low" else "error", "Calculation", cf.caption, w)
 
+    def _addressing_variants(self):
+        """A table calculation used on several sheets with different addressing becomes one measure
+        per addressing: Power BI measures cannot read Tableau's 'Compute using' from the visual."""
+        made = {}
+        for (wsn, dsn, field), addr in self.addr_variants.items():
+            info = self.calc_info.get((dsn, field))
+            if info is None or info.kind != "measure" or not self.model.measure(info.name):
+                continue
+            key = (dsn, field, tuple(addr))
+            if key not in made:
+                ds = self.wb.datasource(dsn)
+                cf = ds.calculations[field]
+                along = ", ".join(c for _, c in addr) or "table"
+                name = f"{info.name} (along {along})"
+                try:
+                    res = DaxTranslator(_DsResolver(self, ds)).translate(info.ast, "agg", addressing=addr)
+                except (TranslationError, KeyError, IndexError) as e:
+                    self.issue("error", "Calculation", cf.caption, f"Addressing variant not converted: {e}")
+                    continue
+                self.model.table(self.measure_table).measures.append(
+                    PbiMeasure(name, res.expression, tableau_format_to_pbi(cf.default_format), cf.description,
+                               cf.folder, cf.internal_name, info.datatype))
+                self.calc_mappings.append(CalcMapping(
+                    ds.caption, f"{cf.caption} (compute using {along})", cf.formula, "measure", name,
+                    info.table, res.expression, res.status,
+                    res.warnings + [f"Table calculation addressed along {along} on worksheet '{wsn}'."],
+                    sorted(res.functions), cf.xml_path, "rule:table-calc-window", res.confidence,
+                    cf.internal_name))
+                made[key] = name
+            self.variant_names[(wsn, dsn, field)] = made[key]
+
     def _describe_special(self, cf: CalculatedField):
         if cf.kind == "group":
             return "GROUP " + "; ".join(f"{b['label']} = {b['values']}" for b in cf.extra.get("bins", []))
@@ -969,10 +1045,14 @@ class Converter:
                 ast = self.calc_ast.get(ds.name, {}).get(ref.field)
                 if ast is None or not contains(ast, lambda n: isinstance(n, Func) and n.name in TABLE_CALCS):
                     continue
-                if (ds.name, ref.field) in self.addressing:
-                    continue
                 addr_refs = self._addressing_refs(ws, ref)
-                self.addressing[(ds.name, ref.field)] = [x for x in (self.dim_target(r) for r in addr_refs) if x]
+                addr = [x for x in (self.dim_target(r) for r in addr_refs) if x]
+                if (ds.name, ref.field) in self.addressing:
+                    if addr != self.addressing[(ds.name, ref.field)]:
+                        # same table calculation computed along other dimensions on this sheet
+                        self.addr_variants[(ws.name, ds.name, ref.field)] = addr
+                    continue
+                self.addressing[(ds.name, ref.field)] = addr
                 self.addressing[(ds.name, ref.field + "@ws")] = ws.name
 
     def _addressing_refs(self, ws: Worksheet, ref: FieldRef):
@@ -988,10 +1068,12 @@ class Converter:
                         out.append(r)
             if out:
                 return out
+        # Tableau XML: ordering-type='Rows' = Table (across) -> addresses the Columns-shelf dimensions;
+        # 'Columns' = Table (down) -> addresses the Rows-shelf dimensions.
         if ot == "rows":
-            return dims(ws.rows)
-        if ot == "columns":
             return dims(ws.cols)
+        if ot == "columns":
+            return dims(ws.rows)
         return dims(ws.cols) or dims(ws.rows)
 
     def _date_part_column(self, ref: FieldRef):
@@ -1189,7 +1271,7 @@ class Converter:
         def meas(refs):
             out = []
             for r in refs:
-                m = self.measure_target(r)
+                m = self.variant_names.get((ws.name, r.datasource, r.field)) or self.measure_target(r)
                 if m:
                     out.append(("measure", self.measure_table if not self._param_measure(m) else self._param_measure(m), m))
                     self.field_map[(ws.name, r.key)] = m
@@ -1248,11 +1330,16 @@ class Converter:
                 v.visual_type = "lineClusteredColumnComboChart"
                 v.roles["Y"] = meas(all_meas[:1])
                 v.roles["Y2"] = meas(all_meas[1:])
-        elif mark in ("square",) and row_dims and col_dims:
-            v.visual_type = "pivotTable"
-            v.roles["Rows"] = cols(row_dims)
-            v.roles["Columns"] = cols(col_dims)
-            v.roles["Values"] = meas(color_meas or text_meas or all_meas)
+        elif mark in ("square",) and (row_dims or col_dims) and (color_meas or text_meas or all_meas):
+            if row_dims and col_dims:
+                v.visual_type = "pivotTable"
+                v.roles["Rows"] = cols(row_dims + color_dims)      # a colour dimension is part of the grain
+                v.roles["Columns"] = cols(col_dims)
+                v.roles["Values"] = meas(color_meas or text_meas or all_meas)
+            else:                                                   # e.g. Measure Names alone on Columns
+                v.visual_type = "tableEx"
+                v.roles["Values"] = cols(row_dims + col_dims + color_dims) + meas(
+                    _dedupe(color_meas + text_meas + all_meas))
             v.notes.append("Highlight table converted to a matrix; apply conditional formatting (background colour).")
         elif mark == "square" and not row_dims and not col_dims:
             v.visual_type = "treemap"

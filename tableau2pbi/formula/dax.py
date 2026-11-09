@@ -271,6 +271,8 @@ class DaxTranslator:
             if n.name in ("ZN", "ISNULL", "COUNT", "COUNTD", "SIZE", "INDEX", "TODAY", "NOW", "PI", "RANK",
                           "RANK_DENSE", "RANK_UNIQUE", "RANK_MODIFIED", "FIRST", "LAST"):
                 return False
+            if n.name in ("LOOKUP", "PREVIOUS_VALUE"):
+                return True                          # NULL beyond the edge of the partition
             if n.name == "IFNULL":
                 return self.may_be_null(n.args[1]) if len(n.args) > 1 else False
             if n.name == "IIF":
@@ -464,8 +466,12 @@ class DaxTranslator:
         Tableau evaluates the LOD at its own grain and aggregates the results over the
         combinations of view dimensions x LOD dimensions (not over records)."""
         self.warnings, self.functions, self.confidence, self._var_n = [], set(), "high", 0
+        expr, typ = self._lod_agg(n, outer_agg, _Ctx("agg"))
+        return DaxResult(expr, "agg", typ, list(self.warnings), set(self.functions), self.confidence)
+
+    def _lod_agg(self, n: LOD, outer_agg: str, ctx: "_Ctx"):
         dims = self._lod_dims(n)
-        ctx = _Ctx("agg")
+        ctx = _Ctx("agg", None, ctx.addressing, ctx.vars, None)
         fact = self.r.fact_table
         inner, typ = self.tr(n.expr, ctx)
         iter_fn = {"sum": "SUMX", "avg": "AVERAGEX", "min": "MINX", "max": "MAXX",
@@ -486,7 +492,7 @@ class DaxTranslator:
             else:
                 expr = f"CALCULATE({inner}, ALLSELECTED({grain}))"   # keeps filters on the dims
         self.functions.update({"CALCULATE", iter_fn, "SUMMARIZE"})
-        return DaxResult(expr, "agg", typ, list(self.warnings), set(self.functions), self.confidence)
+        return expr, typ
 
     # ----------------------------------------------------- functions --
     def t_Func(self, n: Func, ctx: _Ctx):
@@ -580,6 +586,15 @@ class DaxTranslator:
         arg = n.args[0]
         if ctx.mode == "row" and ctx.in_iter is None:
             raise TranslationError(f"Aggregate {name}() inside a row-level calculation")
+        lod = arg if isinstance(arg, LOD) else None
+        if lod is None and isinstance(arg, Field) and not arg.is_parameter:
+            c = self.r.calc(arg.name)
+            if c is not None and c.kind == "measure" and isinstance(c.ast, LOD):
+                lod = c.ast
+        outer = {"SUM": "sum", "AVG": "avg", "MIN": "min", "MAX": "max", "MEDIAN": "med"}.get(name)
+        if lod is not None and outer and ctx.in_iter is None:
+            # Tableau aggregates an LOD over its own grain (view dims x LOD dims), not over records.
+            return self._lod_agg(lod, outer, ctx)
         target = self._agg_target(arg)
         if name == "ATTR":
             if target is None:
@@ -619,8 +634,13 @@ class DaxTranslator:
                  "VARP": "VARX.P"}
         if name == "COUNTD":
             self.functions.update({"COUNTROWS", "DISTINCT", "SELECTCOLUMNS", "FILTER"})
-            return (f"COUNTROWS(FILTER(DISTINCT(SELECTCOLUMNS({q_table(table)}, \"__v\", {inner})), "
-                    f"NOT ISBLANK([__v])))"), "integer"
+            expr = (f"COUNTROWS(FILTER(DISTINCT(SELECTCOLUMNS({q_table(table)}, \"__v\", {inner})), "
+                    f"NOT ISBLANK([__v])))")
+            if ctx.in_iter is None:
+                # Tableau: COUNTD of only-NULL values is 0 when the mark has records (DAX: BLANK)
+                self.functions.add("ISBLANK")
+                expr = f"(VAR __cd = {expr} RETURN IF(ISBLANK(__cd), IF(COUNTROWS({q_table(table)}) > 0, 0), __cd))"
+            return expr, "integer"
         if name == "PERCENTILE":
             p, _ = self.tr(n.args[1], ctx)
             self.functions.add("PERCENTILEX.INC")
@@ -714,12 +734,15 @@ class DaxTranslator:
             return f"COUNTROWS({rel}) - ROWNUMBER({rel}, ORDERBY({order}))", "integer"
         if name == "LOOKUP":
             off = self.tr(n.args[1], ctx)[0] if len(n.args) > 1 else "0"
-            self.functions.add("OFFSET")
-            return f"CALCULATE({arg}, OFFSET({off}, {rel}, ORDERBY({order})))", "real"
+            self.functions.update({"OFFSET", "ISEMPTY"})
+            # no row at the offset (edge of the partition): Tableau returns NULL, even for ZN(...)
+            return (f"IF(ISEMPTY(OFFSET({off}, {rel}, ORDERBY({order}))), BLANK(), "
+                    f"CALCULATE({arg}, OFFSET({off}, {rel}, ORDERBY({order}))))"), "real"
         if name == "PREVIOUS_VALUE":
             self.warn("PREVIOUS_VALUE() is recursive; converted as OFFSET(-1) of the expression.", "low")
-            self.functions.add("OFFSET")
-            return f"CALCULATE({arg}, OFFSET(-1, {rel}, ORDERBY({order})))", "real"
+            self.functions.update({"OFFSET", "ISEMPTY"})
+            return (f"IF(ISEMPTY(OFFSET(-1, {rel}, ORDERBY({order}))), BLANK(), "
+                    f"CALCULATE({arg}, OFFSET(-1, {rel}, ORDERBY({order}))))"), "real"
         raise TranslationError(f"Unsupported table calculation {name}")
 
     # ------------------------------------------------ specific funcs --

@@ -1,8 +1,8 @@
 {
   "workbook": "Superstore_Sales",
   "binding": "SQLite: superstore.db",
-  "started": "2026-11-07T09:24:35",
-  "duration_s": 10.09,
+  "started": "2026-11-09T14:20:37",
+  "duration_s": 11.9,
   "tolerance": {
     "absolute": 0.01,
     "relative": 1e-06
